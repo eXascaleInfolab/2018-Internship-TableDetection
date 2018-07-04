@@ -1,3 +1,5 @@
+import subprocess
+import shlex
 from functools import wraps
 
 from flask import Flask, render_template, flash, redirect, url_for, session, request, logging
@@ -22,9 +24,26 @@ Articles = Articles()
 
 
 # Index
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 def index():
+    if request.method == 'POST': #FIXME I didn't handle security yet !!
+
+        # Get Form Fields
+        domain = request.form['domain']
+
+        command = shlex.split("wget -r -A pdf https://%s" % (domain,))
+        print(subprocess.call(command))
+
+        return "crawling"
+        #redirect(url_for('crawling'))
+
     return render_template('home.html')
+
+
+#Crawling
+@app.route('/crawling')
+def crawling():
+    return render_template('crawling.html')
 
 
 # About
@@ -81,6 +100,7 @@ def register():
         return redirect(url_for('login'))
 
     return render_template('register.html', form=form)
+
 
 #User login
 @app.route('/login', methods=['GET', 'POST'])
@@ -150,6 +170,14 @@ def logout():
 @is_logged_in
 def dashboard():
     return render_template('dashboard.html')
+
+
+# Crawling
+@app.route('/crawl/<string:domain>')
+@is_logged_in
+def crawl():
+    return 'crawling..'
+
 
 
 if __name__ == '__main__':
