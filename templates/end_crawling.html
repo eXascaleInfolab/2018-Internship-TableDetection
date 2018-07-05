@@ -1,0 +1,13 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+  <div class="jumbotron text-center">
+    <h1>Data analysis.</h1>
+    {% if session.logged_in != NULL %}
+      <p class="lead">Analysing crawled data.</p>
+      <a href="/stats" class="btn btn-primary btn-lg">Take me to the Stats</a>
+    {% endif %}
+
+  </div>
+
+{% endblock %}

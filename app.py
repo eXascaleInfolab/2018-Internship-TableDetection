@@ -1,5 +1,7 @@
 import subprocess
 import shlex
+import os
+import signal
 from functools import wraps
 
 from flask import Flask, render_template, flash, redirect, url_for, session, request, logging
@@ -22,28 +24,72 @@ mysql = MySQL(app)
 
 Articles = Articles()
 
+# CONSTANTS
+WGET_DATA_PATH = 'data'
+
+
+# Helper Function
+
+# Check if user logged in
+def is_logged_in(f): # FIXME check other way of having login control !
+    @wraps(f)
+    def wrap(*args, **kwargs):
+        if 'logged_in' in session:
+            return f(*args, **kwargs)
+        else:
+            flash('Unauthorized, Please login', 'danger')
+            return redirect(url_for('login'))
+    return wrap
+
 
 # Index
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    if request.method == 'POST': #FIXME I didn't handle security yet !!
+    if request.method == 'POST': #FIXME I didn't handle security yet !! make sure only logged-in people can execute
+        #FIXME use GET?
 
-        # Get Form Fields
+        # Get Form Fields and save
         domain = request.form['domain']
 
-        command = shlex.split("wget -r -A pdf https://%s" % (domain,))
-        print(subprocess.call(command))
+        session['domain'] = domain
+        # TODO use WTForms to get validation
 
-        return "crawling"
-        #redirect(url_for('crawling'))
+        return redirect(url_for('crawling'))
 
     return render_template('home.html')
 
 
-#Crawling
+# Crawling
 @app.route('/crawling')
+@is_logged_in
 def crawling():
+
+    # Prepare WGET command
+    domain = session.get('domain', None)
+
+    print(domain)
+    command = shlex.split("wget -r -A pdf https://%s" % (domain,))
+
+    #TODO use celery
+
+    # Execute command in subdirectory
+    p_id = subprocess.Popen(command, cwd=WGET_DATA_PATH).pid
+    print(p_id)
+    session['crawl_process_id'] = p_id
+
     return render_template('crawling.html')
+
+
+# END Crawling
+@app.route('/crawling/end')
+@is_logged_in
+def end_crawling():
+    p_id = session.get('crawl_process_id', None)
+
+    #FIXME this way of handling the subprocess is quick and dirty
+    #FIXME for more control we could switch to Celery or another library
+    os.kill(p_id, signal.SIGTERM)
+    return render_template('end_crawling.html')
 
 
 # About
@@ -52,9 +98,9 @@ def about():
     return render_template('about.html')
 
 # Articles
-@app.route('/articles')
-def articles():
-    return render_template('articles.html', articles=Articles)
+@app.route('/stats')
+def stats():
+    return render_template('stats.html')
 
 
 #Single Article
@@ -129,7 +175,7 @@ def login():
                 session['username'] = username
 
                 flash('You are now logged in', 'success')
-                return redirect(url_for('dashboard'))
+                return redirect(url_for('index'))
             else:
                 error = 'Invalid login'
                 return render_template('login.html', error=error)
@@ -142,18 +188,6 @@ def login():
         cur.close() # FIXME shouldn't that happen before return?
 
     return render_template('login.html')
-
-
-# Check if user logged in
-def is_logged_in(f): # FIXME check other way of having login control !
-    @wraps(f)
-    def wrap(*args, **kwargs):
-        if 'logged_in' in session:
-            return f(*args, **kwargs)
-        else:
-            flash('Unauthorized, Please login', 'danger')
-            return redirect(url_for('login'))
-    return wrap
 
 
 # Logout

@@ -10,14 +10,9 @@
     {% endif %}
 
     {% if session.logged_in != NULL %}
-      <p class="lead">Please select which domain to crawl: </p>
-      <form action="" method="POST">
-        <div class="form-group">
-          <label>Domain</label>
-          <input type="text" name="domain" class="form-control" value={{request.form.domain}}>
-        </div>
-        <button type="crawl" class="btn btn-primary btn-lg">Crawl</button>
-      </form>
+      <p class="lead">The data is getting collect, if you want to interrupt the process premptively, 			      please do so. Otherwise the process will continue until all desired data is
+		      collected or a limit of about 2GB exceeded.</p>
+       <a href="/crawling/end" class="btn btn-danger btn-lg">Interrupt Crawling</a>
 
     {% endif %}
 
