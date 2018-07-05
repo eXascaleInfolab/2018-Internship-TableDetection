@@ -3,8 +3,35 @@
 {% block body %}
 <div class="jumbotron text-center">
   <h1>Statistics</h1>
-  <p>This page resumes our data analysis.</p>
+  <p>Data analysis for domain: {{domain}}</p>
+    <p>{{n_files}} pdf files were found!</p>
+
   <a href="/" class="btn btn-primary btn-lg">Take me back to the start</a>
+
+    <style>
+        .node {
+          cursor: pointer;
+        }
+
+        .node circle {
+          fill: #fff;
+          stroke: steelblue;
+          stroke-width: 1.5px;
+        }
+
+        .node text {
+          font: 10px sans-serif;
+        }
+
+        .link {
+          fill: none;
+          stroke: #ccc;
+          stroke-width: 1.5px;
+        }
+
+    </style>
+    <script src="//d3js.org/d3.v3.min.js"></script>
+    <script src="static/scripts/collapsible_tree.js"></script>
 <div/>
 
 {% endblock %}

@@ -1,7 +1,7 @@
 
 var margin = {top: 20, right: 120, bottom: 20, left: 120},
-    width = 960 - margin.right - margin.left,
-    height = 800 - margin.top - margin.bottom;
+    width = 1600 - margin.right - margin.left,
+    height = 900 - margin.top - margin.bottom;
 
 var i = 0,
     duration = 750,
@@ -19,7 +19,7 @@ var svg = d3.select("body").append("svg")
   .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-d3.json("static/json/flare.json", function(error, flare) {
+d3.json("static/json/example.json", function(error, flare) { // FIXME only works with static?
   if (error) throw error;
 
   root = flare;

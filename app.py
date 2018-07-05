@@ -2,10 +2,11 @@ import subprocess
 import shlex
 import os
 import signal
+from helper import path_stats, path_file_number
+import json
 from functools import wraps
 
 from flask import Flask, render_template, flash, redirect, url_for, session, request, logging
-from data import Articles
 from flask_mysqldb import MySQL
 from wtforms import Form, StringField, TextAreaField, PasswordField, validators
 from passlib.hash import sha256_crypt
@@ -21,8 +22,6 @@ app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
 
 # init MySQL
 mysql = MySQL(app)
-
-Articles = Articles()
 
 # CONSTANTS
 WGET_DATA_PATH = 'data'
@@ -89,6 +88,9 @@ def end_crawling():
     #FIXME this way of handling the subprocess is quick and dirty
     #FIXME for more control we could switch to Celery or another library
     os.kill(p_id, signal.SIGTERM)
+
+    flash('You interrupted the crawler', 'success')
+
     return render_template('end_crawling.html')
 
 
@@ -101,13 +103,42 @@ def about():
 # Articles
 @app.route('/stats')
 def stats():
-    return render_template('stats.html')
+
+    domain = session.get('domain', None)
+    if domain == None:
+        pass
+        # TODO think of bad cases
+
+    path = "data/%s" % (domain,)
+
+    # Call Helper function to create Json string
+
+    # FIXME workaround to weird file system bug with latin/ cp1252 encoding..
+    # https://stackoverflow.com/questions/35959580/non-ascii-file-name-issue-with-os-walk works
+    # https://stackoverflow.com/questions/2004137/unicodeencodeerror-on-joining-file-name doesn't work
+    jason_dict = path_stats('ur'+path)
+
+    # FIXME here I also need to specify encoding -> check if correct
+    json_string = json.dumps(jason_dict, encoding='cp1252', sort_keys=True, indent=4)
+
+    # Store json file in corresponding directory
+    jason_file = open("static/json/%s.json" % (domain,), "w")
+    jason_file.write(json_string)
+    jason_file.close()
+
+    # Call helper function to count number of pdf files
+    n_files = path_file_number('ur'+path) # Also add ur to path (force unicode)
+    # Flash success message
+    flash('The crawled data was successfully parsed', 'success')
+
+    return render_template('stats.html', n_files=n_files, domain=domain)
 
 
 # Test site
 @app.route('/test')
 def test():
     return render_template('test1.html')
+
 
 # Test site2
 @app.route('/test2')

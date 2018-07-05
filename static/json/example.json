@@ -1,0 +1,540 @@
+{
+	"type": "directory",
+	"name": "www.bar.admin.ch",
+	"children": [{
+		"type": "directory",
+		"name": "bar",
+		"children": [{
+			"type": "directory",
+			"name": "en",
+			"children": [{
+				"type": "directory",
+				"name": "home",
+				"children": [{
+					"type": "directory",
+					"name": "ueber-uns",
+					"children": []
+				}, {
+					"type": "directory",
+					"name": "research",
+					"children": [{
+						"type": "directory",
+						"name": "ordering-and-consulting",
+						"children": []
+					}, {
+						"type": "directory",
+						"name": "searching",
+						"children": [{
+							"type": "directory",
+							"name": "search-engines-portals",
+							"children": [{
+								"type": "directory",
+								"name": "wikimedia",
+								"children": []
+							}]
+						}, {
+							"type": "directory",
+							"name": "topics",
+							"children": [{
+								"type": "directory",
+								"name": "fotos--plaene--film-und-ton-im-schweizerischen-bundesarchiv",
+								"children": []
+							}, {
+								"type": "directory",
+								"name": "die-geschichte-der-schweizer-armee",
+								"children": []
+							}, {
+								"type": "directory",
+								"name": "nachrichtendienste--spione--landesverraeter-und-staatsschutz-in-",
+								"children": []
+							}, {
+								"type": "directory",
+								"name": "verkehrsgeschichte-der-schweiz",
+								"children": []
+							}, {
+								"type": "directory",
+								"name": "die-schweizer-wirtschaft-zwischen-markt-und-staat-",
+								"children": []
+							}, {
+								"type": "directory",
+								"name": "die-moderne-schweiz",
+								"children": []
+							}, {
+								"type": "directory",
+								"name": "die-schweiz-im-zweiten-weltkrieg",
+								"children": []
+							}, {
+								"type": "directory",
+								"name": "the-first-world-war-in-switzerland",
+								"children": []
+							}, {
+								"type": "directory",
+								"name": "auf-den-spuren-von-aus--und-einwanderern",
+								"children": []
+							}, {
+								"type": "directory",
+								"name": "stateless-and-travellers-in-switzerland",
+								"children": []
+							}, {
+								"type": "directory",
+								"name": "die-alte-eidgenossenschaft",
+								"children": []
+							}, {
+								"type": "directory",
+								"name": "die-schweizer-aussenpolitik-seit-1848",
+								"children": []
+							}]
+						}]
+					}]
+				}, {
+					"type": "directory",
+					"name": "services-publications",
+					"children": [{
+						"type": "directory",
+						"name": "administrative-history",
+						"children": []
+					}, {
+						"type": "directory",
+						"name": "publications",
+						"children": []
+					}]
+				}, {
+					"type": "directory",
+					"name": "archiving",
+					"children": [{
+						"type": "directory",
+						"name": "tools",
+						"children": []
+					}, {
+						"type": "directory",
+						"name": "digital-documents",
+						"children": []
+					}]
+				}, {
+					"type": "directory",
+					"name": "about-us",
+					"children": [{
+						"type": "directory",
+						"name": "the-federal-archives",
+						"children": []
+					}]
+				}]
+			}]
+		}, {
+			"type": "directory",
+			"name": "de",
+			"children": [{
+				"type": "directory",
+				"name": "home",
+				"children": [{
+					"type": "directory",
+					"name": "ueber-uns",
+					"children": [{
+						"type": "directory",
+						"name": "das-bundesarchiv",
+						"children": []
+					}, {
+						"type": "directory",
+						"name": "veranstaltungen",
+						"children": [{
+							"type": "directory",
+							"name": "fruehere-veranstaltungen",
+							"children": []
+						}]
+					}, {
+						"type": "directory",
+						"name": "stellen",
+						"children": []
+					}, {
+						"type": "file",
+						"name": "Medienmitteilungen.msg-id-69537.html.tmp"
+					}]
+				}, {
+					"type": "directory",
+					"name": "recherche",
+					"children": [{
+						"type": "directory",
+						"name": "bestellen---konsultieren",
+						"children": []
+					}, {
+						"type": "directory",
+						"name": "suchen",
+						"children": [{
+							"type": "directory",
+							"name": "themen",
+							"children": []
+						}, {
+							"type": "directory",
+							"name": "suchmaschinen-portale",
+							"children": []
+						}]
+					}, {
+						"type": "file",
+						"name": "bestellen---konsultieren.html.tmp"
+					}]
+				}, {
+					"type": "directory",
+					"name": "archivierung",
+					"children": [{
+						"type": "directory",
+						"name": "digitale-unterlagen",
+						"children": []
+					}, {
+						"type": "directory",
+						"name": "tools---hilfsmittel",
+						"children": []
+					}, {
+						"type": "directory",
+						"name": "ablieferung",
+						"children": []
+					}]
+				}, {
+					"type": "directory",
+					"name": "informationsmanagement",
+					"children": [{
+						"type": "directory",
+						"name": "tools---hilfsmittel",
+						"children": []
+					}, {
+						"type": "directory",
+						"name": "archivwuerdigkeit",
+						"children": []
+					}, {
+						"type": "directory",
+						"name": "aus--und-weiterbildung",
+						"children": []
+					}]
+				}, {
+					"type": "directory",
+					"name": "service-publikationen",
+					"children": [{
+						"type": "directory",
+						"name": "publikationen",
+						"children": []
+					}, {
+						"type": "directory",
+						"name": "verwaltungsgeschichte",
+						"children": []
+					}, {
+						"type": "directory",
+						"name": "service",
+						"children": [{
+							"type": "directory",
+							"name": "archivportal-europa",
+							"children": []
+						}]
+					}]
+				}]
+			}]
+		}, {
+			"type": "directory",
+			"name": "it",
+			"children": [{
+				"type": "directory",
+				"name": "home",
+				"children": [{
+					"type": "directory",
+					"name": "ricerca",
+					"children": [{
+						"type": "directory",
+						"name": "ricerca",
+						"children": [{
+							"type": "directory",
+							"name": "temi",
+							"children": [{
+								"type": "directory",
+								"name": "die-moderne-schweiz",
+								"children": []
+							}, {
+								"type": "directory",
+								"name": "die-schweiz-im-zweiten-weltkrieg",
+								"children": []
+							}, {
+								"type": "directory",
+								"name": "auf-den-spuren-von-aus--und-einwanderern",
+								"children": []
+							}, {
+								"type": "directory",
+								"name": "die-alte-eidgenossenschaft",
+								"children": []
+							}, {
+								"type": "directory",
+								"name": "la-prima-guerra-mondiale-in-svizzera",
+								"children": []
+							}, {
+								"type": "directory",
+								"name": "die-schweizer-aussenpolitik-seit-1848",
+								"children": []
+							}]
+						}]
+					}]
+				}, {
+					"type": "directory",
+					"name": "archiviazione",
+					"children": [{
+						"type": "directory",
+						"name": "strumenti",
+						"children": []
+					}, {
+						"type": "directory",
+						"name": "versamento-di-documenti",
+						"children": []
+					}, {
+						"type": "directory",
+						"name": "documenti-digitali",
+						"children": []
+					}]
+				}, {
+					"type": "directory",
+					"name": "chi-siamo",
+					"children": []
+				}, {
+					"type": "directory",
+					"name": "servizi-e-pubblicazioni",
+					"children": []
+				}, {
+					"type": "directory",
+					"name": "gestione-dell-informazione",
+					"children": [{
+						"type": "directory",
+						"name": "strumenti",
+						"children": []
+					}, {
+						"type": "directory",
+						"name": "formazione",
+						"children": []
+					}, {
+						"type": "directory",
+						"name": "valore-archivistico",
+						"children": []
+					}]
+				}]
+			}]
+		}, {
+			"type": "directory",
+			"name": "fr",
+			"children": [{
+				"type": "directory",
+				"name": "home",
+				"children": [{
+					"type": "directory",
+					"name": "archivage",
+					"children": [{
+						"type": "directory",
+						"name": "outils-et-instruments",
+						"children": []
+					}, {
+						"type": "directory",
+						"name": "versement-de-documents",
+						"children": []
+					}, {
+						"type": "directory",
+						"name": "documents-numeriques",
+						"children": []
+					}]
+				}, {
+					"type": "directory",
+					"name": "portrait",
+					"children": []
+				}, {
+					"type": "directory",
+					"name": "recherche",
+					"children": []
+				}, {
+					"type": "directory",
+					"name": "prestations-publications",
+					"children": []
+				}, {
+					"type": "directory",
+					"name": "gestion-de-l-information",
+					"children": [{
+						"type": "directory",
+						"name": "valeur-archivistique",
+						"children": []
+					}]
+				}]
+			}]
+		}]
+	}, {
+		"type": "directory",
+		"name": "dam",
+		"children": [{
+			"type": "directory",
+			"name": "bar",
+			"children": [{
+				"type": "directory",
+				"name": "en",
+				"children": [{
+					"type": "directory",
+					"name": "dokumente",
+					"children": [{
+						"type": "directory",
+						"name": "konzepte_und_weisungen",
+						"children": [{
+							"type": "directory",
+							"name": "policy_digitale_archivierung.pdf.download.pdf",
+							"children": [{
+								"type": "file",
+								"name": "digital_archivingpolicy.pdf"
+							}]
+						}]
+					}]
+				}]
+			}, {
+				"type": "directory",
+				"name": "de",
+				"children": [{
+					"type": "directory",
+					"name": "dokumente",
+					"children": [{
+						"type": "directory",
+						"name": "publikationen",
+						"children": [{
+							"type": "directory",
+							"name": "von_der_geschaeftsablageinsbundesarchivangebotundbewertungvonunt.pdf.download.pdf",
+							"children": [{
+								"type": "file",
+								"name": "von_der_geschaeftsablageinsbundesarchivangebotundbewertungvonunt.pdf"
+							}]
+						}]
+					}, {
+						"type": "directory",
+						"name": "gesetzgebung",
+						"children": [{
+							"type": "directory",
+							"name": "weisungen_ueber_dieanbietepflichtunddieablieferungvonunterlagena.pdf.download.pdf",
+							"children": [{
+								"type": "file",
+								"name": "weisungen_ueber_dieanbietepflichtunddieablieferungvonunterlagena.pdf"
+							}]
+						}]
+					}, {
+						"type": "directory",
+						"name": "kundeninformation",
+						"children": [{
+							"type": "directory",
+							"name": "merkblatt_handaktenundprivatarchivefuermagistratspersonenderbund.pdf.download.pdf",
+							"children": [{
+								"type": "file",
+								"name": "merkblatt_handaktenundprivatarchivefuermagistratspersonenderbund.pdf"
+							}]
+						}, {
+							"type": "directory",
+							"name": "merkblatt_negativliste.pdf.download.pdf",
+							"children": [{
+								"type": "file",
+								"name": "merkblatt_negativliste.pdf"
+							}]
+						}, {
+							"type": "directory",
+							"name": "Merkblatt_Aufbereitung_Ablieferung_Personaldossiers.pdf.download.pdf",
+							"children": [{
+								"type": "file",
+								"name": "Merkblatt_Aufbereitung_Ablieferung_Personaldossiers.pdf"
+							}]
+						}, {
+							"type": "directory",
+							"name": "siard_formatbeschreibung.pdf.download.pdf",
+							"children": [{
+								"type": "file",
+								"name": "siard_formatbeschreibung.pdf"
+							}]
+						}, {
+							"type": "directory",
+							"name": "siard_suite_faq.pdf.download.pdf",
+							"children": [{
+								"type": "file",
+								"name": "siard_suite_faq.pdf"
+							}]
+						}, {
+							"type": "directory",
+							"name": "merkblatt_handaktenundprivatarchivefuertopkaderderbundesverwaltu.pdf.download.pdf",
+							"children": [{
+								"type": "file",
+								"name": "merkblatt_handaktenundprivatarchivefuertopkaderderbundesverwaltu.pdf"
+							}]
+						}]
+					}, {
+						"type": "directory",
+						"name": "veranstaltungen",
+						"children": [{
+							"type": "directory",
+							"name": "Bericht_Bewertungswerkstatt_2017.pdf.download.pdf",
+							"children": [{
+								"type": "file",
+								"name": "Bericht Bewertungswerkstatt 2017 Version Webseite.pdf"
+							}]
+						}]
+					}, {
+						"type": "directory",
+						"name": "konzepte_und_weisungen",
+						"children": [{
+							"type": "directory",
+							"name": "gesamtkonzept_2010.pdf.download.pdf",
+							"children": [{
+								"type": "file",
+								"name": "gesamtkonzept_2010.pdf"
+							}]
+						}, {
+							"type": "directory",
+							"name": "policy_digitale_archivierung.pdf.download.pdf",
+							"children": [{
+								"type": "file",
+								"name": "policy_digitale_archivierung.pdf"
+							}]
+						}]
+					}, {
+						"type": "directory",
+						"name": "bewertungsentscheide",
+						"children": [{
+							"type": "directory",
+							"name": "bewertungsempfehlungen.pdf.download.pdf",
+							"children": [{
+								"type": "file",
+								"name": "bewertungsempfehlungen.pdf"
+							}]
+						}]
+					}]
+				}]
+			}, {
+				"type": "directory",
+				"name": "it",
+				"children": [{
+					"type": "directory",
+					"name": "dokumente",
+					"children": [{
+						"type": "directory",
+						"name": "kundeninformation",
+						"children": [{
+							"type": "directory",
+							"name": "siard_formatbeschreibung.pdf.download.pdf",
+							"children": [{
+								"type": "file",
+								"name": "siard_format_descriptioning.pdf"
+							}]
+						}]
+					}]
+				}]
+			}, {
+				"type": "directory",
+				"name": "fr",
+				"children": [{
+					"type": "directory",
+					"name": "dokumente",
+					"children": [{
+						"type": "directory",
+						"name": "kundeninformation",
+						"children": [{
+							"type": "directory",
+							"name": "siard_suite_faq.pdf.download.pdf",
+							"children": [{
+								"type": "file",
+								"name": "siard_suite_faq_F.pdf"
+							}]
+						}]
+					}]
+				}]
+			}]
+		}]
+	}]
+}
