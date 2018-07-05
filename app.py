@@ -97,13 +97,25 @@ def end_crawling():
 def about():
     return render_template('about.html')
 
+
 # Articles
 @app.route('/stats')
 def stats():
     return render_template('stats.html')
 
 
-#Single Article
+# Test site
+@app.route('/test')
+def test():
+    return render_template('test1.html')
+
+# Test site2
+@app.route('/test2')
+def test2():
+    return render_template('test2.html')
+
+
+# Single Article
 @app.route('/article/<string:id>/')
 def article(id):
 

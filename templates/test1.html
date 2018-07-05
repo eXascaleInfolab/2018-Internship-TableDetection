@@ -1,0 +1,37 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+  <div class="jumbotron text-center">
+        <style>
+
+        .node {
+          cursor: pointer;
+        }
+
+        .node circle {
+          fill: #fff;
+          stroke: steelblue;
+          stroke-width: 1.5px;
+        }
+
+        .node text {
+          font: 10px sans-serif;
+        }
+
+        .link {
+          fill: none;
+          stroke: #ccc;
+          stroke-width: 1.5px;
+        }
+
+        </style>
+
+          <h1> This is test page one.</h1>
+          <h2> It should display a nice visualisation.</h2>
+          <script src="//d3js.org/d3.v3.min.js"></script>
+          <script src="static/scripts/test1.js"></script>
+  </div>
+
+{% endblock %}
+
+

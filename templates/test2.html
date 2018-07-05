@@ -1,0 +1,23 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+  <div class="jumbotron text-center">
+    <h1>Test2 site</h1>
+    <h2>Test2 site</h2>
+
+    {% if session.logged_in == NULL %}
+      <p class="lead">Log in to be able to crawl a domain.</p>
+      <a href="/register" class="btn btn-primary btn-lg">Register</a>
+      <a href="/login" class="btn btn-success btn-lg">Login</a>
+    {% endif %}
+
+    {% if session.logged_in != NULL %}
+       <a href="/test2" class="btn btn-danger btn-lg">Reload this pages</a>
+
+    {% endif %}
+
+  </div>
+
+  <script src="static/scripts/test2.js"></script>
+
+{% endblock %}
