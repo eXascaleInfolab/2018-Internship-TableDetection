@@ -5,7 +5,7 @@ import signal
 from helper import path_stats, path_file_number
 import json
 from functools import wraps
-from urlparse import urlparse
+from urllib.parse import urlparse
 
 from flask import Flask, render_template, flash, redirect, url_for, session, request, logging
 from flask_mysqldb import MySQL
@@ -130,7 +130,7 @@ def stats():
     jason_dict = path_stats(path) #adding ur does not work as expected either
 
     # FIXME here I also need to specify encoding -> check if correct
-    json_string = json.dumps(jason_dict, encoding='cp1252', sort_keys=True, indent=4)
+    json_string = json.dumps(jason_dict, sort_keys=True, indent=4) #, encoding='cp1252' not needed in python3
 
     # Store json file in corresponding directory
     jason_file = open("static/json/%s.json" % (domain,), "w")
