@@ -1,0 +1,110 @@
+{
+    "children": [
+        {
+            "children": [
+                {
+                    "children": [], 
+                    "name": "en", 
+                    "type": "directory"
+                }, 
+                {
+                    "children": [
+                        {
+                            "children": [
+                                {
+                                    "children": [
+                                        {
+                                            "children": [
+                                                {
+                                                    "children": [
+                                                        {
+                                                            "children": [], 
+                                                            "name": "leistungen-iv", 
+                                                            "type": "directory"
+                                                        }
+                                                    ], 
+                                                    "name": "grundlagen-gesetze", 
+                                                    "type": "directory"
+                                                }
+                                            ], 
+                                            "name": "iv", 
+                                            "type": "directory"
+                                        }, 
+                                        {
+                                            "children": [
+                                                {
+                                                    "children": [], 
+                                                    "name": "reformen-revisionen", 
+                                                    "type": "directory"
+                                                }
+                                            ], 
+                                            "name": "ueberblick", 
+                                            "type": "directory"
+                                        }, 
+                                        {
+                                            "children": [
+                                                {
+                                                    "children": [
+                                                        {
+                                                            "name": "el-reform.html.tmp", 
+                                                            "type": "file"
+                                                        }
+                                                    ], 
+                                                    "name": "reformen-und-revisionen", 
+                                                    "type": "directory"
+                                                }
+                                            ], 
+                                            "name": "el", 
+                                            "type": "directory"
+                                        }
+                                    ], 
+                                    "name": "sozialversicherungen", 
+                                    "type": "directory"
+                                }, 
+                                {
+                                    "children": [], 
+                                    "name": "bsv", 
+                                    "type": "directory"
+                                }, 
+                                {
+                                    "children": [], 
+                                    "name": "informationen-fuer", 
+                                    "type": "directory"
+                                }, 
+                                {
+                                    "children": [
+                                        {
+                                            "children": [], 
+                                            "name": "medieninformationen", 
+                                            "type": "directory"
+                                        }
+                                    ], 
+                                    "name": "publikationen-und-service", 
+                                    "type": "directory"
+                                }
+                            ], 
+                            "name": "home", 
+                            "type": "directory"
+                        }
+                    ], 
+                    "name": "de", 
+                    "type": "directory"
+                }, 
+                {
+                    "children": [], 
+                    "name": "it", 
+                    "type": "directory"
+                }, 
+                {
+                    "children": [], 
+                    "name": "fr", 
+                    "type": "directory"
+                }
+            ], 
+            "name": "bsv", 
+            "type": "directory"
+        }
+    ], 
+    "name": "www.bsv.admin.ch", 
+    "type": "directory"
+}

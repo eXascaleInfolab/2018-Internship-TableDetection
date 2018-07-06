@@ -9,6 +9,7 @@
                                 {
                                     "children": [], 
                                     "name": "themes", 
+                                    "npdf": 0, 
                                     "type": "directory"
                                 }, 
                                 {
@@ -16,33 +17,60 @@
                                         {
                                             "children": [], 
                                             "name": "jobs-and-careers", 
+                                            "npdf": 0, 
                                             "type": "directory"
                                         }, 
                                         {
                                             "children": [], 
                                             "name": "head-of-the-foitt", 
+                                            "npdf": 0, 
                                             "type": "directory"
                                         }
                                     ], 
                                     "name": "foitt", 
+                                    "npdf": 0, 
+                                    "type": "directory"
+                                }, 
+                                {
+                                    "children": [
+                                        {
+                                            "children": [
+                                                {
+                                                    "children": [], 
+                                                    "name": "schulungen", 
+                                                    "npdf": 0, 
+                                                    "type": "directory"
+                                                }
+                                            ], 
+                                            "name": "allgemeines-zur-swiss-government-pki", 
+                                            "npdf": 0, 
+                                            "type": "directory"
+                                        }
+                                    ], 
+                                    "name": "subsites", 
+                                    "npdf": 0, 
                                     "type": "directory"
                                 }, 
                                 {
                                     "children": [], 
                                     "name": "customer-area", 
+                                    "npdf": 0, 
                                     "type": "directory"
                                 }, 
                                 {
                                     "children": [], 
                                     "name": "documentation", 
+                                    "npdf": 0, 
                                     "type": "directory"
                                 }
                             ], 
                             "name": "home", 
+                            "npdf": 0, 
                             "type": "directory"
                         }
                     ], 
                     "name": "en", 
+                    "npdf": 0, 
                     "type": "directory"
                 }, 
                 {
@@ -52,12 +80,64 @@
                                 {
                                     "children": [
                                         {
-                                            "children": [], 
+                                            "children": [
+                                                {
+                                                    "children": [], 
+                                                    "name": "zertifikatstypen", 
+                                                    "npdf": 0, 
+                                                    "type": "directory"
+                                                }, 
+                                                {
+                                                    "children": [], 
+                                                    "name": "rootzertifikate", 
+                                                    "npdf": 0, 
+                                                    "type": "directory"
+                                                }, 
+                                                {
+                                                    "children": [], 
+                                                    "name": "cp-und-cps", 
+                                                    "npdf": 0, 
+                                                    "type": "directory"
+                                                }, 
+                                                {
+                                                    "children": [], 
+                                                    "name": "schulungen", 
+                                                    "npdf": 0, 
+                                                    "type": "directory"
+                                                }, 
+                                                {
+                                                    "children": [], 
+                                                    "name": "aktuelle-informationen", 
+                                                    "npdf": 0, 
+                                                    "type": "directory"
+                                                }
+                                            ], 
+                                            "name": "allgemeines-zur-swiss-government-pki", 
+                                            "npdf": 0, 
+                                            "type": "directory"
+                                        }, 
+                                        {
+                                            "children": [
+                                                {
+                                                    "children": [], 
+                                                    "name": "schnupperlehre", 
+                                                    "npdf": 0, 
+                                                    "type": "directory"
+                                                }, 
+                                                {
+                                                    "children": [], 
+                                                    "name": "highlights", 
+                                                    "npdf": 0, 
+                                                    "type": "directory"
+                                                }
+                                            ], 
                                             "name": "herzlich-willkommen-bei-der-berufsbildung-bit", 
+                                            "npdf": 0, 
                                             "type": "directory"
                                         }
                                     ], 
                                     "name": "subsites", 
+                                    "npdf": 0, 
                                     "type": "directory"
                                 }, 
                                 {
@@ -65,25 +145,30 @@
                                         {
                                             "children": [], 
                                             "name": "jobs-und-karriere", 
+                                            "npdf": 0, 
                                             "type": "directory"
                                         }, 
                                         {
                                             "children": [], 
                                             "name": "amtsleitung", 
+                                            "npdf": 0, 
                                             "type": "directory"
                                         }
                                     ], 
                                     "name": "das-bit", 
+                                    "npdf": 0, 
                                     "type": "directory"
                                 }, 
                                 {
                                     "children": [], 
                                     "name": "kundenbereich", 
+                                    "npdf": 0, 
                                     "type": "directory"
                                 }, 
                                 {
                                     "children": [], 
                                     "name": "themen", 
+                                    "npdf": 0, 
                                     "type": "directory"
                                 }, 
                                 {
@@ -95,26 +180,50 @@
                                                         {
                                                             "children": [], 
                                                             "name": "kundenzeitschrift-eisbrecher-ausgabe-70", 
+                                                            "npdf": 0, 
+                                                            "type": "directory"
+                                                        }, 
+                                                        {
+                                                            "children": [], 
+                                                            "name": "kundenzeitschrift-eisbrecher-ausgabe-68", 
+                                                            "npdf": 0, 
+                                                            "type": "directory"
+                                                        }, 
+                                                        {
+                                                            "children": [], 
+                                                            "name": "kundenzeitschrift-eisbrecher-ausgabe-67", 
+                                                            "npdf": 0, 
+                                                            "type": "directory"
+                                                        }, 
+                                                        {
+                                                            "children": [], 
+                                                            "name": "kundenzeitschrift-eisbrecher-ausgabe-69", 
+                                                            "npdf": 0, 
                                                             "type": "directory"
                                                         }
                                                     ], 
                                                     "name": "eisbrecher-archiv", 
+                                                    "npdf": 0, 
                                                     "type": "directory"
                                                 }
                                             ], 
                                             "name": "kundenzeitschrift-eisbrecher", 
+                                            "npdf": 0, 
                                             "type": "directory"
                                         }
                                     ], 
                                     "name": "dokumentation", 
+                                    "npdf": 0, 
                                     "type": "directory"
                                 }
                             ], 
                             "name": "home", 
+                            "npdf": 0, 
                             "type": "directory"
                         }
                     ], 
                     "name": "de", 
+                    "npdf": 0, 
                     "type": "directory"
                 }, 
                 {
@@ -122,13 +231,35 @@
                         {
                             "children": [
                                 {
+                                    "children": [
+                                        {
+                                            "children": [
+                                                {
+                                                    "children": [], 
+                                                    "name": "corsi", 
+                                                    "npdf": 0, 
+                                                    "type": "directory"
+                                                }
+                                            ], 
+                                            "name": "la-swiss-government-pki-in-generale", 
+                                            "npdf": 0, 
+                                            "type": "directory"
+                                        }
+                                    ], 
+                                    "name": "subsites", 
+                                    "npdf": 0, 
+                                    "type": "directory"
+                                }, 
+                                {
                                     "children": [], 
                                     "name": "temi", 
+                                    "npdf": 0, 
                                     "type": "directory"
                                 }, 
                                 {
                                     "children": [], 
                                     "name": "documentazione", 
+                                    "npdf": 0, 
                                     "type": "directory"
                                 }, 
                                 {
@@ -136,33 +267,34 @@
                                         {
                                             "children": [], 
                                             "name": "impieghi-et-carriera", 
+                                            "npdf": 0, 
                                             "type": "directory"
                                         }, 
                                         {
-                                            "children": [
-                                                {
-                                                    "name": "direzione.html.tmp", 
-                                                    "type": "file"
-                                                }
-                                            ], 
+                                            "children": [], 
                                             "name": "il-direttore-dell-ufficio", 
+                                            "npdf": 0, 
                                             "type": "directory"
                                         }
                                     ], 
                                     "name": "l-ufit", 
+                                    "npdf": 0, 
                                     "type": "directory"
                                 }, 
                                 {
                                     "children": [], 
                                     "name": "area-cliente", 
+                                    "npdf": 0, 
                                     "type": "directory"
                                 }
                             ], 
                             "name": "home", 
+                            "npdf": 0, 
                             "type": "directory"
                         }
                     ], 
                     "name": "it", 
+                    "npdf": 0, 
                     "type": "directory"
                 }, 
                 {
@@ -171,7 +303,47 @@
                             "children": [
                                 {
                                     "children": [], 
+                                    "name": "themes", 
+                                    "npdf": 0, 
+                                    "type": "directory"
+                                }, 
+                                {
+                                    "children": [
+                                        {
+                                            "children": [
+                                                {
+                                                    "children": [], 
+                                                    "name": "highlights", 
+                                                    "npdf": 0, 
+                                                    "type": "directory"
+                                                }, 
+                                                {
+                                                    "children": [], 
+                                                    "name": "stage-d-essai", 
+                                                    "npdf": 0, 
+                                                    "type": "directory"
+                                                }
+                                            ], 
+                                            "name": "formation-professionnelle", 
+                                            "npdf": 0, 
+                                            "type": "directory"
+                                        }, 
+                                        {
+                                            "children": [
+                                                {
+                                                    "children": [], 
+                                                    "name": "formations", 
+                                                    "npdf": 0, 
+                                                    "type": "directory"
+                                                }
+                                            ], 
+                                            "name": "generalites-concernant-la-swiss-government-pki", 
+                                            "npdf": 0, 
+                                            "type": "directory"
+                                        }
+                                    ], 
                                     "name": "subsites", 
+                                    "npdf": 0, 
                                     "type": "directory"
                                 }, 
                                 {
@@ -179,10 +351,18 @@
                                         {
                                             "children": [], 
                                             "name": "emploi-et-carriere", 
+                                            "npdf": 0, 
+                                            "type": "directory"
+                                        }, 
+                                        {
+                                            "children": [], 
+                                            "name": "direction-de-l-office", 
+                                            "npdf": 0, 
                                             "type": "directory"
                                         }
                                     ], 
                                     "name": "l-ofit", 
+                                    "npdf": 0, 
                                     "type": "directory"
                                 }, 
                                 {
@@ -194,35 +374,43 @@
                                                         {
                                                             "children": [], 
                                                             "name": "kundenzeitschrift-eisbrecher-ausgabe-70", 
+                                                            "npdf": 0, 
                                                             "type": "directory"
                                                         }
                                                     ], 
                                                     "name": "eisbrecher-archiv", 
+                                                    "npdf": 0, 
                                                     "type": "directory"
                                                 }
                                             ], 
                                             "name": "le-magazine-eisbrecher", 
+                                            "npdf": 0, 
                                             "type": "directory"
                                         }
                                     ], 
                                     "name": "documentation", 
+                                    "npdf": 0, 
                                     "type": "directory"
                                 }, 
                                 {
                                     "children": [], 
                                     "name": "l-espace-client", 
+                                    "npdf": 0, 
                                     "type": "directory"
                                 }
                             ], 
                             "name": "home", 
+                            "npdf": 0, 
                             "type": "directory"
                         }
                     ], 
                     "name": "fr", 
+                    "npdf": 0, 
                     "type": "directory"
                 }
             ], 
             "name": "bit", 
+            "npdf": 0, 
             "type": "directory"
         }, 
         {
@@ -239,32 +427,39 @@
                                                     "children": [
                                                         {
                                                             "name": "location_map_blackpearl.pdf", 
+                                                            "npdf": 1, 
                                                             "type": "file"
                                                         }
                                                     ], 
                                                     "name": "situationsplan_blackpearl.pdf.download.pdf", 
+                                                    "npdf": 1, 
                                                     "type": "directory"
                                                 }, 
                                                 {
                                                     "children": [
                                                         {
                                                             "name": "location_map_titanicii.pdf", 
+                                                            "npdf": 1, 
                                                             "type": "file"
                                                         }
                                                     ], 
                                                     "name": "situationsplan_titanicll.pdf.download.pdf", 
+                                                    "npdf": 1, 
                                                     "type": "directory"
                                                 }
                                             ], 
                                             "name": "das-bit", 
+                                            "npdf": 2, 
                                             "type": "directory"
                                         }
                                     ], 
                                     "name": "dokumente", 
+                                    "npdf": 2, 
                                     "type": "directory"
                                 }
                             ], 
                             "name": "en", 
+                            "npdf": 2, 
                             "type": "directory"
                         }, 
                         {
@@ -276,45 +471,90 @@
                                                 {
                                                     "children": [
                                                         {
+                                                            "name": "mission_bit.pdf", 
+                                                            "npdf": 1, 
+                                                            "type": "file"
+                                                        }
+                                                    ], 
+                                                    "name": "mission_bit.pdf.download.pdf", 
+                                                    "npdf": 1, 
+                                                    "type": "directory"
+                                                }, 
+                                                {
+                                                    "children": [
+                                                        {
                                                             "name": "situationsplan_blackpearl.pdf", 
+                                                            "npdf": 1, 
                                                             "type": "file"
                                                         }
                                                     ], 
                                                     "name": "situationsplan_blackpearl.pdf.download.pdf", 
+                                                    "npdf": 1, 
                                                     "type": "directory"
                                                 }, 
                                                 {
                                                     "children": [
                                                         {
                                                             "name": "factsheet_praxisintegriertesbachelorstudium.pdf", 
+                                                            "npdf": 1, 
                                                             "type": "file"
                                                         }
                                                     ], 
                                                     "name": "factsheet_praxisintegriertesbachelorstudium.pdf.download.pdf", 
+                                                    "npdf": 1, 
+                                                    "type": "directory"
+                                                }, 
+                                                {
+                                                    "children": [
+                                                        {
+                                                            "name": "organigramm_bit.pdf", 
+                                                            "npdf": 1, 
+                                                            "type": "file"
+                                                        }
+                                                    ], 
+                                                    "name": "organigramm_bit.pdf.download.pdf", 
+                                                    "npdf": 1, 
                                                     "type": "directory"
                                                 }, 
                                                 {
                                                     "children": [
                                                         {
                                                             "name": "situationsplan_titanicll.pdf", 
+                                                            "npdf": 1, 
                                                             "type": "file"
                                                         }
                                                     ], 
                                                     "name": "situationsplan_titanicll.pdf.download.pdf", 
+                                                    "npdf": 1, 
+                                                    "type": "directory"
+                                                }, 
+                                                {
+                                                    "children": [
+                                                        {
+                                                            "name": "anreise_eichenweg.pdf", 
+                                                            "npdf": 1, 
+                                                            "type": "file"
+                                                        }
+                                                    ], 
+                                                    "name": "anreise_eichenweg.pdf.download.pdf", 
+                                                    "npdf": 1, 
                                                     "type": "directory"
                                                 }, 
                                                 {
                                                     "children": [
                                                         {
                                                             "name": "flyer_hochschulabsolventen.pdf", 
+                                                            "npdf": 1, 
                                                             "type": "file"
                                                         }
                                                     ], 
                                                     "name": "flyer_hochschulabsolventen.pdf.download.pdf", 
+                                                    "npdf": 1, 
                                                     "type": "directory"
                                                 }
                                             ], 
                                             "name": "das-bit", 
+                                            "npdf": 7, 
                                             "type": "directory"
                                         }, 
                                         {
@@ -322,23 +562,618 @@
                                                 {
                                                     "children": [
                                                         {
+                                                            "name": "Antrag_Hilfsorganisationen_Altgeraete.pdf", 
+                                                            "npdf": 1, 
+                                                            "type": "file"
+                                                        }
+                                                    ], 
+                                                    "name": "antragsformular-hilfsorganisationen-pdf.pdf.download.pdf", 
+                                                    "npdf": 1, 
+                                                    "type": "directory"
+                                                }, 
+                                                {
+                                                    "children": [
+                                                        {
+                                                            "name": "Checkliste.pdf", 
+                                                            "npdf": 1, 
+                                                            "type": "file"
+                                                        }
+                                                    ], 
+                                                    "name": "checkliste-pdf.pdf.download.pdf", 
+                                                    "npdf": 1, 
+                                                    "type": "directory"
+                                                }
+                                            ], 
+                                            "name": "charity-projekte", 
+                                            "npdf": 2, 
+                                            "type": "directory"
+                                        }, 
+                                        {
+                                            "children": [
+                                                {
+                                                    "children": [
+                                                        {
+                                                            "children": [
+                                                                {
+                                                                    "name": "EB69.pdf", 
+                                                                    "npdf": 1, 
+                                                                    "type": "file"
+                                                                }
+                                                            ], 
+                                                            "name": "Eisbrecher Nr. 69.pdf.download.pdf", 
+                                                            "npdf": 1, 
+                                                            "type": "directory"
+                                                        }
+                                                    ], 
+                                                    "name": "ausgabe-nr-69", 
+                                                    "npdf": 1, 
+                                                    "type": "directory"
+                                                }, 
+                                                {
+                                                    "children": [
+                                                        {
                                                             "name": "EB70-Web.pdf", 
+                                                            "npdf": 1, 
                                                             "type": "file"
                                                         }
                                                     ], 
                                                     "name": "eisbrecher-nr-70.pdf.download.pdf", 
+                                                    "npdf": 1, 
+                                                    "type": "directory"
+                                                }, 
+                                                {
+                                                    "children": [
+                                                        {
+                                                            "children": [
+                                                                {
+                                                                    "name": "EB67-September.pdf", 
+                                                                    "npdf": 1, 
+                                                                    "type": "file"
+                                                                }
+                                                            ], 
+                                                            "name": "dokument-eisbrecher-67.pdf.download.pdf", 
+                                                            "npdf": 1, 
+                                                            "type": "directory"
+                                                        }
+                                                    ], 
+                                                    "name": "augabe67", 
+                                                    "npdf": 1, 
+                                                    "type": "directory"
+                                                }, 
+                                                {
+                                                    "children": [
+                                                        {
+                                                            "children": [
+                                                                {
+                                                                    "name": "eb-nr-68.pdf", 
+                                                                    "npdf": 1, 
+                                                                    "type": "file"
+                                                                }
+                                                            ], 
+                                                            "name": "eb-nr-68.pdf.download.pdf", 
+                                                            "npdf": 1, 
+                                                            "type": "directory"
+                                                        }, 
+                                                        {
+                                                            "children": [
+                                                                {
+                                                                    "name": "eb66-safe-agil-in-grossprojekten-zusammenarbeiten.pdf", 
+                                                                    "npdf": 1, 
+                                                                    "type": "file"
+                                                                }
+                                                            ], 
+                                                            "name": "eb66-safe-agil-in-grossprojekten-zusammenarbeiten.pdf.download.pdf", 
+                                                            "npdf": 1, 
+                                                            "type": "directory"
+                                                        }, 
+                                                        {
+                                                            "children": [
+                                                                {
+                                                                    "name": "eb64-steigende-zufriedenheit-mit-den-leistungen-des-bit.pdf", 
+                                                                    "npdf": 1, 
+                                                                    "type": "file"
+                                                                }
+                                                            ], 
+                                                            "name": "eb64-steigende-zufriedenheit-mit-den-leistungen-des-bit.pdf.download.pdf", 
+                                                            "npdf": 1, 
+                                                            "type": "directory"
+                                                        }
+                                                    ], 
+                                                    "name": "ausgabe-nr-68", 
+                                                    "npdf": 3, 
                                                     "type": "directory"
                                                 }
                                             ], 
                                             "name": "eisbrecher", 
+                                            "npdf": 6, 
+                                            "type": "directory"
+                                        }, 
+                                        {
+                                            "children": [
+                                                {
+                                                    "children": [
+                                                        {
+                                                            "name": "berufsbildung_merkblattbewerbung.pdf", 
+                                                            "npdf": 1, 
+                                                            "type": "file"
+                                                        }
+                                                    ], 
+                                                    "name": "berufsbildung_merkblattbewerbung.pdf.download.pdf", 
+                                                    "npdf": 1, 
+                                                    "type": "directory"
+                                                }
+                                            ], 
+                                            "name": "berufsbildung", 
+                                            "npdf": 1, 
+                                            "type": "directory"
+                                        }, 
+                                        {
+                                            "children": [
+                                                {
+                                                    "children": [
+                                                        {
+                                                            "name": "sg-pki_klassecc-enterprisecpdcipsec.pdf", 
+                                                            "npdf": 1, 
+                                                            "type": "file"
+                                                        }
+                                                    ], 
+                                                    "name": "sg-pki_klassecc-enterprisecpdcipsec.pdf.download.pdf", 
+                                                    "npdf": 1, 
+                                                    "type": "directory"
+                                                }, 
+                                                {
+                                                    "children": [
+                                                        {
+                                                            "name": "manuelles_enrollmentklasseedomaincontrollerzertifikate.pdf", 
+                                                            "npdf": 1, 
+                                                            "type": "file"
+                                                        }
+                                                    ], 
+                                                    "name": "manuelles_enrollmentklasseedomaincontrollerzertifikate.pdf.download.pdf", 
+                                                    "npdf": 1, 
+                                                    "type": "directory"
+                                                }, 
+                                                {
+                                                    "children": [
+                                                        {
+                                                            "name": "sg-pki_klassecc-enterprisecpdcefsrecoveryagent.pdf", 
+                                                            "npdf": 1, 
+                                                            "type": "file"
+                                                        }
+                                                    ], 
+                                                    "name": "sg-pki_klassecc-enterprisecpdcefsrecoveryagent.pdf.download.pdf", 
+                                                    "npdf": 1, 
+                                                    "type": "directory"
+                                                }, 
+                                                {
+                                                    "children": [
+                                                        {
+                                                            "children": [
+                                                                {
+                                                                    "name": "formular_fuer_karten-prestagingauftraege.pdf", 
+                                                                    "npdf": 1, 
+                                                                    "type": "file"
+                                                                }
+                                                            ], 
+                                                            "name": "formular_fuer_karten-prestagingauftraege.pdf.download.pdf", 
+                                                            "npdf": 1, 
+                                                            "type": "directory"
+                                                        }, 
+                                                        {
+                                                            "children": [
+                                                                {
+                                                                    "name": "bestellformular_fuergemaltosmartcardsfuer3und4kreiskundenundkant.pdf", 
+                                                                    "npdf": 1, 
+                                                                    "type": "file"
+                                                                }
+                                                            ], 
+                                                            "name": "bestellformular_fuergemaltosmartcardsfuer3und4kreiskundenundkant.pdf.download.pdf", 
+                                                            "npdf": 1, 
+                                                            "type": "directory"
+                                                        }, 
+                                                        {
+                                                            "children": [
+                                                                {
+                                                                    "name": "antrag_fuer_pin-resetsuperuser.pdf", 
+                                                                    "npdf": 1, 
+                                                                    "type": "file"
+                                                                }
+                                                            ], 
+                                                            "name": "antrag_fuer_pin-resetsuperuser.pdf.download.pdf", 
+                                                            "npdf": 1, 
+                                                            "type": "directory"
+                                                        }, 
+                                                        {
+                                                            "children": [
+                                                                {
+                                                                    "name": "antrag_lra_officerklassea.pdf", 
+                                                                    "npdf": 1, 
+                                                                    "type": "file"
+                                                                }
+                                                            ], 
+                                                            "name": "antrag_lra_officerklassea.pdf.download.pdf", 
+                                                            "npdf": 1, 
+                                                            "type": "directory"
+                                                        }, 
+                                                        {
+                                                            "children": [
+                                                                {
+                                                                    "name": "anmeldeformular_schulunglraofficerklassea.pdf", 
+                                                                    "npdf": 1, 
+                                                                    "type": "file"
+                                                                }
+                                                            ], 
+                                                            "name": "anmeldeformular_schulunglraofficerklassea.pdf.download.pdf", 
+                                                            "npdf": 1, 
+                                                            "type": "directory"
+                                                        }
+                                                    ], 
+                                                    "name": "it-entwicklung", 
+                                                    "npdf": 5, 
+                                                    "type": "directory"
+                                                }, 
+                                                {
+                                                    "children": [
+                                                        {
+                                                            "children": [
+                                                                {
+                                                                    "name": "bhb_rootzertifikateupdatenmitwindowsupdate.pdf", 
+                                                                    "npdf": 1, 
+                                                                    "type": "file"
+                                                                }
+                                                            ], 
+                                                            "name": "bhb_rootzertifikateupdatenmitwindowsupdate.pdf.download.pdf", 
+                                                            "npdf": 1, 
+                                                            "type": "directory"
+                                                        }, 
+                                                        {
+                                                            "children": [
+                                                                {
+                                                                    "name": "manuelles_enrollmentvonklasseezertifikaten.pdf", 
+                                                                    "npdf": 1, 
+                                                                    "type": "file"
+                                                                }
+                                                            ], 
+                                                            "name": "manuelles_enrollmentvonklasseezertifikaten.pdf.download.pdf", 
+                                                            "npdf": 1, 
+                                                            "type": "directory"
+                                                        }
+                                                    ], 
+                                                    "name": "suchinfrastrukturbund", 
+                                                    "npdf": 2, 
+                                                    "type": "directory"
+                                                }, 
+                                                {
+                                                    "children": [
+                                                        {
+                                                            "children": [
+                                                                {
+                                                                    "name": "Antragsformular f\u00fcr Code Signing Zertifikate der SG-PKI_Klasse E_V1.0_DE.pdf", 
+                                                                    "npdf": 1, 
+                                                                    "type": "file"
+                                                                }
+                                                            ], 
+                                                            "name": "Antrag_CodeSigning_KlasseE.pdf.download.pdf", 
+                                                            "npdf": 1, 
+                                                            "type": "directory"
+                                                        }, 
+                                                        {
+                                                            "children": [
+                                                                {
+                                                                    "name": "Revokationsantrag f\u00fcr Code Signing Zertifikate der SG-PKI_Klasse E_V1.0_DE.pdf", 
+                                                                    "npdf": 1, 
+                                                                    "type": "file"
+                                                                }
+                                                            ], 
+                                                            "name": "Revokationsantrag_CodeSigning_Klasse E.pdf.download.pdf", 
+                                                            "npdf": 1, 
+                                                            "type": "directory"
+                                                        }
+                                                    ], 
+                                                    "name": "Formulare", 
+                                                    "npdf": 2, 
+                                                    "type": "directory"
+                                                }, 
+                                                {
+                                                    "children": [
+                                                        {
+                                                            "children": [
+                                                                {
+                                                                    "name": "auspraegungen_klasseev126zertifikate.pdf", 
+                                                                    "npdf": 1, 
+                                                                    "type": "file"
+                                                                }
+                                                            ], 
+                                                            "name": "auspraegungen_klasseev125zertifikate.pdf.download.pdf", 
+                                                            "npdf": 1, 
+                                                            "type": "directory"
+                                                        }, 
+                                                        {
+                                                            "children": [
+                                                                {
+                                                                    "name": "klasse_d-bestellungeinerneuenpolicyv11.pdf", 
+                                                                    "npdf": 1, 
+                                                                    "type": "file"
+                                                                }
+                                                            ], 
+                                                            "name": "klasse_d-bestellungeinerneuenpolicyv11.pdf.download.pdf", 
+                                                            "npdf": 1, 
+                                                            "type": "directory"
+                                                        }
+                                                    ], 
+                                                    "name": "scanning_center", 
+                                                    "npdf": 2, 
+                                                    "type": "directory"
+                                                }, 
+                                                {
+                                                    "children": [
+                                                        {
+                                                            "name": "adminpki_klassec-enterprisecpdcpdf.pdf", 
+                                                            "npdf": 1, 
+                                                            "type": "file"
+                                                        }
+                                                    ], 
+                                                    "name": "adminpki_klassec-enterprisecpdcpdf.pdf.download.pdf", 
+                                                    "npdf": 1, 
+                                                    "type": "directory"
+                                                }, 
+                                                {
+                                                    "children": [
+                                                        {
+                                                            "name": "sg-pki_klassecc-enterprisecpdcbasicefs.pdf", 
+                                                            "npdf": 1, 
+                                                            "type": "file"
+                                                        }
+                                                    ], 
+                                                    "name": "sg-pki_klassecc-enterprisecpdcbasicefs.pdf.download.pdf", 
+                                                    "npdf": 1, 
+                                                    "type": "directory"
+                                                }, 
+                                                {
+                                                    "children": [
+                                                        {
+                                                            "children": [
+                                                                {
+                                                                    "name": "swiss_governmentpkiobjectidentifiersoid.pdf", 
+                                                                    "npdf": 1, 
+                                                                    "type": "file"
+                                                                }
+                                                            ], 
+                                                            "name": "swiss_governmentpkiobjectidentifiersoid.pdf.download.pdf", 
+                                                            "npdf": 1, 
+                                                            "type": "directory"
+                                                        }, 
+                                                        {
+                                                            "children": [
+                                                                {
+                                                                    "name": "swiss_governmentpkicalayoutandpolicies.pdf", 
+                                                                    "npdf": 1, 
+                                                                    "type": "file"
+                                                                }
+                                                            ], 
+                                                            "name": "swiss_governmentpkicalayoutandpolicies.pdf.download.pdf", 
+                                                            "npdf": 1, 
+                                                            "type": "directory"
+                                                        }
+                                                    ], 
+                                                    "name": "telekommunikation", 
+                                                    "npdf": 2, 
+                                                    "type": "directory"
+                                                }, 
+                                                {
+                                                    "children": [
+                                                        {
+                                                            "children": [
+                                                                {
+                                                                    "name": "adminpki_klassec-enterprisecpwebserversslpdf.pdf", 
+                                                                    "npdf": 1, 
+                                                                    "type": "file"
+                                                                }
+                                                            ], 
+                                                            "name": "adminpki_klassec-enterprisecpwebserversslpdf.pdf.download.pdf", 
+                                                            "npdf": 1, 
+                                                            "type": "directory"
+                                                        }, 
+                                                        {
+                                                            "children": [
+                                                                {
+                                                                    "name": "adminpki_klassec-enterprisecpconfigmgr-siteserversign.pdf", 
+                                                                    "npdf": 1, 
+                                                                    "type": "file"
+                                                                }
+                                                            ], 
+                                                            "name": "adminpki_klassec-enterprisecpconfigmgr-siteserversign.pdf.download.pdf", 
+                                                            "npdf": 1, 
+                                                            "type": "directory"
+                                                        }, 
+                                                        {
+                                                            "children": [
+                                                                {
+                                                                    "name": "adminpki_klassec-enterprisecpconfigmgr-os-deployment.pdf", 
+                                                                    "npdf": 1, 
+                                                                    "type": "file"
+                                                                }
+                                                            ], 
+                                                            "name": "adminpki_klassec-enterprisecpconfigmgr-os-deployment.pdf.download.pdf", 
+                                                            "npdf": 1, 
+                                                            "type": "directory"
+                                                        }, 
+                                                        {
+                                                            "children": [
+                                                                {
+                                                                    "name": "sg-pki_klassecc-enterprisecpnps.pdf", 
+                                                                    "npdf": 1, 
+                                                                    "type": "file"
+                                                                }
+                                                            ], 
+                                                            "name": "sg-pki_klassecc-enterprisecpnps.pdf.download.pdf", 
+                                                            "npdf": 1, 
+                                                            "type": "directory"
+                                                        }, 
+                                                        {
+                                                            "children": [
+                                                                {
+                                                                    "name": "sg-pki_klassecc-enterprisecpwebserverssl.pdf", 
+                                                                    "npdf": 1, 
+                                                                    "type": "file"
+                                                                }
+                                                            ], 
+                                                            "name": "sg-pki_klassecc-enterprisecpwebserverssl.pdf.download.pdf", 
+                                                            "npdf": 1, 
+                                                            "type": "directory"
+                                                        }, 
+                                                        {
+                                                            "children": [
+                                                                {
+                                                                    "name": "sg-pki_klassecc-enterprisecpconfigmgr-os-deployment.pdf", 
+                                                                    "npdf": 1, 
+                                                                    "type": "file"
+                                                                }
+                                                            ], 
+                                                            "name": "sg-pki_klassecc-enterprisecpconfigmgr-os-deployment.pdf.download.pdf", 
+                                                            "npdf": 1, 
+                                                            "type": "directory"
+                                                        }, 
+                                                        {
+                                                            "children": [
+                                                                {
+                                                                    "name": "adminpki_klassec-enterprisecpsmimepdf.pdf", 
+                                                                    "npdf": 1, 
+                                                                    "type": "file"
+                                                                }
+                                                            ], 
+                                                            "name": "adminpki_klassec-enterprisecpsmimepdf.pdf.download.pdf", 
+                                                            "npdf": 1, 
+                                                            "type": "directory"
+                                                        }, 
+                                                        {
+                                                            "children": [
+                                                                {
+                                                                    "name": "adminpki_klassec-enterprisecpworkstationauthpdf.pdf", 
+                                                                    "npdf": 1, 
+                                                                    "type": "file"
+                                                                }
+                                                            ], 
+                                                            "name": "adminpki_klassec-enterprisecpworkstationauthpdf.pdf.download.pdf", 
+                                                            "npdf": 1, 
+                                                            "type": "directory"
+                                                        }, 
+                                                        {
+                                                            "children": [
+                                                                {
+                                                                    "name": "adminpki_klassec-enterprisecpspdf.pdf", 
+                                                                    "npdf": 1, 
+                                                                    "type": "file"
+                                                                }
+                                                            ], 
+                                                            "name": "adminpki_klassec-enterprisecpspdf.pdf.download.pdf", 
+                                                            "npdf": 1, 
+                                                            "type": "directory"
+                                                        }, 
+                                                        {
+                                                            "children": [
+                                                                {
+                                                                    "name": "sg-pki_klassecc-enterprisecpworkstationauth.pdf", 
+                                                                    "npdf": 1, 
+                                                                    "type": "file"
+                                                                }
+                                                            ], 
+                                                            "name": "sg-pki_klassecc-enterprisecpworkstationauth.pdf.download.pdf", 
+                                                            "npdf": 1, 
+                                                            "type": "directory"
+                                                        }, 
+                                                        {
+                                                            "children": [
+                                                                {
+                                                                    "name": "adminpki_klassec-enterprisecpipsecpdf.pdf", 
+                                                                    "npdf": 1, 
+                                                                    "type": "file"
+                                                                }
+                                                            ], 
+                                                            "name": "adminpki_klassec-enterprisecpipsecpdf.pdf.download.pdf", 
+                                                            "npdf": 1, 
+                                                            "type": "directory"
+                                                        }
+                                                    ], 
+                                                    "name": "richtlinie", 
+                                                    "npdf": 11, 
+                                                    "type": "directory"
+                                                }, 
+                                                {
+                                                    "children": [
+                                                        {
+                                                            "children": [
+                                                                {
+                                                                    "name": "einrichten_des_tsa-services.pdf", 
+                                                                    "npdf": 1, 
+                                                                    "type": "file"
+                                                                }
+                                                            ], 
+                                                            "name": "einrichten_des_tsa-services.pdf.download.pdf", 
+                                                            "npdf": 1, 
+                                                            "type": "directory"
+                                                        }
+                                                    ], 
+                                                    "name": "web-hosting", 
+                                                    "npdf": 1, 
+                                                    "type": "directory"
+                                                }, 
+                                                {
+                                                    "children": [
+                                                        {
+                                                            "children": [
+                                                                {
+                                                                    "name": "sg-pki_klassecc-enterprisecpkerberosauthentication.pdf", 
+                                                                    "npdf": 1, 
+                                                                    "type": "file"
+                                                                }
+                                                            ], 
+                                                            "name": "sg-pki_klassecc-enterprisecpkerberosauthentication.pdf.download.pdf", 
+                                                            "npdf": 1, 
+                                                            "type": "directory"
+                                                        }
+                                                    ], 
+                                                    "name": "sap", 
+                                                    "npdf": 1, 
+                                                    "type": "directory"
+                                                }, 
+                                                {
+                                                    "children": [
+                                                        {
+                                                            "name": "medienmitteilungictskills.pdf", 
+                                                            "npdf": 1, 
+                                                            "type": "file"
+                                                        }
+                                                    ], 
+                                                    "name": "medienmitteilungictskills.pdf.download.pdf", 
+                                                    "npdf": 1, 
+                                                    "type": "directory"
+                                                }, 
+                                                {
+                                                    "children": [
+                                                        {
+                                                            "name": "sg-pki_klassecc-enterprisecpremotedesktopcomputer.pdf", 
+                                                            "npdf": 1, 
+                                                            "type": "file"
+                                                        }
+                                                    ], 
+                                                    "name": "sg-pki_klassecc-enterprisecpremotedesktopcomputer.pdf.download.pdf", 
+                                                    "npdf": 1, 
+                                                    "type": "directory"
+                                                }
+                                            ], 
+                                            "name": "pki", 
+                                            "npdf": 33, 
                                             "type": "directory"
                                         }
                                     ], 
                                     "name": "dokumente", 
+                                    "npdf": 49, 
                                     "type": "directory"
                                 }
                             ], 
                             "name": "de", 
+                            "npdf": 49, 
                             "type": "directory"
                         }, 
                         {
@@ -351,34 +1186,41 @@
                                                     "children": [
                                                         {
                                                             "name": "ubicazione_blackpearl.pdf", 
+                                                            "npdf": 1, 
                                                             "type": "file"
                                                         }
                                                     ], 
                                                     "name": "situationsplan_blackpearl.pdf.download.pdf", 
+                                                    "npdf": 1, 
                                                     "type": "directory"
                                                 }, 
                                                 {
                                                     "children": [
                                                         {
                                                             "name": "ubicazione_titanicii.pdf", 
+                                                            "npdf": 1, 
                                                             "type": "file"
                                                         }
                                                     ], 
                                                     "name": "situationsplan_titanicll.pdf.download.pdf", 
+                                                    "npdf": 1, 
                                                     "type": "directory"
                                                 }, 
                                                 {
                                                     "children": [
                                                         {
                                                             "name": "flyer_diplomati-universitari.pdf", 
+                                                            "npdf": 1, 
                                                             "type": "file"
                                                         }
                                                     ], 
                                                     "name": "flyer_hochschulabsolventen.pdf.download.pdf", 
+                                                    "npdf": 1, 
                                                     "type": "directory"
                                                 }
                                             ], 
                                             "name": "das-bit", 
+                                            "npdf": 3, 
                                             "type": "directory"
                                         }, 
                                         {
@@ -389,24 +1231,29 @@
                                                             "children": [
                                                                 {
                                                                     "name": "definizione_ufficialelraclassea.pdf", 
+                                                                    "npdf": 1, 
                                                                     "type": "file"
                                                                 }
                                                             ], 
                                                             "name": "antrag_lra_officerklassea.pdf.download.pdf", 
+                                                            "npdf": 1, 
                                                             "type": "directory"
                                                         }, 
                                                         {
                                                             "children": [
                                                                 {
                                                                     "name": "formulare_d_iscrizionealcorsodiformazionedufficialelradiclassea.pdf", 
+                                                                    "npdf": 1, 
                                                                     "type": "file"
                                                                 }
                                                             ], 
                                                             "name": "anmeldeformular_schulunglraofficerklassea.pdf.download.pdf", 
+                                                            "npdf": 1, 
                                                             "type": "directory"
                                                         }
                                                     ], 
                                                     "name": "it-entwicklung", 
+                                                    "npdf": 2, 
                                                     "type": "directory"
                                                 }, 
                                                 {
@@ -415,26 +1262,32 @@
                                                             "children": [
                                                                 {
                                                                     "name": "einrichten_des_tsa-services.pdf", 
+                                                                    "npdf": 1, 
                                                                     "type": "file"
                                                                 }
                                                             ], 
                                                             "name": "einrichten_des_tsa-services.pdf.download.pdf", 
+                                                            "npdf": 1, 
                                                             "type": "directory"
                                                         }
                                                     ], 
                                                     "name": "web-hosting", 
+                                                    "npdf": 1, 
                                                     "type": "directory"
                                                 }
                                             ], 
                                             "name": "pki", 
+                                            "npdf": 3, 
                                             "type": "directory"
                                         }
                                     ], 
                                     "name": "dokumente", 
+                                    "npdf": 6, 
                                     "type": "directory"
                                 }
                             ], 
                             "name": "it", 
+                            "npdf": 6, 
                             "type": "directory"
                         }, 
                         {
@@ -446,34 +1299,197 @@
                                                 {
                                                     "children": [
                                                         {
+                                                            "name": "mission_bit.pdf", 
+                                                            "npdf": 1, 
+                                                            "type": "file"
+                                                        }
+                                                    ], 
+                                                    "name": "mission_bit.pdf.download.pdf", 
+                                                    "npdf": 1, 
+                                                    "type": "directory"
+                                                }, 
+                                                {
+                                                    "children": [
+                                                        {
+                                                            "name": "plan_d_acces_blackpearl.pdf", 
+                                                            "npdf": 1, 
+                                                            "type": "file"
+                                                        }
+                                                    ], 
+                                                    "name": "situationsplan_blackpearl.pdf.download.pdf", 
+                                                    "npdf": 1, 
+                                                    "type": "directory"
+                                                }, 
+                                                {
+                                                    "children": [
+                                                        {
+                                                            "name": "factsheet_praxisintegriertesbachelorstudium.pdf", 
+                                                            "npdf": 1, 
+                                                            "type": "file"
+                                                        }
+                                                    ], 
+                                                    "name": "factsheet_praxisintegriertesbachelorstudium.pdf.download.pdf", 
+                                                    "npdf": 1, 
+                                                    "type": "directory"
+                                                }, 
+                                                {
+                                                    "children": [
+                                                        {
+                                                            "name": "plan_d_acces_titanicll.pdf", 
+                                                            "npdf": 1, 
+                                                            "type": "file"
+                                                        }
+                                                    ], 
+                                                    "name": "situationsplan_titanicll.pdf.download.pdf", 
+                                                    "npdf": 1, 
+                                                    "type": "directory"
+                                                }, 
+                                                {
+                                                    "children": [
+                                                        {
                                                             "name": "flyer_pour_les_diplomesdeshautesecoles.pdf", 
+                                                            "npdf": 1, 
                                                             "type": "file"
                                                         }
                                                     ], 
                                                     "name": "flyer_hochschulabsolventen.pdf.download.pdf", 
+                                                    "npdf": 1, 
                                                     "type": "directory"
                                                 }
                                             ], 
                                             "name": "das-bit", 
+                                            "npdf": 5, 
+                                            "type": "directory"
+                                        }, 
+                                        {
+                                            "children": [
+                                                {
+                                                    "children": [
+                                                        {
+                                                            "name": "Formulaire bienfaisance.pdf", 
+                                                            "npdf": 1, 
+                                                            "type": "file"
+                                                        }
+                                                    ], 
+                                                    "name": "antragsformular-hilfsorganisationen-pdf.pdf.download.pdf", 
+                                                    "npdf": 1, 
+                                                    "type": "directory"
+                                                }, 
+                                                {
+                                                    "children": [
+                                                        {
+                                                            "name": "Checkliste.pdf", 
+                                                            "npdf": 1, 
+                                                            "type": "file"
+                                                        }
+                                                    ], 
+                                                    "name": "checkliste-pdf.pdf.download.pdf", 
+                                                    "npdf": 1, 
+                                                    "type": "directory"
+                                                }
+                                            ], 
+                                            "name": "charity-projekte", 
+                                            "npdf": 2, 
+                                            "type": "directory"
+                                        }, 
+                                        {
+                                            "children": [
+                                                {
+                                                    "children": [
+                                                        {
+                                                            "children": [
+                                                                {
+                                                                    "name": "definition_officierlraclassea.pdf", 
+                                                                    "npdf": 1, 
+                                                                    "type": "file"
+                                                                }
+                                                            ], 
+                                                            "name": "antrag_lra_officerklassea.pdf.download.pdf", 
+                                                            "npdf": 1, 
+                                                            "type": "directory"
+                                                        }, 
+                                                        {
+                                                            "children": [
+                                                                {
+                                                                    "name": "inscription_formationofficierlradeclassea.pdf", 
+                                                                    "npdf": 1, 
+                                                                    "type": "file"
+                                                                }
+                                                            ], 
+                                                            "name": "anmeldeformular_schulunglraofficerklassea.pdf.download.pdf", 
+                                                            "npdf": 1, 
+                                                            "type": "directory"
+                                                        }
+                                                    ], 
+                                                    "name": "it-entwicklung", 
+                                                    "npdf": 2, 
+                                                    "type": "directory"
+                                                }, 
+                                                {
+                                                    "children": [
+                                                        {
+                                                            "children": [
+                                                                {
+                                                                    "name": "update_des_certificatsracineaveclewindowsupdate.pdf", 
+                                                                    "npdf": 1, 
+                                                                    "type": "file"
+                                                                }
+                                                            ], 
+                                                            "name": "bhb_rootzertifikateupdatenmitwindowsupdate.pdf.download.pdf", 
+                                                            "npdf": 1, 
+                                                            "type": "directory"
+                                                        }
+                                                    ], 
+                                                    "name": "suchinfrastrukturbund", 
+                                                    "npdf": 1, 
+                                                    "type": "directory"
+                                                }, 
+                                                {
+                                                    "children": [
+                                                        {
+                                                            "children": [
+                                                                {
+                                                                    "name": "configurer_le_servicetsa.pdf", 
+                                                                    "npdf": 1, 
+                                                                    "type": "file"
+                                                                }
+                                                            ], 
+                                                            "name": "einrichten_des_tsa-services.pdf.download.pdf", 
+                                                            "npdf": 1, 
+                                                            "type": "directory"
+                                                        }
+                                                    ], 
+                                                    "name": "web-hosting", 
+                                                    "npdf": 1, 
+                                                    "type": "directory"
+                                                }
+                                            ], 
+                                            "name": "pki", 
+                                            "npdf": 4, 
                                             "type": "directory"
                                         }
                                     ], 
                                     "name": "dokumente", 
+                                    "npdf": 11, 
                                     "type": "directory"
                                 }
                             ], 
                             "name": "fr", 
+                            "npdf": 11, 
                             "type": "directory"
                         }
                     ], 
                     "name": "bit", 
+                    "npdf": 68, 
                     "type": "directory"
                 }
             ], 
             "name": "dam", 
+            "npdf": 68, 
             "type": "directory"
         }
     ], 
     "name": "www.bit.admin.ch", 
+    "npdf": 68, 
     "type": "directory"
 }
