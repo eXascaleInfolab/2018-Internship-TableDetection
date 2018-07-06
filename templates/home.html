@@ -10,11 +10,12 @@
     {% endif %}
 
     {% if session.logged_in != NULL %}
-      <p class="lead">Please select which domain to crawl: </p>
+      <p class="lead">Please select which URL to crawl: </p>
       <form action="" method="POST">
         <div class="form-group">
-          <label>Domain</label>
-          <input type="text" name="domain" class="form-control" value={{request.form.domain}}>
+          <label>URL (ex: https://www.bit.admin.ch)</label>
+          <input type="text" name="url" class="form-control" value='https://www.bit.admin.ch'>
+          <!-- <input type="text" name="url" class="form-control" value={{request.form.url}}> -->
         </div>
         <button type="crawl" class="btn btn-primary btn-lg">Crawl</button>
       </form>

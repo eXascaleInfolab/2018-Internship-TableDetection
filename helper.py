@@ -19,13 +19,5 @@ def path_stats(path):
 
 # finds the number of files in given path
 def path_file_number(path):
-    n_file = 0
-    if os.path.isdir(path):
-        for x in os.listdir(path):
-            n_file += path_file_number(os.path.join(path, x))
-    else:
-        n_file += 1
-
-    # FIXME this is not precise when 0 files present
-
-    return n_file
+    n_files = sum([len(files) for r, d, files in os.walk(path)])
+    return n_files

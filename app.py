@@ -5,6 +5,7 @@ import signal
 from helper import path_stats, path_file_number
 import json
 from functools import wraps
+from urlparse import urlparse
 
 from flask import Flask, render_template, flash, redirect, url_for, session, request, logging
 from flask_mysqldb import MySQL
@@ -47,10 +48,18 @@ def index():
     if request.method == 'POST': #FIXME I didn't handle security yet !! make sure only logged-in people can execute
         #FIXME use GET?
 
-        # Get Form Fields and save
-        domain = request.form['domain']
+        # Note: instead of domain user can type in url
+        # The url will then get parsed to extract domain, while the crawler starts at url.
+        # FIXME make it work regardless of having htttp:// or not
 
-        session['domain'] = domain
+        # Get Form Fields and save
+        url = request.form['url']
+        parsed = urlparse(url)
+
+        print(parsed)
+        session['domain'] = parsed.netloc
+        session['url'] = url
+
         # TODO use WTForms to get validation
 
         return redirect(url_for('crawling'))
@@ -64,12 +73,12 @@ def index():
 def crawling():
 
     # Prepare WGET command
-    domain = session.get('domain', None)
+    url = session.get('url', None)
 
-    print(domain)
-    command = shlex.split("wget -r -A pdf https://%s" % (domain,))
+    command = shlex.split("wget -r -A pdf %s" % (url,))
 
     #TODO use celery
+    #TODO give feedback how wget is doing
 
     # Execute command in subdirectory
     p_id = subprocess.Popen(command, cwd=WGET_DATA_PATH).pid
@@ -87,6 +96,8 @@ def end_crawling():
 
     #FIXME this way of handling the subprocess is quick and dirty
     #FIXME for more control we could switch to Celery or another library
+
+    #TODO stop process after reaching a certain size like 2GB
     os.kill(p_id, signal.SIGTERM)
 
     flash('You interrupted the crawler', 'success')
@@ -116,7 +127,7 @@ def stats():
     # FIXME workaround to weird file system bug with latin/ cp1252 encoding..
     # https://stackoverflow.com/questions/35959580/non-ascii-file-name-issue-with-os-walk works
     # https://stackoverflow.com/questions/2004137/unicodeencodeerror-on-joining-file-name doesn't work
-    jason_dict = path_stats('ur'+path)
+    jason_dict = path_stats(path) #adding ur does not work as expected either
 
     # FIXME here I also need to specify encoding -> check if correct
     json_string = json.dumps(jason_dict, encoding='cp1252', sort_keys=True, indent=4)
@@ -127,7 +138,7 @@ def stats():
     jason_file.close()
 
     # Call helper function to count number of pdf files
-    n_files = path_file_number('ur'+path) # Also add ur to path (force unicode)
+    n_files = path_file_number(path) # FIXME somehow ur is not needed here?
     # Flash success message
     flash('The crawled data was successfully parsed', 'success')
 

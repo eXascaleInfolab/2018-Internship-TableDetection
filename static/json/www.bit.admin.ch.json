@@ -1,0 +1,479 @@
+{
+    "children": [
+        {
+            "children": [
+                {
+                    "children": [
+                        {
+                            "children": [
+                                {
+                                    "children": [], 
+                                    "name": "themes", 
+                                    "type": "directory"
+                                }, 
+                                {
+                                    "children": [
+                                        {
+                                            "children": [], 
+                                            "name": "jobs-and-careers", 
+                                            "type": "directory"
+                                        }, 
+                                        {
+                                            "children": [], 
+                                            "name": "head-of-the-foitt", 
+                                            "type": "directory"
+                                        }
+                                    ], 
+                                    "name": "foitt", 
+                                    "type": "directory"
+                                }, 
+                                {
+                                    "children": [], 
+                                    "name": "customer-area", 
+                                    "type": "directory"
+                                }, 
+                                {
+                                    "children": [], 
+                                    "name": "documentation", 
+                                    "type": "directory"
+                                }
+                            ], 
+                            "name": "home", 
+                            "type": "directory"
+                        }
+                    ], 
+                    "name": "en", 
+                    "type": "directory"
+                }, 
+                {
+                    "children": [
+                        {
+                            "children": [
+                                {
+                                    "children": [
+                                        {
+                                            "children": [], 
+                                            "name": "herzlich-willkommen-bei-der-berufsbildung-bit", 
+                                            "type": "directory"
+                                        }
+                                    ], 
+                                    "name": "subsites", 
+                                    "type": "directory"
+                                }, 
+                                {
+                                    "children": [
+                                        {
+                                            "children": [], 
+                                            "name": "jobs-und-karriere", 
+                                            "type": "directory"
+                                        }, 
+                                        {
+                                            "children": [], 
+                                            "name": "amtsleitung", 
+                                            "type": "directory"
+                                        }
+                                    ], 
+                                    "name": "das-bit", 
+                                    "type": "directory"
+                                }, 
+                                {
+                                    "children": [], 
+                                    "name": "kundenbereich", 
+                                    "type": "directory"
+                                }, 
+                                {
+                                    "children": [], 
+                                    "name": "themen", 
+                                    "type": "directory"
+                                }, 
+                                {
+                                    "children": [
+                                        {
+                                            "children": [
+                                                {
+                                                    "children": [
+                                                        {
+                                                            "children": [], 
+                                                            "name": "kundenzeitschrift-eisbrecher-ausgabe-70", 
+                                                            "type": "directory"
+                                                        }
+                                                    ], 
+                                                    "name": "eisbrecher-archiv", 
+                                                    "type": "directory"
+                                                }
+                                            ], 
+                                            "name": "kundenzeitschrift-eisbrecher", 
+                                            "type": "directory"
+                                        }
+                                    ], 
+                                    "name": "dokumentation", 
+                                    "type": "directory"
+                                }
+                            ], 
+                            "name": "home", 
+                            "type": "directory"
+                        }
+                    ], 
+                    "name": "de", 
+                    "type": "directory"
+                }, 
+                {
+                    "children": [
+                        {
+                            "children": [
+                                {
+                                    "children": [], 
+                                    "name": "temi", 
+                                    "type": "directory"
+                                }, 
+                                {
+                                    "children": [], 
+                                    "name": "documentazione", 
+                                    "type": "directory"
+                                }, 
+                                {
+                                    "children": [
+                                        {
+                                            "children": [], 
+                                            "name": "impieghi-et-carriera", 
+                                            "type": "directory"
+                                        }, 
+                                        {
+                                            "children": [
+                                                {
+                                                    "name": "direzione.html.tmp", 
+                                                    "type": "file"
+                                                }
+                                            ], 
+                                            "name": "il-direttore-dell-ufficio", 
+                                            "type": "directory"
+                                        }
+                                    ], 
+                                    "name": "l-ufit", 
+                                    "type": "directory"
+                                }, 
+                                {
+                                    "children": [], 
+                                    "name": "area-cliente", 
+                                    "type": "directory"
+                                }
+                            ], 
+                            "name": "home", 
+                            "type": "directory"
+                        }
+                    ], 
+                    "name": "it", 
+                    "type": "directory"
+                }, 
+                {
+                    "children": [
+                        {
+                            "children": [
+                                {
+                                    "children": [], 
+                                    "name": "subsites", 
+                                    "type": "directory"
+                                }, 
+                                {
+                                    "children": [
+                                        {
+                                            "children": [], 
+                                            "name": "emploi-et-carriere", 
+                                            "type": "directory"
+                                        }
+                                    ], 
+                                    "name": "l-ofit", 
+                                    "type": "directory"
+                                }, 
+                                {
+                                    "children": [
+                                        {
+                                            "children": [
+                                                {
+                                                    "children": [
+                                                        {
+                                                            "children": [], 
+                                                            "name": "kundenzeitschrift-eisbrecher-ausgabe-70", 
+                                                            "type": "directory"
+                                                        }
+                                                    ], 
+                                                    "name": "eisbrecher-archiv", 
+                                                    "type": "directory"
+                                                }
+                                            ], 
+                                            "name": "le-magazine-eisbrecher", 
+                                            "type": "directory"
+                                        }
+                                    ], 
+                                    "name": "documentation", 
+                                    "type": "directory"
+                                }, 
+                                {
+                                    "children": [], 
+                                    "name": "l-espace-client", 
+                                    "type": "directory"
+                                }
+                            ], 
+                            "name": "home", 
+                            "type": "directory"
+                        }
+                    ], 
+                    "name": "fr", 
+                    "type": "directory"
+                }
+            ], 
+            "name": "bit", 
+            "type": "directory"
+        }, 
+        {
+            "children": [
+                {
+                    "children": [
+                        {
+                            "children": [
+                                {
+                                    "children": [
+                                        {
+                                            "children": [
+                                                {
+                                                    "children": [
+                                                        {
+                                                            "name": "location_map_blackpearl.pdf", 
+                                                            "type": "file"
+                                                        }
+                                                    ], 
+                                                    "name": "situationsplan_blackpearl.pdf.download.pdf", 
+                                                    "type": "directory"
+                                                }, 
+                                                {
+                                                    "children": [
+                                                        {
+                                                            "name": "location_map_titanicii.pdf", 
+                                                            "type": "file"
+                                                        }
+                                                    ], 
+                                                    "name": "situationsplan_titanicll.pdf.download.pdf", 
+                                                    "type": "directory"
+                                                }
+                                            ], 
+                                            "name": "das-bit", 
+                                            "type": "directory"
+                                        }
+                                    ], 
+                                    "name": "dokumente", 
+                                    "type": "directory"
+                                }
+                            ], 
+                            "name": "en", 
+                            "type": "directory"
+                        }, 
+                        {
+                            "children": [
+                                {
+                                    "children": [
+                                        {
+                                            "children": [
+                                                {
+                                                    "children": [
+                                                        {
+                                                            "name": "situationsplan_blackpearl.pdf", 
+                                                            "type": "file"
+                                                        }
+                                                    ], 
+                                                    "name": "situationsplan_blackpearl.pdf.download.pdf", 
+                                                    "type": "directory"
+                                                }, 
+                                                {
+                                                    "children": [
+                                                        {
+                                                            "name": "factsheet_praxisintegriertesbachelorstudium.pdf", 
+                                                            "type": "file"
+                                                        }
+                                                    ], 
+                                                    "name": "factsheet_praxisintegriertesbachelorstudium.pdf.download.pdf", 
+                                                    "type": "directory"
+                                                }, 
+                                                {
+                                                    "children": [
+                                                        {
+                                                            "name": "situationsplan_titanicll.pdf", 
+                                                            "type": "file"
+                                                        }
+                                                    ], 
+                                                    "name": "situationsplan_titanicll.pdf.download.pdf", 
+                                                    "type": "directory"
+                                                }, 
+                                                {
+                                                    "children": [
+                                                        {
+                                                            "name": "flyer_hochschulabsolventen.pdf", 
+                                                            "type": "file"
+                                                        }
+                                                    ], 
+                                                    "name": "flyer_hochschulabsolventen.pdf.download.pdf", 
+                                                    "type": "directory"
+                                                }
+                                            ], 
+                                            "name": "das-bit", 
+                                            "type": "directory"
+                                        }, 
+                                        {
+                                            "children": [
+                                                {
+                                                    "children": [
+                                                        {
+                                                            "name": "EB70-Web.pdf", 
+                                                            "type": "file"
+                                                        }
+                                                    ], 
+                                                    "name": "eisbrecher-nr-70.pdf.download.pdf", 
+                                                    "type": "directory"
+                                                }
+                                            ], 
+                                            "name": "eisbrecher", 
+                                            "type": "directory"
+                                        }
+                                    ], 
+                                    "name": "dokumente", 
+                                    "type": "directory"
+                                }
+                            ], 
+                            "name": "de", 
+                            "type": "directory"
+                        }, 
+                        {
+                            "children": [
+                                {
+                                    "children": [
+                                        {
+                                            "children": [
+                                                {
+                                                    "children": [
+                                                        {
+                                                            "name": "ubicazione_blackpearl.pdf", 
+                                                            "type": "file"
+                                                        }
+                                                    ], 
+                                                    "name": "situationsplan_blackpearl.pdf.download.pdf", 
+                                                    "type": "directory"
+                                                }, 
+                                                {
+                                                    "children": [
+                                                        {
+                                                            "name": "ubicazione_titanicii.pdf", 
+                                                            "type": "file"
+                                                        }
+                                                    ], 
+                                                    "name": "situationsplan_titanicll.pdf.download.pdf", 
+                                                    "type": "directory"
+                                                }, 
+                                                {
+                                                    "children": [
+                                                        {
+                                                            "name": "flyer_diplomati-universitari.pdf", 
+                                                            "type": "file"
+                                                        }
+                                                    ], 
+                                                    "name": "flyer_hochschulabsolventen.pdf.download.pdf", 
+                                                    "type": "directory"
+                                                }
+                                            ], 
+                                            "name": "das-bit", 
+                                            "type": "directory"
+                                        }, 
+                                        {
+                                            "children": [
+                                                {
+                                                    "children": [
+                                                        {
+                                                            "children": [
+                                                                {
+                                                                    "name": "definizione_ufficialelraclassea.pdf", 
+                                                                    "type": "file"
+                                                                }
+                                                            ], 
+                                                            "name": "antrag_lra_officerklassea.pdf.download.pdf", 
+                                                            "type": "directory"
+                                                        }, 
+                                                        {
+                                                            "children": [
+                                                                {
+                                                                    "name": "formulare_d_iscrizionealcorsodiformazionedufficialelradiclassea.pdf", 
+                                                                    "type": "file"
+                                                                }
+                                                            ], 
+                                                            "name": "anmeldeformular_schulunglraofficerklassea.pdf.download.pdf", 
+                                                            "type": "directory"
+                                                        }
+                                                    ], 
+                                                    "name": "it-entwicklung", 
+                                                    "type": "directory"
+                                                }, 
+                                                {
+                                                    "children": [
+                                                        {
+                                                            "children": [
+                                                                {
+                                                                    "name": "einrichten_des_tsa-services.pdf", 
+                                                                    "type": "file"
+                                                                }
+                                                            ], 
+                                                            "name": "einrichten_des_tsa-services.pdf.download.pdf", 
+                                                            "type": "directory"
+                                                        }
+                                                    ], 
+                                                    "name": "web-hosting", 
+                                                    "type": "directory"
+                                                }
+                                            ], 
+                                            "name": "pki", 
+                                            "type": "directory"
+                                        }
+                                    ], 
+                                    "name": "dokumente", 
+                                    "type": "directory"
+                                }
+                            ], 
+                            "name": "it", 
+                            "type": "directory"
+                        }, 
+                        {
+                            "children": [
+                                {
+                                    "children": [
+                                        {
+                                            "children": [
+                                                {
+                                                    "children": [
+                                                        {
+                                                            "name": "flyer_pour_les_diplomesdeshautesecoles.pdf", 
+                                                            "type": "file"
+                                                        }
+                                                    ], 
+                                                    "name": "flyer_hochschulabsolventen.pdf.download.pdf", 
+                                                    "type": "directory"
+                                                }
+                                            ], 
+                                            "name": "das-bit", 
+                                            "type": "directory"
+                                        }
+                                    ], 
+                                    "name": "dokumente", 
+                                    "type": "directory"
+                                }
+                            ], 
+                            "name": "fr", 
+                            "type": "directory"
+                        }
+                    ], 
+                    "name": "bit", 
+                    "type": "directory"
+                }
+            ], 
+            "name": "dam", 
+            "type": "directory"
+        }
+    ], 
+    "name": "www.bit.admin.ch", 
+    "type": "directory"
+}
