@@ -18,21 +18,26 @@ for table in tables:
 
 import PyPDF2
 import os
+# Possible bugfix
+from PyPDF2 import PdfFileReader, utils
+from io import StringIO
+import subprocess
 
-keywords = ('Tabelle', 'tableau') # TODO add more
+keywords = ('\nTableau', '\nTabelle', '\nTabella', '\nTable') # TODO add more
 
 
 # counts the number of tables in a given pdf page
 def count_tables_page(page):
     page_content = page.extractText()
+    print(page_content)
     i = 0
     for keyword in keywords:
         i += page_content.count(keyword)
     return i
 
 # counts the number of tables in a given pdf document
-def count_tables_doc(filename):
-    pdf_file = open(filename)
+def count_tables_doc(pdf_file):
+
     read_pdf = PyPDF2.PdfFileReader(pdf_file)
     number_of_pages = read_pdf.getNumPages()
     i = 0
@@ -44,9 +49,44 @@ def count_tables_doc(filename):
 # counts the number of tables in a given directory and its subdirectories
 def count_tables_dir(dirname):
     i = 0
+    print('dirname: ' + dirname)
 
     # r=root, d=directories, f = files
     for r, d, f in os.walk(dirname):
         for file in f:
             if ".pdf" in file: # not really required but why not
-                i += count_tables_doc(os.path.join(r, file))
+
+                pdf_file = open(os.path.join(r, file), mode='rb')
+                i += count_tables_doc(pdf_file)
+                # proposed fix
+    return i
+
+# Getting weird EOF marker not found errors
+# try solution from https://codedprojects.wordpress.com/2017/06/09/how-to-fix-pypdf-error-eof-marker-not-found/
+def decompress_pdf(temp_buffer):
+    temp_buffer.seek(0)  # Make sure we're at the start of the file.
+
+    process = subprocess.Popen(['pdftk.exe',
+                                '-',  # Read from stdin.
+                                'output',
+                                '-',  # Write to stdout.
+                                'uncompress'],
+                               stdin=temp_buffer,
+                               stdout=subprocess.PIPE,
+                               stderr=subprocess.PIPE)
+    stdout, stderr = process.communicate()
+
+    return StringIO(stdout)
+
+
+'''
+                with open(os.path.join(r, file), encoding='latin1') as input_file:
+                    input_buffer = StringIO(input_file.read())
+                try:
+                    input_pdf = PdfFileReader(input_buffer)
+                except utils.PdfReadError:
+                    input_pdf = PdfFileReader(decompress_pdf(input_file))
+                i += count_tables_doc(input_pdf)
+'''
+
+
