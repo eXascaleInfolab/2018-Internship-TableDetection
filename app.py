@@ -2,7 +2,8 @@ import subprocess
 import shlex
 import os
 import signal
-from helper import path_stats, path_file_number
+from helper import path_dict, path_number_of_files
+from table_detection import count_tables_dir
 import json
 from functools import wraps
 from urllib.parse import urlparse
@@ -81,10 +82,10 @@ def crawling():
     #TODO give feedback how wget is doing
 
     # Execute command in subdirectory
-    p_id = subprocess.Popen(command, cwd=WGET_DATA_PATH).pid
-    print(p_id)
-    session['crawl_process_id'] = p_id
+    process = subprocess.Popen(command, cwd=WGET_DATA_PATH)
+    session['crawl_process_id'] = process.pid
 
+    exitCode = process.returncode
     return render_template('crawling.html')
 
 
@@ -111,7 +112,7 @@ def about():
     return render_template('about.html')
 
 
-# Articles
+# General Statistics
 @app.route('/stats')
 def stats():
 
@@ -127,7 +128,7 @@ def stats():
     # FIXME workaround to weird file system bug with latin/ cp1252 encoding..
     # https://stackoverflow.com/questions/35959580/non-ascii-file-name-issue-with-os-walk works
     # https://stackoverflow.com/questions/2004137/unicodeencodeerror-on-joining-file-name doesn't work
-    jason_dict = path_stats(path) #adding ur does not work as expected either
+    jason_dict = path_dict(path) #adding ur does not work as expected either
 
     # FIXME here I also need to specify encoding -> check if correct
     json_string = json.dumps(jason_dict, sort_keys=True, indent=4) #, encoding='cp1252' not needed in python3
@@ -138,12 +139,26 @@ def stats():
     jason_file.close()
 
     # Call helper function to count number of pdf files
-    n_files = path_file_number(path) # FIXME somehow ur is not needed here?
+    n_files = path_number_of_files(path) # FIXME somehow ur is not needed here?
+    session['n_files'] = n_files
     # Flash success message
     flash('The crawled data was successfully parsed', 'success')
 
     return render_template('stats.html', n_files=n_files, domain=domain)
 
+# PDF table detection
+@app.route('/detection')
+def detection():
+    # detect number of tables found during crawl
+    path = "data/%s" % (session.get('domain', None),)
+    n_tables = count_tables_dir(path)
+
+    # save number of tables
+    session['n_tables'] = n_tables
+
+    flash('The pdf detection was successful', 'success')
+
+    return render_template('detection.html', n_tables=n_tables, n_files=session.get('n_files', 0), domain=session.get('domain', None))
 
 # Test site
 @app.route('/test')
