@@ -8,6 +8,8 @@ import json
 from functools import wraps
 from urllib.parse import urlparse
 
+import flask
+import time
 from flask import Flask, render_template, flash, redirect, url_for, session, request, logging
 from flask_mysqldb import MySQL
 from wtforms import Form, StringField, TextAreaField, PasswordField, validators
@@ -81,11 +83,14 @@ def crawling():
     #TODO use celery
     #TODO give feedback how wget is doing
 
+    #TODO https://stackoverflow.com/questions/15041620/how-to-continuously-display-python-output-in-a-webpage
+
     # Execute command in subdirectory
     process = subprocess.Popen(command, cwd=WGET_DATA_PATH)
     session['crawl_process_id'] = process.pid
 
     exitCode = process.returncode
+
     return render_template('crawling.html')
 
 
@@ -114,6 +119,7 @@ def about():
 
 # General Statistics
 @app.route('/stats')
+@is_logged_in
 def stats():
 
     domain = session.get('domain', None)
@@ -142,23 +148,40 @@ def stats():
     n_files = path_number_of_files(path) # FIXME somehow ur is not needed here?
     session['n_files'] = n_files
     # Flash success message
-    flash('The crawled data was successfully parsed', 'success')
+    flash('The crawled data was successfully parsed.', 'success')
 
     return render_template('stats.html', n_files=n_files, domain=domain)
 
+
 # PDF table detection
 @app.route('/detection')
+@is_logged_in
 def detection():
     # detect number of tables found during crawl
     path = "data/%s" % (session.get('domain', None),)
-    n_tables = count_tables_dir(path)
+    n_tables, n_errors = count_tables_dir(path)
 
     # save number of tables
     session['n_tables'] = n_tables
 
-    flash('The pdf detection was successful', 'success')
+    flash('The pdf detection was successful.', 'success')
 
-    return render_template('detection.html', n_tables=n_tables, n_files=session.get('n_files', 0), domain=session.get('domain', None))
+    # FIXME Save query in DB
+    # Create cursor
+    #cur = mysql.connection.cursor()
+
+    # Execute query
+    #cur.execute("INSERT INTO users(name, email, username, password) VALUES(%s, %s, %s, %s)",
+    #            (name, email, username, password))
+
+    # Commit to DB
+    #mysql.connection.commit()
+
+    # Close connection
+    #cur.close()
+
+    return render_template('detection.html', n_errors=n_errors, n_tables=n_tables, n_files=session.get('n_files', 0), domain=session.get('domain', None))
+
 
 # Test site
 @app.route('/test')

@@ -178,15 +178,9 @@
                                                 {
                                                     "children": [
                                                         {
-                                                            "children": [
-                                                                {
-                                                                    "name": "innofloor.html.tmp",
-                                                                    "npdf": 1,
-                                                                    "type": "file"
-                                                                }
-                                                            ],
+                                                            "children": [],
                                                             "name": "kundenzeitschrift-eisbrecher-ausgabe-70",
-                                                            "npdf": 1,
+                                                            "npdf": 0,
                                                             "type": "directory"
                                                         },
                                                         {
@@ -209,27 +203,27 @@
                                                         }
                                                     ],
                                                     "name": "eisbrecher-archiv",
-                                                    "npdf": 1,
+                                                    "npdf": 0,
                                                     "type": "directory"
                                                 }
                                             ],
                                             "name": "kundenzeitschrift-eisbrecher",
-                                            "npdf": 1,
+                                            "npdf": 0,
                                             "type": "directory"
                                         }
                                     ],
                                     "name": "dokumentation",
-                                    "npdf": 1,
+                                    "npdf": 0,
                                     "type": "directory"
                                 }
                             ],
                             "name": "home",
-                            "npdf": 1,
+                            "npdf": 0,
                             "type": "directory"
                         }
                     ],
                     "name": "de",
-                    "npdf": 1,
+                    "npdf": 0,
                     "type": "directory"
                 },
                 {
@@ -416,7 +410,7 @@
                 }
             ],
             "name": "bit",
-            "npdf": 1,
+            "npdf": 0,
             "type": "directory"
         },
         {
@@ -1496,6 +1490,6 @@
         }
     ],
     "name": "www.bit.admin.ch",
-    "npdf": 69,
+    "npdf": 68,
     "type": "directory"
 }

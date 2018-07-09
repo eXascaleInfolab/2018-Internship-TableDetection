@@ -15,7 +15,7 @@ def path_dict(path):
         d['npdf'] = path_number_of_files(p) # Really bad, but quick way out
     else:
         d['type'] = "file"
-        d['npdf'] = 1
+        d['npdf'] = 1 #TODO check if pdf file or not !!
 
     return d
 
@@ -23,6 +23,7 @@ def path_dict(path):
 # finds the number of files in given path
 def path_number_of_files(path):
     n_files = sum([len(files) for r, d, files in os.walk(path)])
+    # TODO quickly check if pdf file or not !!!!!
     return n_files
 
 

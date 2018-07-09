@@ -1,6 +1,13 @@
 {% extends 'layout.html' %}
 
 {% block body %}
+<div class="jumbotron text-center" id="pane">
     <h1>About.</h1>
-    <p class="lead">This App crawls a given domain looking for pdf's and displays some stats.</p>
+    <p class="lead"> This app implements 3 main steps:</p>
+    <ol class="list-group">
+        <li> Crawling a domain and retrieving all PDF that can be found</li>
+        <li> Analysing the PDF's found and detecting the tables present</li>
+        <li> Extracting the data from the tables</li>
+    </ol>
+</div>
 {% endblock %}

@@ -3,9 +3,10 @@
 {% block body %}
 <div class="jumbotron text-center" id="pane">
     <h1>Table Detection</h1>
-    <p>{{n_files}} PDF were collected from domain: {{domain}}</p>
+    <p><strong>{{n_files}}</strong> PDF were collected from domain: <strong>{{domain}}</strong></p>
 
-    <p> Our method has found {{n_tables}} tables inside the crawled files.</p>
+    <p> Our method has found <strong>{{n_tables}}</strong> tables inside the crawled files.</p>
+    <p> There were <strong>{{n_errors}}</strong> PDF file(s) that could not be analysed.</p>
 
     <a href="/" class="btn btn-primary btn-lg">Take me back to the start</a>
 

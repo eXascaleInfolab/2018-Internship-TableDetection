@@ -35,10 +35,14 @@ def count_tables_page(page):
         i += page_content.count(keyword)
     return i
 
+
 # counts the number of tables in a given pdf document
 def count_tables_doc(pdf_file):
+    try:
+        read_pdf = PyPDF2.PdfFileReader(pdf_file)
+    except PyPDF2.utils.PdfReadError:
+        return -1
 
-    read_pdf = PyPDF2.PdfFileReader(pdf_file)
     number_of_pages = read_pdf.getNumPages()
     i = 0
     for p in range(0, number_of_pages):
@@ -48,19 +52,26 @@ def count_tables_doc(pdf_file):
 
 # counts the number of tables in a given directory and its subdirectories
 def count_tables_dir(dirname):
-    i = 0
+    n_tables = 0
+    n_errors = 0
     print('dirname: ' + dirname)
 
     # r=root, d=directories, f = files
     for r, d, f in os.walk(dirname):
         for file in f:
             if ".pdf" in file: # not really required but why not
-
                 pdf_file = open(os.path.join(r, file), mode='rb')
-                i += count_tables_doc(pdf_file)
-                # proposed fix
-    return i
 
+                # Need to catch tables that haven't been fully downloaded and don't have EOFMarker
+                i = count_tables_doc(pdf_file)
+                if i < 0:
+                    n_errors += 1
+                else:
+                    n_tables += i
+    return n_tables, n_errors
+
+
+'''
 # Getting weird EOF marker not found errors
 # try solution from https://codedprojects.wordpress.com/2017/06/09/how-to-fix-pypdf-error-eof-marker-not-found/
 def decompress_pdf(temp_buffer):
@@ -79,7 +90,6 @@ def decompress_pdf(temp_buffer):
     return StringIO(stdout)
 
 
-'''
                 with open(os.path.join(r, file), encoding='latin1') as input_file:
                     input_buffer = StringIO(input_file.read())
                 try:
