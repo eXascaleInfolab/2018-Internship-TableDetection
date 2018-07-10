@@ -3,7 +3,8 @@ import shlex
 import os
 import signal
 from helper import path_dict, path_number_of_files
-from table_detection import count_tables_dir
+from heuristic_table_detection import count_tables_dir
+import tabula
 import json
 from functools import wraps
 from urllib.parse import urlparse
@@ -27,6 +28,7 @@ mysql = MySQL(app)
 
 # CONSTANTS
 WGET_DATA_PATH = 'data'
+
 
 
 # Helper Function
@@ -120,6 +122,14 @@ def about():
 @is_logged_in
 def stats():
 
+    return render_template('stats.html', n_files=session.get('n_files', None), domain=session.get('domain', None))
+
+
+# PDF processing
+@app.route('/processing')
+@is_logged_in
+def detection():
+
     domain = session.get('domain', None)
     if domain == None:
         pass
@@ -127,40 +137,35 @@ def stats():
 
     path = "data/%s" % (domain,)
 
-    # Call Helper function to create Json string
+    # STEP 1: Call Helper function to create Json string
 
     # FIXME workaround to weird file system bug with latin/ cp1252 encoding..
     # https://stackoverflow.com/questions/35959580/non-ascii-file-name-issue-with-os-walk works
     # https://stackoverflow.com/questions/2004137/unicodeencodeerror-on-joining-file-name doesn't work
-    jason_dict = path_dict(path) #adding ur does not work as expected either
+    jason_dict = path_dict(path)  # adding ur does not work as expected either
 
-    # FIXME here I also need to specify encoding -> check if correct
-    json_string = json.dumps(jason_dict, sort_keys=True, indent=4) #, encoding='cp1252' not needed in python3
+    json_string = json.dumps(jason_dict, sort_keys=True, indent=4)  # , encoding='cp1252' not needed in python3
 
     # Store json file in corresponding directory
     jason_file = open("static/json/%s.json" % (domain,), "w")
     jason_file.write(json_string)
     jason_file.close()
 
-    # Call helper function to count number of pdf files
-    n_files = path_number_of_files(path) # FIXME somehow ur is not needed here?
+    # STEP 2: Call helper function to count number of pdf files
+    n_files = path_number_of_files(path)  # FIXME somehow ur is not needed here?
     session['n_files'] = n_files
-    # Flash success message
-    flash('The crawled data was successfully parsed.', 'success')
 
-    return render_template('stats.html', n_files=n_files, domain=domain)
+    # STEP 3: Extract tables from pdf's
 
 
-# PDF table detection
-@app.route('/detection')
-@is_logged_in
-def detection():
+
+
+
     # detect number of tables found during crawl
     path = "data/%s" % (session.get('domain', None),)
-    n_tables, n_errors = count_tables_dir(path)
 
-    # save number of tables
-    session['n_tables'] = n_tables
+    tabula.convert_into_by_batch("5.pdf", "5.csv", output_format="csv", pages='all')
+
 
     flash('The pdf detection was successful.', 'success')
 
@@ -178,7 +183,10 @@ def detection():
     # Close connection
     #cur.close()
 
-    return render_template('detection.html', n_errors=n_errors, n_tables=n_tables, n_files=session.get('n_files', 0), domain=session.get('domain', None))
+    # Flash success message
+    flash('The crawled data was successfully parsed.', 'success')
+
+    return render_template('detection.html', n_files=session.get('n_files', 0), domain=session.get('domain', None))
 
 
 # Test site
