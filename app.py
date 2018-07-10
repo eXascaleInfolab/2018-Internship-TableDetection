@@ -2,7 +2,7 @@ import subprocess
 import shlex
 import os
 import signal
-from helper import path_dict, path_number_of_files
+from helper import path_dict, path_number_of_files, pdf_stats
 from heuristic_table_detection import count_tables_dir
 import tabula
 import json
@@ -128,7 +128,7 @@ def stats():
 # PDF processing
 @app.route('/processing')
 @is_logged_in
-def detection():
+def processing():
 
     domain = session.get('domain', None)
     if domain == None:
@@ -156,16 +156,7 @@ def detection():
     session['n_files'] = n_files
 
     # STEP 3: Extract tables from pdf's
-
-
-
-
-
-    # detect number of tables found during crawl
-    path = "data/%s" % (session.get('domain', None),)
-
-    tabula.convert_into_by_batch("5.pdf", "5.csv", output_format="csv", pages='all')
-
+    stats, n_error, n_success = pdf_stats(path)
 
     flash('The pdf detection was successful.', 'success')
 
@@ -186,7 +177,7 @@ def detection():
     # Flash success message
     flash('The crawled data was successfully parsed.', 'success')
 
-    return render_template('detection.html', n_files=session.get('n_files', 0), domain=session.get('domain', None))
+    return render_template('processing.html', n_files=session.get('n_files', 0), domain=session.get('domain', None))
 
 
 # Test site
@@ -199,13 +190,6 @@ def test():
 @app.route('/test2')
 def test2():
     return render_template('test2.html')
-
-
-# Single Article
-@app.route('/article/<string:id>/')
-def article(id):
-
-    return render_template('article.html', id=id)
 
 
 class RegisterForm(Form):
