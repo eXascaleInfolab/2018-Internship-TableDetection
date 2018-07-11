@@ -197,9 +197,9 @@ def stats():
     n_tables = sum([subdict['n_pages'] for filename, subdict in json_stats.items()])
     n_rows = sum([subdict['n_table_rows'] for filename, subdict in json_stats.items()])
 
-    medium_tables = [subdict['table_sizes']['medium'] for filename, subdict in json_stats.items()]
-    small_tables = [subdict['table_sizes']['small'] for filename, subdict in json_stats.items()]
-    large_tables = [subdict['table_sizes']['large'] for filename, subdict in json_stats.items()]
+    medium_tables = sum([subdict['table_sizes']['medium'] for filename, subdict in json_stats.items()])
+    small_tables = sum([subdict['table_sizes']['small'] for filename, subdict in json_stats.items()])
+    large_tables = sum([subdict['table_sizes']['large'] for filename, subdict in json_stats.items()])
 
     return render_template('statistics.html', n_files=n_files, n_success=n_success, n_tables=n_tables, n_rows=n_rows,
                            n_errors=n_errors, domain=domain, small_tables=small_tables, medium_tables=medium_tables,
