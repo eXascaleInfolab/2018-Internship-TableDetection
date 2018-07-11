@@ -20,20 +20,24 @@ def path_dict(path):
         d['npdf'] = path_number_of_files(p) # Really bad, but quick way out
     else:
         d['type'] = "file"
-        d['npdf'] = 1 #TODO check if pdf file or not !!
-
+        if ".pdf" in p:
+            print(p)
+            d['npdf'] = 1
+        else:
+            d['npdf'] = 0
+            print(p)
     return d
 
 
 # TODO write a Bottom up or DP method to make it faster ! (ask Akansha)
 # finds the number of files in given path
 def path_number_of_files(path):
-    n_files = sum([len(files) for r, d, files in os.walk(path)])
-    # TODO quickly check if pdf file or not !!!!!
+    n_files = sum([len(list(filter(lambda f: ".pdf" in f, files))) for r, d, files in os.walk(path)])
     return n_files
 
 
-def pdf_stats(path):
+# Uses Tabula to detect and extract tables from the pdf's
+def pdf_stats(path, n_pdf):
     stats = {}
     n_success = 0
     n_error = 0
@@ -54,7 +58,7 @@ def pdf_stats(path):
                     n_pages = 0
                     n_table_pages = 0
                     n_table_rows = 0
-                    table_stats = {'small-tables': 0, 'medium-tables': 0, 'large-tables': 0}
+                    table_sizes = {'small': 0, 'medium': 0, 'large': 0}
 
                     # STEP 1: count total number of pages
                     pdf_file = PyPDF2.PdfFileReader(open(rel_file, mode='rb'))
@@ -73,16 +77,23 @@ def pdf_stats(path):
 
                             # Add table stats
                             if rows <= SMALL_TABLE_LIMIT:
-                                table_stats['small-tables'] += 1
+                                table_sizes['small'] += 1
                             elif rows <= MEDIUM_TABLE_LIMIT:
-                                table_stats['medium-tables'] += 1
+                                table_sizes['medium'] += 1
                             else:
-                                table_stats['large-tables'] += 1
+                                table_sizes['large'] += 1
 
                     # STEP 4: save stats
-                    stats[fileName] = (n_pages, n_table_pages, n_table_rows, table_stats) # FIXME use fileName or relFile ?
+                    creation_date = pdf_file.getDocumentInfo()['/CreationDate']
+                    stats[fileName] = {'n_pages': n_pages, 'n_tables_pages': n_table_pages,
+                                       'n_table_rows': n_table_rows, 'creation_date': creation_date,
+                                       'table_sizes': table_sizes}
+
                     print("Tabula Conversion done for %s" % (fileName,))
                     n_success = n_success + 1
+
+                    if n_success >= n_pdf:
+                        return stats, n_error, n_success
                 except:
                     print("not successful!")
                     n_error += 1

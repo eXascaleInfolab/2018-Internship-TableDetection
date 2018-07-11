@@ -1,35 +1,45 @@
 {% extends 'layout.html' %}
 
 {% block body %}
-  <div>
-     <div class="row">
-       <div class="col-lg-12">
-         <h1 class="page-header">Welcome To the PDF Crawl App</h1>
-       </div>
-        <!-- /.col-lg-12 -->
-     </div>
+<h1 class="page-header"> Welcome to the PDF Crawl App</h1>
+<div class=" col-lg-8 well">
+{% if session.logged_in == NULL %}
+  <p class="lead">Log in to be able to crawl a domain.</p>
+  <a href="/register" class="btn btn-primary btn-lg">Register</a>
+  <a href="/login" class="btn btn-success btn-lg">Login</a>
+{% endif %}
 
+{% if session.logged_in != NULL %}
+  <p class="lead">Please select which URL to crawl: </p>
+  <form action="" method="POST">
+    <div class="form-group ">
+      <label>URL</label>
+      <input type="text" name="url" class="form-control" value='https://www.bit.admin.ch'>
+      <!-- <input type="text" name="url" class="form-control" value={{request.form.url}}> -->
+    </div>
+    <button type="crawl" class="btn btn-primary btn-lg btn-block">Crawl</button>
+  </form>
 
+{% endif %}
 
-    {% if session.logged_in == NULL %}
-      <p class="lead">Log in to be able to crawl a domain.</p>
-      <a href="/register" class="btn btn-primary btn-lg">Register</a>
-      <a href="/login" class="btn btn-success btn-lg">Login</a>
-    {% endif %}
+</div>
 
-    {% if session.logged_in != NULL %}
-      <p class="lead">Please select which URL to crawl: </p>
-      <form action="" method="POST">
-        <div class="form-group">
-          <label>URL</label>
-          <input type="text" name="url" class="form-control" value='https://www.bit.admin.ch'>
-          <!-- <input type="text" name="url" class="form-control" value={{request.form.url}}> -->
+ <div class="col-lg-4">
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                How this tool works:
+            </div>
+            <div class="panel-body">
+                <ol>
+                    <li>Chose which domain to crawl. If you enter a specific url the crawler will start to crawl from there.</li>
+                    <li>After finishing fetching the pdf or being interrupted this tool will analyse the pdf</li>
+                    <li>Finally you will be able to see the collected data on the Stats page.</li>
+                </ol>
+
+            </div>
+            <!-- /.panel-body -->
         </div>
-        <button type="crawl" class="btn btn-primary btn-lg">Crawl</button>
-      </form>
-
-    {% endif %}
-
-  </div>
-
+        <!-- /.panel -->
+    </div>
+    <!-- /.col-lg-4 -->
 {% endblock %}

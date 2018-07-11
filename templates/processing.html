@@ -1,14 +1,24 @@
 {% extends 'layout.html' %}
 
 {% block body %}
-<div class="jumbotron text-center" id="pane">
-    <h1>Processing Finished.</h1>
-    <p><strong>{{n_files}}</strong> PDF were collected from domain: <strong>{{domain}}</strong></p>
+<div class="row">
+  <div class="progress progress-striped active">
+      <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
+          <span class="sr-only">80% Complete</span>
+      </div>
+  </div>
+</div>
 
-    <p> Our method has found <strong>{{n_tables}}</strong> tables inside the crawled files.</p>
-    <p> There were <strong>{{n_errors}}</strong> PDF file(s) that could not be analysed.</p>
 
-    <a href="/stats" class="btn btn-primary btn-lg">Show stats</a>
+<div class="col-lg-12">
+    <h1 class="page-header"> Processing finished </h1>
+
+    <p class="lead"><strong>{{n_files}}</strong> PDF were collected from domain: <strong>{{domain}}</strong></p>
+
+    <p class="lead"> Our method has found <strong>{{n_tables}}</strong> tables inside the crawled files.</p>
+    <p class="lead"> There were <strong>{{n_errors}}</strong> PDF file(s) that could not be analysed.</p>
+
+    <a href="/stats" class="btn btn-success btn-lg">Show stats</a>
 
     <div/>
 {% endblock %}

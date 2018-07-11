@@ -117,14 +117,6 @@ def about():
     return render_template('about.html')
 
 
-# General Statistics
-@app.route('/stats')
-@is_logged_in
-def stats():
-
-    return render_template('stats.html', n_files=session.get('n_files', None), domain=session.get('domain', None))
-
-
 # PDF processing
 @app.route('/processing')
 @is_logged_in
@@ -156,9 +148,19 @@ def processing():
     session['n_files'] = n_files
 
     # STEP 3: Extract tables from pdf's
-    #stats, n_error, n_success = pdf_stats(path)
+    stats, n_error, n_success = pdf_stats(path, 10) #FIXME constant
 
-    flash('The pdf detection was successful.', 'success')
+    # STEP 4: Save stats
+    session['n_error'] = n_error
+    session['n_success'] = n_success
+    session['stats'] = json.dumps(stats, sort_keys=True, indent=4)
+
+    # Store json file in corresponding directory
+    jason_file = open("static/json/%s.stats.json" % (domain,), "w")
+    jason_file.write(json_string)
+    jason_file.close()
+
+    flash('The pdf analysis was successful.', 'success')
 
     # FIXME Save query in DB
     # Create cursor
@@ -174,16 +176,40 @@ def processing():
     # Close connection
     #cur.close()
 
-    # Flash success message
-    flash('The crawled data was successfully parsed.', 'success')
+    return render_template('processing.html', n_files=n_files, domain=domain)
 
-    return render_template('processing.html', n_files=session.get('n_files', 0), domain=session.get('domain', None))
+
+# General Statistics
+@app.route('/stats')
+@is_logged_in
+def stats():
+
+    # STEP 1: retrieve all saved stats
+    n_files = session.get('n_files', None)
+    n_success = session.get('n_success', None)
+    domain = session.get('domain', None)
+    url = session.get('url', None)
+    n_success = session.get('n_success', None)
+    n_errors = session.get('n_error', None)
+    json_stats = json.loads(session.get('stats', None))
+
+    # STEP 2: do some processing to retrieve interesting info from stats
+    n_tables = sum([subdict['n_pages'] for filename, subdict in json_stats.items()])
+    n_rows = sum([subdict['n_table_rows'] for filename, subdict in json_stats.items()])
+
+    medium_tables = [subdict['table_sizes']['medium'] for filename, subdict in json_stats.items()]
+    small_tables = [subdict['table_sizes']['small'] for filename, subdict in json_stats.items()]
+    large_tables = [subdict['table_sizes']['large'] for filename, subdict in json_stats.items()]
+
+    return render_template('statistics.html', n_files=n_files, n_success=n_success, n_tables=n_tables, n_rows=n_rows,
+                           n_errors=n_errors, domain=domain, small_tables=small_tables, medium_tables=medium_tables,
+                           large_tables=large_tables, stats=session.get('stats', None))
 
 
 # Test site
-@app.route('/test')
-def test():
-    return render_template('test1.html')
+@app.route('/test1')
+def test1():
+    return render_template('stats.html', domain=session.get('domain',None))
 
 
 # Test site2
@@ -235,7 +261,7 @@ def register():
     return render_template('register.html', form=form)
 
 
-#User login
+# User login
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -291,14 +317,6 @@ def logout():
 @is_logged_in
 def dashboard():
     return render_template('dashboard.html')
-
-
-# Crawling
-@app.route('/crawl/<string:domain>')
-@is_logged_in
-def crawl():
-    return 'crawling..'
-
 
 
 if __name__ == '__main__':

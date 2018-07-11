@@ -38,14 +38,10 @@
     <div id="wrapper">
         {% include 'includes/_navbar.html' %}
 
+        <!-- Page Content -->
         <div id="page-wrapper">
-            <div class="row">
-                <div class="col-lg-12">
-                    {% include 'includes/_messages.html' %}
-                    {% block body %}{% endblock %}
-                </div>
-                <!-- /.col-lg-12 -->
-            </div>
+            {% include 'includes/_messages.html' %}
+            {% block body %}{% endblock %}
         </div>
         <!-- /#page-wrapper -->
 
