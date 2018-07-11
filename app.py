@@ -191,6 +191,11 @@ def test():
 def test2():
     return render_template('test2.html')
 
+# Test site3
+@app.route('/test3')
+def test3():
+    return render_template('index.html')
+
 
 class RegisterForm(Form):
     name = StringField('Name', [validators.Length(min=1, max=50)])
