@@ -1,8 +1,16 @@
 {% extends 'layout.html' %}
 
 {% block body %}
-  <div class="jumbotron text-center">
-    <h1>Welcome To the PDF Crawl App</h1>
+  <div>
+     <div class="row">
+       <div class="col-lg-12">
+         <h1 class="page-header">Welcome To the PDF Crawl App</h1>
+       </div>
+        <!-- /.col-lg-12 -->
+     </div>
+
+
+
     {% if session.logged_in == NULL %}
       <p class="lead">Log in to be able to crawl a domain.</p>
       <a href="/register" class="btn btn-primary btn-lg">Register</a>

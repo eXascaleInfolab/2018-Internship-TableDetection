@@ -419,11 +419,6 @@
             "type": "directory"
         },
         {
-            "name": "index.html.tmp",
-            "npdf": 1,
-            "type": "file"
-        },
-        {
             "children": [
                 {
                     "children": [
@@ -1500,6 +1495,6 @@
         }
     ],
     "name": "www.bit.admin.ch",
-    "npdf": 70,
+    "npdf": 69,
     "type": "directory"
 }
