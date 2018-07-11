@@ -156,7 +156,7 @@ def processing():
     session['n_files'] = n_files
 
     # STEP 3: Extract tables from pdf's
-    stats, n_error, n_success = pdf_stats(path)
+    #stats, n_error, n_success = pdf_stats(path)
 
     flash('The pdf detection was successful.', 'success')
 

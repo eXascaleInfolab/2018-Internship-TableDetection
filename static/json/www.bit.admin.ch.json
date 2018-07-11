@@ -359,10 +359,15 @@
                                             "name": "direction-de-l-office",
                                             "npdf": 0,
                                             "type": "directory"
+                                        },
+                                        {
+                                            "name": "l-ofit-en-bref.html.tmp",
+                                            "npdf": 1,
+                                            "type": "file"
                                         }
                                     ],
                                     "name": "l-ofit",
-                                    "npdf": 0,
+                                    "npdf": 1,
                                     "type": "directory"
                                 },
                                 {
@@ -400,18 +405,23 @@
                                 }
                             ],
                             "name": "home",
-                            "npdf": 0,
+                            "npdf": 1,
                             "type": "directory"
                         }
                     ],
                     "name": "fr",
-                    "npdf": 0,
+                    "npdf": 1,
                     "type": "directory"
                 }
             ],
             "name": "bit",
-            "npdf": 0,
+            "npdf": 1,
             "type": "directory"
+        },
+        {
+            "name": "index.html.tmp",
+            "npdf": 1,
+            "type": "file"
         },
         {
             "children": [
@@ -1490,6 +1500,6 @@
         }
     ],
     "name": "www.bit.admin.ch",
-    "npdf": 68,
+    "npdf": 70,
     "type": "directory"
 }
