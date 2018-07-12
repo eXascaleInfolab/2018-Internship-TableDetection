@@ -1,291 +1,245 @@
 {% extends 'layout.html' %}
 
 {% block body %}
-  <div class="col-lg-12">
-    <h1 class="page-header"> Statistics </h1>
-
-      <div class="row">
-                <div class="col-lg-3 col-md-6">
-                    <div class="panel panel-primary">
-                        <div class="panel-heading">
-                            <div class="row">
-                                <div class="col-xs-3">
-                                    <i class="fa fa-file-pdf-o fa-5x"></i>
-                                </div>
-                                <div class="col-xs-9 text-right">
-                                    <div class="huge">{{n_files}}/{{n_success}}</div>
-                                    <div>PDF crawled / PDF analysed </div>
-                                </div>
-                            </div>
+<h1 class="page-header"> Statistics </h1>
+<div class="row">
+        <div class="col-lg-3 col-md-6">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-xs-3">
+                            <i class="fa fa-file-pdf-o fa-5x"></i>
                         </div>
-                        <a href="#">
-                            <div class="panel-footer">
-                                <span class="pull-left">View Details</span>
-                                <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
-                                <div class="clearfix"></div>
-                            </div>
-                        </a>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6">
-                    <div class="panel panel-green">
-                        <div class="panel-heading">
-                            <div class="row">
-                                <div class="col-xs-3">
-                                    <i class="fa fa-list-alt fa-5x"></i>
-                                </div>
-                                <div class="col-xs-9 text-right">
-                                    <div class="huge">{{n_tables}}</div>
-                                    <div>Tables found</div>
-                                </div>
-                            </div>
+                        <div class="col-xs-9 text-right">
+                            <div class="huge">{{n_success}} / {{n_files}}</div>
+                            <div>PDF analysed / PDF crawled</div>
                         </div>
-                        <a href="#">
-                            <div class="panel-footer">
-                                <span class="pull-left">View Details</span>
-                                <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
-                                <div class="clearfix"></div>
-                            </div>
-                        </a>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6">
-                    <div class="panel panel-yellow">
-                        <div class="panel-heading">
-                            <div class="row">
-                                <div class="col-xs-3">
-                                    <i class="fa fa-align-justify fa-5x"></i>
-                                </div>
-                                <div class="col-xs-9 text-right">
-                                    <div class="huge">{{n_rows}}</div>
-                                    <div>Total Rows</div>
-                                </div>
-                            </div>
-                        </div>
-                        <a href="#">
-                            <div class="panel-footer">
-                                <span class="pull-left">View Details</span>
-                                <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
-                                <div class="clearfix"></div>
-                            </div>
-                        </a>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6">
-                    <div class="panel panel-red">
-                        <div class="panel-heading">
-                            <div class="row">
-                                <div class="col-xs-3">
-                                    <i class="fa fa-times-circle fa-5x"></i>
-                                </div>
-                                <div class="col-xs-9 text-right">
-                                    <div class="huge">{{n_errors}}</div>
-                                    <div>PDF not processed</div>
-                                </div>
-                            </div>
-                        </div>
-                        <a href="#">
-                            <div class="panel-footer">
-                                <span class="pull-left">View Details</span>
-                                <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
-                                <div class="clearfix"></div>
-                            </div>
-                        </a>
                     </div>
                 </div>
             </div>
-            <!-- /.row -->
-      <div class="row">
-                <div class="col-lg-8">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <i class="fa fa-bar-chart-o fa-fw"></i> Bubble Chart
-                            <div class="pull-right">
-                                <div class="btn-group">
-                                    <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
-                                        Actions
-                                        <span class="caret"></span>
-                                    </button>
-                                    <ul class="dropdown-menu pull-right" role="menu">
-                                        <li><a href="#">Action</a>
-                                        </li>
-                                        <li><a href="#">Another action</a>
-                                        </li>
-                                        <li><a href="#">Something else here</a>
-                                        </li>
-                                        <li class="divider"></li>
-                                        <li><a href="#">Separated link</a>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="panel panel-green">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-xs-3">
+                            <i class="fa fa-list-alt fa-5x"></i>
                         </div>
-                        <!-- /.panel-heading -->
-                        <div class="panel-body">
-                            <div class="row">
-                                <canvas id = "bubble"></canvas>
-                            </div>
-                            <!-- /.row -->
+                        <div class="col-xs-9 text-right">
+                            <div class="huge">{{n_tables}}</div>
+                            <div>Tables found</div>
                         </div>
-                        <!-- /.panel-body -->
                     </div>
-                    <!-- /.panel -->
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <i class="fa fa-bar-chart-o fa-fw"></i> Area Chart Example
-                            <div class="pull-right">
-                                <div class="btn-group">
-                                    <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
-                                        Actions
-                                        <span class="caret"></span>
-                                    </button>
-                                    <ul class="dropdown-menu pull-right" role="menu">
-                                        <li><a href="#">Action</a>
-                                        </li>
-                                        <li><a href="#">Another action</a>
-                                        </li>
-                                        <li><a href="#">Something else here</a>
-                                        </li>
-                                        <li class="divider"></li>
-                                        <li><a href="#">Separated link</a>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- /.panel-heading -->
-                        <div class="panel-body">
-                            <div id="morris-area-chart"></div>
-                        </div>
-                        <!-- /.panel-body -->
-                    </div>
-                    <!-- /.panel -->
                 </div>
-                <!-- /.col-lg-8 -->
-                <div class="col-lg-4">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <i class="fa fa-bell fa-fw"></i> Additional Statistics: raw numbers
-                        </div>
-                        <!-- /.panel-heading -->
-                        <div class="panel-body">
-                            <div class="list-group">
-                                <a href="#" class="list-group-item">
-                                    <i class="fa fa-comment fa-fw"></i> New Comment
-                                    <span class="pull-right text-muted small"><em>4 minutes ago</em>
-                                    </span>
-                                </a>
-                                <a href="#" class="list-group-item">
-                                    <i class="fa fa-twitter fa-fw"></i> 3 New Followers
-                                    <span class="pull-right text-muted small"><em>12 minutes ago</em>
-                                    </span>
-                                </a>
-                                <a href="#" class="list-group-item">
-                                    <i class="fa fa-envelope fa-fw"></i> Message Sent
-                                    <span class="pull-right text-muted small"><em>27 minutes ago</em>
-                                    </span>
-                                </a>
-                                <a href="#" class="list-group-item">
-                                    <i class="fa fa-tasks fa-fw"></i> New Task
-                                    <span class="pull-right text-muted small"><em>43 minutes ago</em>
-                                    </span>
-                                </a>
-                                <a href="#" class="list-group-item">
-                                    <i class="fa fa-upload fa-fw"></i> Server Rebooted
-                                    <span class="pull-right text-muted small"><em>11:32 AM</em>
-                                    </span>
-                                </a>
-                                <a href="#" class="list-group-item">
-                                    <i class="fa fa-bolt fa-fw"></i> Server Crashed!
-                                    <span class="pull-right text-muted small"><em>11:13 AM</em>
-                                    </span>
-                                </a>
-                                <a href="#" class="list-group-item">
-                                    <i class="fa fa-warning fa-fw"></i> Server Not Responding
-                                    <span class="pull-right text-muted small"><em>10:57 AM</em>
-                                    </span>
-                                </a>
-                                <a href="#" class="list-group-item">
-                                    <i class="fa fa-shopping-cart fa-fw"></i> New Order Placed
-                                    <span class="pull-right text-muted small"><em>9:49 AM</em>
-                                    </span>
-                                </a>
-                                <a href="#" class="list-group-item">
-                                    <i class="fa fa-money fa-fw"></i> Payment Received
-                                    <span class="pull-right text-muted small"><em>Yesterday</em>
-                                    </span>
-                                </a>
-                            </div>
-                            <!-- /.list-group -->
-                            <a href="#" class="btn btn-default btn-block">View All Alerts</a>
-                        </div>
-                        <!-- /.panel-body -->
-                    </div>
-                    <!-- /.panel -->
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <i class="fa fa-bar-chart-o fa-fw"></i> Donut Chart Example
-                        </div>
-                        <div class="panel-body">
-                            <canvas id = "donut1"></canvas>
-                        </div>
-                        <!-- /.panel-body -->
-                    </div>
-                    <!-- /.panel -->
-                    <!-- /.panel -->
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <i class="fa fa-bar-chart-o fa-fw"></i> Donut Chart Example
-                        </div>
-                        <div class="panel-body">
-                            <canvas id = "donut2"></canvas>
-                        </div>
-                        <!-- /.panel-body -->
-                    </div>
-                    <!-- /.panel -->
-                    <!-- /.panel -->
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <i class="fa fa-bar-chart-o fa-fw"></i> Donut Chart Example
-                        </div>
-                        <div class="panel-body">
-                            <canvas id = "donut3"></canvas>
-                        </div>
-                        <!-- /.panel-body -->
-                    </div>
-                    <!-- /.panel -->
-                </div>
-                <!-- /.col-lg-4 -->
             </div>
-            <!-- /.row -->
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="panel panel-yellow">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-xs-3">
+                            <i class="fa fa-align-justify fa-5x"></i>
+                        </div>
+                        <div class="col-xs-9 text-right">
+                            <div class="huge">{{n_rows}}</div>
+                            <div>Total Table Rows</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="panel panel-red">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-xs-3">
+                            <i class="fa fa-times-circle fa-5x"></i>
+                        </div>
+                        <div class="col-xs-9 text-right">
+                            <div class="huge">{{n_errors}}</div>
+                            <div>PDF processing errors</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+<div class="row">
+        <div class="col-lg-8">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <i class="fa fa-bar-chart-o fa-fw"></i> Processed files (Larger radius indicates more pages)
+                    <div class="pull-right">
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
+                                Actions
+                                <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu pull-right" role="menu">
+                                <li><a href="#">Action</a>
+                                </li>
+                                <li><a href="#">Another action</a>
+                                </li>
+                                <li><a href="#">Something else here</a>
+                                </li>
+                                <li class="divider"></li>
+                                <li><a href="#">Separated link</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <!-- /.panel-heading -->
+                <div class="panel-body">
+                    <div class="row">
+                        <canvas id = "bubble"></canvas>
+                    </div>
+                    <!-- /.row -->
+                </div>
+                <!-- /.panel-body -->
+            </div>
+            <!-- /.panel -->
+        </div>
+        <!-- /.col-lg-8 -->
+        <div class="col-lg-4">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <i class="fa fa-gear fa-fw"></i> Additional Statistics: raw numbers
+                </div>
+                <!-- /.panel-heading -->
+                <div class="panel-body">
+                    <div class="list-group">
+                        <a href="#" class="list-group-item">
+                            <i class="fa fa-search fa-fw"></i> Crawling start time
+                            <span class="pull-right text-muted small"><em>11:13 AM</em>
+                            </span>
+                        </a>
+                        <a href="#" class="list-group-item">
+                            <i class="fa fa-clock-o  fa-fw"></i> Crawling duration
+                            <span class="pull-right text-muted small"><em>10:57 hours</em>
+                            </span>
+                        </a>
+                        <a href="#" class="list-group-item">
+                            <i class="fa fa-clock-o  fa-fw"></i> Processing duration
+                            <span class="pull-right text-muted small"><em>9:49 hours</em>
+                            </span>
+                        </a>
+                        <a href="#" class="list-group-item">
+                            <i class="fa fa-file-pdf-o fa-fw"></i> Oldest PDF
+                            <span class="pull-right text-muted small"><em>2004</em>
+                            </span>
+                        </a>
+                        <a href="#" class="list-group-item">
+                            <i class="fa fa-file-pdf-o fa-fw"></i> Most recent PDF
+                            <span class="pull-right text-muted small"><em>2017</em>
+                            </span>
+                        </a>
+                        <a href="#" class="list-group-item">
+                            <i class="fa fa-navicon  fa-fw"></i> Small Tables found
+                            <span class="pull-right text-muted small"><em>{{small_tables}}</em>
+                            </span>
+                        </a>
+                        <a href="#" class="list-group-item">
+                            <i class="fa fa-th fa-fw"></i> Medium Tables found
+                            <span class="pull-right text-muted small"><em>{{medium_tables}}</em>
+                            </span>
+                        </a>
+                        <a href="#" class="list-group-item">
+                            <i class="fa fa-th-large  fa-fw"></i> Large Tables found
+                            <span class="pull-right text-muted small"><em>{{large_tables}}</em>
+                            </span>
+                        </a>
+                    </div>
+                </div>
+                <!-- /.panel-body -->
+            </div>
+            <!-- /.panel -->
+        </div>
+        <!-- /.col-lg-4 -->
+    </div>
+<div class="row">
+  <div class="col-sm-4">
+      <div class="panel panel-default">
+          <div class="panel-heading">
+              <i class="fa fa-bar-chart-o fa-fw"></i> Tables Sizes
+          </div>
+          <div class="panel-body">
+              <canvas id = "donut1"></canvas>
+          </div>
+          <!-- /.panel-body -->
+      </div>
+      <!-- /.panel -->
   </div>
-
+  <div class="col-sm-4">
+      <div class="panel panel-default">
+          <div class="panel-heading">
+              <i class="fa fa-bar-chart-o fa-fw"></i> Table Pages vs Text only Pages
+          </div>
+          <div class="panel-body">
+              <canvas id = "donut2"></canvas>
+          </div>
+          <!-- /.panel-body -->
+      </div>
+      <!-- /.panel -->
+  </div>
+  <div class="col-sm-4">
+      <div class="panel panel-default">
+          <div class="panel-heading">
+              <i class="fa fa-bar-chart-o fa-fw"></i> Total PDF with Tables
+          </div>
+          <div class="panel-body">
+              <canvas id = "donut3"></canvas>
+          </div>
+          <!-- /.panel-body -->
+      </div>
+      <!-- /.panel -->
+  </div>
+</div>
+<div class="row">
+    <div class="col-lg-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <i class="fa fa-bar-chart-o fa-fw"></i> Website Hierarchy
+                <button onclick="expandAll()">Expand All</button>
+                <button onclick="collapseAll()">Collapse All</button>
+            </div>
+            <!-- /.panel-heading -->
+            <div class="panel-body">
+                <div id = "hierarchy"></div>
+            </div>
+            <!-- /.panel-body -->
+        </div>
+        <!-- /.panel -->
+    </div>
+</div>
 
 <!-- Chart.js JavaScript -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
-
 <script>
 
+    /*
+    Constants
+     */
     var stats = {{ stats|safe }};
-
-    var ctx = document.getElementById('donut1').getContext('2d');
+    var baseColors = [[51, 122, 183], [92, 184, 92], [240, 173, 78], [217, 83, 79]];
 
     /*
      *  CHART 1 : Donut TABLE SIZE
      */
+    var ctx = document.getElementById('donut1').getContext('2d');
 
     data1 = {
         datasets: [{
             "label":"Table Size",
             "data": [{{small_tables}}, {{medium_tables}}, {{large_tables}}],
-            "backgroundColor": ["rgb(255, 99, 132)", "rgb(54, 162, 235)", "rgb(255, 205, 86)"]
+            "backgroundColor": ["rgb(51, 122, 183)", "rgb(92, 184, 92)", "rgb(240, 173, 78)", "rgb(217, 83, 79)"]
         }],
 
         // These labels appear in the legend and in the tooltips when hovering different arcs
         labels: [
-            'Small',
-            'Medium',
-            'Large'
+            'Small tables (< 10 rows)',
+            'Medium tables (< 20 rows)',
+            'Large tables (> 20 rows)'
         ]
     };
 
@@ -322,26 +276,26 @@
 
     data2 = {
         datasets: [{
-            "label":"Table Size",
-            "data": [total_pages - table_pages, table_pages],
-            "backgroundColor": ["rgb(255, 99, 132)", "rgb(54, 162, 235)"]
+            "label":"Processed PDF",
+            "data": [table_pages, total_pages - table_pages],
+            "backgroundColor": ["rgb(51, 122, 183)", "rgb(92, 184, 92)", "rgb(240, 173, 78)", "rgb(217, 83, 79)"]
         }],
         labels: [
-            'PDF Pages without tables',
-            'PDF Pages with tables'
+            'Total pages with tables',
+            'Total pages without tables'
         ]
     };
     data3 = {
         datasets: [{
             "label":"Table Ratio",
             "data": [pdf_with_tables, pdf_without_tables],
-            "backgroundColor": ["rgb(20, 255, 20)", "rgb(255, 20, 20)"]
+            "backgroundColor": ["rgb(51, 122, 183)", "rgb(92, 184, 92)", "rgb(240, 173, 78)", "rgb(217, 83, 79)"]
         }],
 
     // These labels appear in the legend and in the tooltips when hovering different arcs
         labels: [
-            'PDF with tables',
-            'PDF without tables'
+            'PDF containing at least one table',
+            'PDF without any tables'
         ]
     };
 
@@ -380,9 +334,11 @@
     var internalDataLength = datapoints.length;
     i = 0;
     while (i <= internalDataLength) {
-        var randomR = Math.floor((Math.random() * 130) + 100);
-        var randomG = Math.floor((Math.random() * 130) + 100);
-        var randomB = Math.floor((Math.random() * 130) + 100);
+        var baseColor = baseColors[Math.floor(Math.random()*baseColors.length)];
+
+        var randomR = baseColor[0];
+        var randomG = baseColor[1];
+        var randomB = baseColor[2];
 
         var graphBackground = "rgb("
             + randomR + ", "
@@ -408,7 +364,7 @@
 
     var data_bubble = {
         datasets: [{
-            "label": ["Sample Dataset"],
+            "label": ["Processed PDF's"],
             "data": datapoints,
             "backgroundColor": graphColors,
             "hoverBackgroundColor": hoverColor,
@@ -427,11 +383,269 @@
     var myBubbleChart = new Chart(ctx_bubble,{
         type: 'bubble',
         data: data_bubble,
-        options: Chart.defaults.bubble
+        options: {
+                scales: {
+                    yAxes: [{
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Number of tables'
+                        }
+                    }],
+                    xAxes: [{
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Number of table rows'
+                        }
+                    }]
+                }
+            }
+        });
+
+
+    /*
+     *  BAR CHART
+     *  FIXME should work in the future too
+
+
+    var ctx_bar = document.getElementById('bar').getContext('2d');
+
+    // Create Datapoints
+    var datapoints_bar = {};
+    for (var key in stats) {
+        var year = parseInt(stats[key].creation_date.substring(2,6));
+        datapoints_bar[year] = (datapoints_bar[year]||0 + 1);
+    }
+
+    // Create Dates
+
+
+    //var datapoints_bar = [{x:new Date(2014,1,1), y:28}, {x:new Date(2015,1,1), y:62},{x:new Date(2011,4,7), y:100},{x:new Date(2019,1,10), y:10}]
+
+    var data_bar = {
+        datasets: [{
+            "label": ["Sample Dataset"],
+            "data": datapoints_bar,
+            "backgroundColor": graphColors,
+            "hoverBackgroundColor": hoverColor,
+            "borderColor": graphOutlines
+        }],
+        labels: [10,5,5]
+    };
+
+
+    var myBarChart = new Chart(ctx_bar, {
+        type: 'bar',
+        data: data_bar,
+        options: Chart.defaults.bar
     });
+*/
+
+
+</script>
+<style>
+    .node {
+        cursor: pointer;
+    }
+
+    .node circle {
+        fill: #fff;
+        stroke: steelblue;
+        stroke-width: 1.5px;
+    }
+
+    .node text {
+        font: 10px sans-serif;
+    }
+
+    .link {
+        fill: none;
+        stroke: #ccc;
+        stroke-width: 1.5px;
+    }
+
+</style>
+<script src="//d3js.org/d3.v3.min.js"></script>
+<script>
+    var margin = {top: 20, right: 120, bottom: 20, left: 120},
+        width = 1600 - margin.right - margin.left,
+        height = 900 - margin.top - margin.bottom;
+
+    var i = 0,
+        duration = 750,
+        root;
+
+    var tree = d3.layout.tree()
+        .size([height, width]);
+
+    var diagonal = d3.svg.diagonal()
+        .projection(function(d) { return [d.y, d.x]; });
+
+    var svg = d3.select("#hierarchy").append("svg")
+        .attr("width", width + margin.right + margin.left)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    d3.json("static/json/{{domain}}.json", function(error, flare) { // FIXME only works with static?
+        if (error) throw error;
+
+        root = flare;
+        root.x0 = height / 2;
+        root.y0 = 0;
+
+        function collapse(d) {
+            if (d.children) {
+                d._children = d.children;
+                d._children.forEach(collapse);
+                d.children = null;
+            }
+        }
+
+        root.children.forEach(collapse);
+        update(root);
+    });
+
+    d3.select(self.frameElement).style("height", "800px");
+
+    function update(source) {
+
+        // Compute the new tree layout.
+        var nodes = tree.nodes(root).reverse(),
+            links = tree.links(nodes);
+
+        // Normalize for fixed-depth.
+        nodes.forEach(function(d) { d.y = d.depth * 180; });
+
+        // Update the nodes…
+        var node = svg.selectAll("g.node")
+            .data(nodes, function(d) { return d.id || (d.id = ++i); });
+
+        // Enter any new nodes at the parent's previous position.
+        var nodeEnter = node.enter().append("g")
+            .attr("class", "node")
+            .attr("transform", function(d) { return "translate(" + source.y0 + "," + source.x0 + ")"; })
+            .on("click", click);
+
+        nodeEnter.append("circle")
+            .attr("r", 1e-6)
+            .style("fill", function(d) { return d._children ? "lightsteelblue" : "#fff"; });
+
+        nodeEnter.append("text")
+            .attr("x", function(d) { return d.children || d._children ? -10 : 10; })
+            .attr("dy", ".35em")
+            .attr("text-anchor", function(d) { return d.children || d._children ? "end" : "start"; })
+            .text(function(d) { return d.name; })
+            .style("fill-opacity", 1e-6);
+
+        // FIXME added Yann
+        nodeEnter.append("text")
+            .attr("dy", function(d){return +20})
+            .attr("dx", function(d){return -20})
+            .text(function(d){return d.npdf})
+
+        // Transition nodes to their new position.
+        var nodeUpdate = node.transition()
+            .duration(duration)
+            .attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; });
+
+        nodeUpdate.select("circle")
+            .attr("r", 4.5)
+            .style("fill", function(d) { return d._children ? "lightsteelblue" : "#fff"; });
+
+        nodeUpdate.select("text")
+            .style("fill-opacity", 1);
+
+        // Transition exiting nodes to the parent's new position.
+        var nodeExit = node.exit().transition()
+            .duration(duration)
+            .attr("transform", function(d) { return "translate(" + source.y + "," + source.x + ")"; })
+            .remove();
+
+        nodeExit.select("circle")
+            .attr("r", 1e-6);
+
+        nodeExit.select("text")
+            .style("fill-opacity", 1e-6);
+
+        // Update the links…
+        var link = svg.selectAll("path.link")
+            .data(links, function(d) { return d.target.id; })
+
+
+        // Enter any new links at the parent's previous position.
+        link.enter().insert("path", "g")
+            .attr("class", "link")
+            .attr("d", function(d) {
+                var o = {x: source.x0, y: source.y0};
+                return diagonal({source: o, target: o});
+            });
+
+
+        // Transition links to their new position.
+        link.transition()
+            .duration(duration)
+            .attr("d", diagonal);
+
+        // Transition exiting nodes to the parent's new position.
+        link.exit().transition()
+            .duration(duration)
+            .attr("d", function(d) {
+                var o = {x: source.x, y: source.y};
+                return diagonal({source: o, target: o});
+            })
+            .remove();
+
+        // Stash the old positions for transition.
+        nodes.forEach(function(d) {
+            d.x0 = d.x;
+            d.y0 = d.y;
+        });
+    }
+
+    // Toggle children on click.
+    function click(d) {
+        if (d.children) {
+            d._children = d.children;
+            d.children = null;
+        } else {
+            d.children = d._children;
+            d._children = null;
+        }
+        update(d);
+    }
+
+    function expand(d){
+        var children = (d.children)?d.children:d._children;
+        if (d._children) {
+            d.children = d._children;
+            d._children = null;
+        }
+        if(children)
+            children.forEach(expand);
+    }
+
+    function expandAll(){
+        expand(root);
+        update(root);
+    }
+
+    function collapseAll(){
+        root.children.forEach(collapse);
+        collapse(root);
+        update(root);
+    }
+
+    function collapse(d) {
+        if (d.children) {
+            d._children = d.children;
+            d._children.forEach(collapse);
+            d.children = null;
+        }
+    }
 
 
 </script>
 
-{% endblock %}
 
+
+{% endblock %}

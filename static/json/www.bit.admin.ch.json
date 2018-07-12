@@ -129,6 +129,11 @@
                                                     "name": "highlights",
                                                     "npdf": 0,
                                                     "type": "directory"
+                                                },
+                                                {
+                                                    "name": "links.html.tmp",
+                                                    "npdf": 0,
+                                                    "type": "file"
                                                 }
                                             ],
                                             "name": "herzlich-willkommen-bei-der-berufsbildung-bit",
@@ -166,6 +171,11 @@
                                     "type": "directory"
                                 },
                                 {
+                                    "name": "das-bit.html.tmp",
+                                    "npdf": 0,
+                                    "type": "file"
+                                },
+                                {
                                     "children": [],
                                     "name": "themen",
                                     "npdf": 0,
@@ -173,11 +183,6 @@
                                 },
                                 {
                                     "children": [
-                                        {
-                                            "name": "nsb-news_list.html.tmp",
-                                            "npdf": 0,
-                                            "type": "file"
-                                        },
                                         {
                                             "children": [
                                                 {

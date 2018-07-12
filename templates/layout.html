@@ -40,8 +40,10 @@
 
         <!-- Page Content -->
         <div id="page-wrapper">
-            {% include 'includes/_messages.html' %}
-            {% block body %}{% endblock %}
+            <div class="container-fluid">
+                {% include 'includes/_messages.html' %}
+                {% block body %}{% endblock %}
+            </div>
         </div>
         <!-- /#page-wrapper -->
 
