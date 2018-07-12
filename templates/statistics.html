@@ -296,7 +296,29 @@
                             <i class="fa fa-bar-chart-o fa-fw"></i> Donut Chart Example
                         </div>
                         <div class="panel-body">
-                            <canvas id = "donut"></canvas>
+                            <canvas id = "donut1"></canvas>
+                        </div>
+                        <!-- /.panel-body -->
+                    </div>
+                    <!-- /.panel -->
+                    <!-- /.panel -->
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <i class="fa fa-bar-chart-o fa-fw"></i> Donut Chart Example
+                        </div>
+                        <div class="panel-body">
+                            <canvas id = "donut2"></canvas>
+                        </div>
+                        <!-- /.panel-body -->
+                    </div>
+                    <!-- /.panel -->
+                    <!-- /.panel -->
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <i class="fa fa-bar-chart-o fa-fw"></i> Donut Chart Example
+                        </div>
+                        <div class="panel-body">
+                            <canvas id = "donut3"></canvas>
                         </div>
                         <!-- /.panel-body -->
                     </div>
@@ -305,52 +327,106 @@
                 <!-- /.col-lg-4 -->
             </div>
             <!-- /.row -->
-
   </div>
 
-<div class ="col-lg-4 well">
-</div>
-
-<canvas id="myChart"></canvas>
 
 <!-- Chart.js JavaScript -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
 
 <script>
-var stats = {{ stats|tojson }};
 
-var ctx = document.getElementById('donut').getContext('2d');
+    var stats = {{ stats|safe }};
 
+    var ctx = document.getElementById('donut1').getContext('2d');
 
-data = {
-    datasets: [{
-        "label":"{{small_tables}}",
-        "data": [{{small_tables}}, {{medium_tables}}, {{large_tables}}],
+    /*
+     *  CHART 1 : Donut TABLE SIZE
+     */
+
+    data1 = {
+        datasets: [{
+            "label":"Table Size",
+            "data": [{{small_tables}}, {{medium_tables}}, {{large_tables}}],
             "backgroundColor": ["rgb(255, 99, 132)", "rgb(54, 162, 235)", "rgb(255, 205, 86)"]
-    }],
+        }],
+
+        // These labels appear in the legend and in the tooltips when hovering different arcs
+        labels: [
+            'Small',
+            'Medium',
+            'Large'
+        ]
+    };
+
+    var myDoughnutChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: data1,
+        options: Chart.defaults.doughnut
+    });
+
+
+    /*
+     *  CHART 2 & 3: Donut TABLE RATIO and PAGE Ratio
+     */
+    var total_pages = 0;
+    var table_pages = 0;
+    var pdf_with_tables = 0;
+    var pdf_without_tables = 0;
+
+
+    // Extract info from json
+    for (var key in stats) {
+        total_pages += stats[key].n_pages;
+        table_pages += stats[key].n_tables_pages;
+        if (stats[key].n_tables_pages > 0) {
+            pdf_with_tables += 1;
+        } else {
+            pdf_without_tables += 1;
+        }
+    }
+
+    var ctx2 = document.getElementById('donut2').getContext('2d');
+    var ctx3 = document.getElementById('donut3').getContext('2d');
+
+
+    data2 = {
+        datasets: [{
+            "label":"Table Size",
+            "data": [total_pages - table_pages, table_pages],
+            "backgroundColor": ["rgb(255, 99, 132)", "rgb(54, 162, 235)"]
+        }],
+        labels: [
+            total_pages, table_pages
+            //'PDF Pages without tables',
+            //'PDF Pages with tables'
+        ]
+    };
+    data3 = {
+        datasets: [{
+            "label":"Table Ratio",
+            "data": [pdf_with_tables, pdf_without_tables],
+            "backgroundColor": ["rgb(20, 255, 20)", "rgb(255, 20, 20)"]
+        }],
 
     // These labels appear in the legend and in the tooltips when hovering different arcs
-    labels: [
-        'Small',
-        'Medium',
-        'Large'
-    ]
-};
+        labels: [
+            'PDF with tables',
+            'PDF without tables'
+        ]
+    };
 
-
-// And for a doughnut chart
-var myDoughnutChart = new Chart(ctx, {
-    type: 'doughnut',
-    data: data,
-    options: Chart.defaults.doughnut
-});
-
+    var myDoughnutChart2 = new Chart(ctx2, {
+        type: 'doughnut',
+        data: data2,
+        options: Chart.defaults.doughnut
+    });
+    var myDoughnutChart3 = new Chart(ctx3, {
+        type: 'doughnut',
+        data: data3,
+        options: Chart.defaults.doughnut
+    });
 
 </script>
-
-
-
-
 
 {% endblock %}
 
