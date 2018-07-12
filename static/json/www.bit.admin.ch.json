@@ -78,6 +78,11 @@
                         {
                             "children": [
                                 {
+                                    "name": "dokumentation.html.tmp",
+                                    "npdf": 0,
+                                    "type": "file"
+                                },
+                                {
                                     "children": [
                                         {
                                             "children": [
@@ -171,11 +176,6 @@
                                     "type": "directory"
                                 },
                                 {
-                                    "name": "das-bit.html.tmp",
-                                    "npdf": 0,
-                                    "type": "file"
-                                },
-                                {
                                     "children": [],
                                     "name": "themen",
                                     "npdf": 0,
@@ -265,6 +265,11 @@
                                     "name": "temi",
                                     "npdf": 0,
                                     "type": "directory"
+                                },
+                                {
+                                    "name": "l-ufit.html.tmp",
+                                    "npdf": 0,
+                                    "type": "file"
                                 },
                                 {
                                     "children": [],

@@ -28,13 +28,13 @@ mysql = MySQL(app)
 
 # CONSTANTS
 WGET_DATA_PATH = 'data'
-
+PDF_TO_PROCESS = 1
 
 
 # Helper Function
 
 # Check if user logged in
-def is_logged_in(f): # FIXME check other way of having login control !
+def is_logged_in(f):
     @wraps(f)
     def wrap(*args, **kwargs):
         if 'logged_in' in session:
@@ -49,17 +49,14 @@ def is_logged_in(f): # FIXME check other way of having login control !
 @app.route('/', methods=['GET', 'POST'])
 def index():
     if request.method == 'POST': #FIXME I didn't handle security yet !! make sure only logged-in people can execute
-        #FIXME use GET?
 
-        # Note: instead of domain user can type in url
+        # User can type in url
         # The url will then get parsed to extract domain, while the crawler starts at url.
-        # FIXME make it work regardless of having htttp:// or not
 
         # Get Form Fields and save
         url = request.form['url']
         parsed = urlparse(url)
 
-        print(parsed)
         session['domain'] = parsed.netloc
         session['url'] = url
 
@@ -94,7 +91,7 @@ def crawling():
     return render_template('crawling.html')
 
 
-# END Crawling
+# End Crawling
 @app.route('/crawling/end')
 @is_logged_in
 def end_crawling():
@@ -134,47 +131,47 @@ def processing():
     # FIXME workaround to weird file system bug with latin/ cp1252 encoding..
     # https://stackoverflow.com/questions/35959580/non-ascii-file-name-issue-with-os-walk works
     # https://stackoverflow.com/questions/2004137/unicodeencodeerror-on-joining-file-name doesn't work
-    jason_dict = path_dict(path)  # adding ur does not work as expected either
+    hierarchy_dict = path_dict(path)  # adding ur does not work as expected either
 
-    json_string = json.dumps(jason_dict, sort_keys=True, indent=4)  # , encoding='cp1252' not needed in python3
+    hierarchy_stats = json.dumps(hierarchy_dict, sort_keys=True, indent=4)  # , encoding='cp1252' not needed in python3
 
     # Store json file in corresponding directory
     jason_file = open("static/json/%s.json" % (domain,), "w")
-    jason_file.write(json_string)
+    jason_file.write(hierarchy_stats)
     jason_file.close()
 
     # STEP 2: Call helper function to count number of pdf files
-    n_files = path_number_of_files(path)  # FIXME somehow ur is not needed here?
+    n_files = path_number_of_files(path)
     session['n_files'] = n_files
 
     # STEP 3: Extract tables from pdf's
-    stats, n_error, n_success = pdf_stats(path, 10) #FIXME constant
+    stats, n_error, n_success = pdf_stats(path, PDF_TO_PROCESS)
 
     # STEP 4: Save stats
     session['n_error'] = n_error
     session['n_success'] = n_success
-    session['stats'] = json.dumps(stats, sort_keys=True, indent=4)
+    stats_json = json.dumps(stats, sort_keys=True, indent=4)
+    session['stats'] = stats_json
 
     # Store json file in corresponding directory
     jason_file = open("static/json/%s.stats.json" % (domain,), "w")
-    jason_file.write(json_string)
+    jason_file.write(hierarchy_stats)
     jason_file.close()
 
-    flash('The pdf analysis was successful.', 'success')
+    # STEP 5: Save query in DB
 
-    # FIXME Save query in DB
     # Create cursor
-    #cur = mysql.connection.cursor()
+    cur = mysql.connection.cursor()
 
     # Execute query
-    #cur.execute("INSERT INTO users(name, email, username, password) VALUES(%s, %s, %s, %s)",
-    #            (name, email, username, password))
+    cur.execute("INSERT INTO Crawls(crawl_date, pdf_crawled, pdf_processed, domain, url, hierarchy, stats) VALUES(NULL, %s ,%s, %s, %s, %s, %s)",
+                (n_files, n_success, domain, session.get('url', None), hierarchy_dict, stats))
 
     # Commit to DB
-    #mysql.connection.commit()
+    mysql.connection.commit()
 
     # Close connection
-    #cur.close()
+    cur.close()
 
     return render_template('processing.html', n_files=n_files, domain=domain)
 
@@ -194,7 +191,7 @@ def stats():
     json_stats = json.loads(session.get('stats', None))
 
     # STEP 2: do some processing to retrieve interesting info from stats
-    n_tables = sum([subdict['n_pages'] for filename, subdict in json_stats.items()])
+    n_tables = sum([subdict['n_tables_pages'] for filename, subdict in json_stats.items()])
     n_rows = sum([subdict['n_table_rows'] for filename, subdict in json_stats.items()])
 
     medium_tables = sum([subdict['table_sizes']['medium'] for filename, subdict in json_stats.items()])
@@ -316,8 +313,23 @@ def logout():
 @app.route('/dashboard')
 @is_logged_in
 def dashboard():
-    return render_template('dashboard.html')
 
+    # Create cursor
+    cur = mysql.connection.cursor()
+
+    # Get Crawls
+    result = cur.execute("SELECT crawl_date, pdf_crawled, pdf_processed, domain, url FROM Crawls")
+
+    crawls = cur.fetchall()
+
+    if result > 0:
+        return render_template('dashboard.html', crawls=crawls)
+    else:
+        msg = 'No Crawls Found'
+        return render_template('dashboard.html', msg=msg)
+
+    # Close connection FIXME is this code executed
+    cur.close()
 
 if __name__ == '__main__':
     app.secret_key='Aj"$7PE#>3AC6W]`STXYLz*[G\gQWA'

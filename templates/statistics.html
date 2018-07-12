@@ -278,7 +278,7 @@
         datasets: [{
             "label":"Processed PDF",
             "data": [table_pages, total_pages - table_pages],
-            "backgroundColor": ["rgb(51, 122, 183)", "rgb(92, 184, 92)", "rgb(240, 173, 78)", "rgb(217, 83, 79)"]
+            "backgroundColor": ["rgb(92, 184, 92)", "rgb(51, 122, 183)", "rgb(240, 173, 78)", "rgb(217, 83, 79)"]
         }],
         labels: [
             'Total pages with tables',
@@ -289,7 +289,7 @@
         datasets: [{
             "label":"Table Ratio",
             "data": [pdf_with_tables, pdf_without_tables],
-            "backgroundColor": ["rgb(51, 122, 183)", "rgb(92, 184, 92)", "rgb(240, 173, 78)", "rgb(217, 83, 79)"]
+            "backgroundColor": ["rgb(92, 184, 92)", "rgb(51, 122, 183)", "rgb(240, 173, 78)", "rgb(217, 83, 79)"]
         }],
 
     // These labels appear in the legend and in the tooltips when hovering different arcs
@@ -405,8 +405,7 @@
     /*
      *  BAR CHART
      *  FIXME should work in the future too
-
-
+    */
     var ctx_bar = document.getElementById('bar').getContext('2d');
 
     // Create Datapoints
@@ -438,7 +437,7 @@
         data: data_bar,
         options: Chart.defaults.bar
     });
-*/
+
 
 
 </script>
