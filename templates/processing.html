@@ -4,7 +4,7 @@
 <div class="row">
   <div class="progress progress-striped active">
       <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
-          <span class="sr-only">80% Complete</span>
+          <span class="sr-only">100% Complete</span>
       </div>
   </div>
 </div>
@@ -13,12 +13,9 @@
 <div class="col-lg-12">
     <h1 class="page-header"> Processing finished </h1>
 
-    <p class="lead"><strong>{{n_files}}</strong> PDF were collected from domain: <strong>{{domain}}</strong></p>
+    <p class="lead"><strong>{{n_files}}</strong> PDF were processed from domain: <strong>{{domain}}</strong></p>
 
-    <p class="lead"> Our method has found <strong>{{n_tables}}</strong> tables inside the crawled files.</p>
-    <p class="lead"> There were <strong>{{n_errors}}</strong> PDF file(s) that could not be analysed.</p>
-
-    <a href="/stats" class="btn btn-success btn-lg">Show stats</a>
+    <a href="/statistics" class="btn btn-success btn-lg">Show stats</a>
 
     <div/>
 {% endblock %}

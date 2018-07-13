@@ -21,11 +21,9 @@ def path_dict(path):
     else:
         d['type'] = "file"
         if ".pdf" in p:
-            print(p)
             d['npdf'] = 1
         else:
             d['npdf'] = 0
-            print(p)
     return d
 
 

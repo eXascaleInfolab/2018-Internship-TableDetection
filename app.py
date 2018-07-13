@@ -13,6 +13,7 @@ from flask import Flask, render_template, flash, redirect, url_for, session, req
 from flask_mysqldb import MySQL
 from wtforms import Form, StringField, TextAreaField, PasswordField, validators
 from passlib.hash import sha256_crypt
+import time
 
 app = Flask(__name__)
 
@@ -71,8 +72,10 @@ def index():
 @app.route('/crawling')
 @is_logged_in
 def crawling():
+    # STEP 0: TimeKeeping
+    session['crawl_start_time'] = time.time()
 
-    # Prepare WGET command
+    # STEP 1: Prepare WGET command
     url = session.get('url', None)
 
     command = shlex.split("wget -r -A pdf %s" % (url,))
@@ -82,7 +85,7 @@ def crawling():
 
     #TODO https://stackoverflow.com/questions/15041620/how-to-continuously-display-python-output-in-a-webpage
 
-    # Execute command in subdirectory
+    # STEP 2: Execute command in subdirectory
     process = subprocess.Popen(command, cwd=WGET_DATA_PATH)
     session['crawl_process_id'] = process.pid
 
@@ -103,6 +106,11 @@ def end_crawling():
     #TODO stop process after reaching a certain size like 2GB
     os.kill(p_id, signal.SIGTERM)
 
+    # STEP 2: TimeKeeping
+    crawl_start_time = session.get('crawl_start_time', None)
+    session['crawl_total_time'] = time.time() - crawl_start_time
+
+    # STEP 3: Successful interruption
     flash('You interrupted the crawler', 'success')
 
     return render_template('end_crawling.html')
@@ -118,6 +126,9 @@ def about():
 @app.route('/processing')
 @is_logged_in
 def processing():
+
+    # STEP 0: Time keeping
+    proc_start_time = time.time()
 
     domain = session.get('domain', None)
     if domain == None:
@@ -158,14 +169,19 @@ def processing():
     jason_file.write(hierarchy_stats)
     jason_file.close()
 
-    # STEP 5: Save query in DB
+    # STEP 5: Time Keeping
+    proc_over_time = time.time()
+    proc_total_time = proc_over_time - proc_start_time
+
+    # STEP 6: Save query in DB
+    #TODO save time
 
     # Create cursor
     cur = mysql.connection.cursor()
 
     # Execute query
-    cur.execute("INSERT INTO Crawls(crawl_date, pdf_crawled, pdf_processed, domain, url, hierarchy, stats) VALUES(NULL, %s ,%s, %s, %s, %s, %s)",
-                (n_files, n_success, domain, session.get('url', None), hierarchy_dict, stats))
+    cur.execute("INSERT INTO Crawls(cid, crawl_date, pdf_crawled, pdf_processed, process_errors, domain, url, hierarchy, stats, crawl_total_time, proc_total_time) VALUES(NULL, NULL, %s ,%s, %s, %s, %s, %s, %s, %s, %s)",
+                (n_files, n_success, n_error, domain, session.get('url', None), hierarchy_dict, stats_json, session.get('crawl_total_time', None), proc_total_time))
 
     # Commit to DB
     mysql.connection.commit()
@@ -173,15 +189,13 @@ def processing():
     # Close connection
     cur.close()
 
-    return render_template('processing.html', n_files=n_files, domain=domain)
-
+    return render_template('processing.html', n_files=n_success, domain=domain, cid=0)
 
 # General Statistics
-@app.route('/stats')
+@app.route('/statistics')
 @is_logged_in
-def stats():
+def statistics():
 
-    # STEP 1: retrieve all saved stats
     n_files = session.get('n_files', None)
     n_success = session.get('n_success', None)
     domain = session.get('domain', None)
@@ -189,6 +203,8 @@ def stats():
     n_success = session.get('n_success', None)
     n_errors = session.get('n_error', None)
     json_stats = json.loads(session.get('stats', None))
+    proc_total_time = session.get('proc_total_time', None)
+    crawl_total_time = session.get('crawl_total_time', None)
 
     # STEP 2: do some processing to retrieve interesting info from stats
     n_tables = sum([subdict['n_tables_pages'] for filename, subdict in json_stats.items()])
@@ -200,7 +216,41 @@ def stats():
 
     return render_template('statistics.html', n_files=n_files, n_success=n_success, n_tables=n_tables, n_rows=n_rows,
                            n_errors=n_errors, domain=domain, small_tables=small_tables, medium_tables=medium_tables,
-                           large_tables=large_tables, stats=session.get('stats', None))
+                           large_tables=large_tables, stats=session.get('stats', None),
+                           end_time="42. October 1279", crawl_total_time=round(crawl_total_time / 60.0, 1),
+                           proc_total_time=round( proc_total_time / 60.0, 1))
+
+
+# CID specific Statistics
+@app.route('/statistics/<int:cid>')
+@is_logged_in
+def cid_statistics(cid):
+
+    # STEP 1: retrieve all saved stats from DB
+    # Create cursor
+    cur = mysql.connection.cursor()
+
+    result = cur.execute('SELECT * FROM Crawls WHERE cid = %s' % cid)
+    crawl = cur.fetchall()[0]
+
+    print(session.get('stats', None))
+    print(crawl['stats'])
+
+    # STEP 2: do some processing to retrieve interesting info from stats
+    json_stats = json.loads(crawl['stats'])
+    n_tables = sum([subdict['n_tables_pages'] for filename, subdict in json_stats.items()])
+    n_rows = sum([subdict['n_table_rows'] for filename, subdict in json_stats.items()])
+
+    medium_tables = sum([subdict['table_sizes']['medium'] for filename, subdict in json_stats.items()])
+    small_tables = sum([subdict['table_sizes']['small'] for filename, subdict in json_stats.items()])
+    large_tables = sum([subdict['table_sizes']['large'] for filename, subdict in json_stats.items()])
+
+    return render_template('statistics.html', n_files=crawl['pdf_crawled'], n_success=crawl['pdf_processed'],
+                           n_tables=n_tables, n_rows=n_rows, n_errors=crawl['process_errors'], domain=['crawl.domain'],
+                           small_tables=small_tables, medium_tables=medium_tables,
+                           large_tables=large_tables, stats=session.get('stats', None),
+                           end_time="42. October 1279", crawl_total_time=round(crawl['crawl_total_time'] / 60.0, 1),
+                           proc_total_time=round(crawl['proc_total_time'] / 60.0, 1))
 
 
 # Test site
@@ -228,7 +278,7 @@ class RegisterForm(Form):
                                           validators.EqualTo('confirm', message='Passwords do not match')])
     confirm = PasswordField('Confirm Password')
 
-
+# Register
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     form = RegisterForm(request.form)
@@ -242,7 +292,7 @@ def register():
         cur = mysql.connection.cursor()
 
         # Execute query
-        cur.execute("INSERT INTO users(name, email, username, password) VALUES(%s, %s, %s, %s)",
+        cur.execute("INSERT INTO Users(name, email, username, password) VALUES(%s, %s, %s, %s)",
                     (name, email, username, password))
 
         # Commit to DB
@@ -270,7 +320,7 @@ def login():
         cur = mysql.connection.cursor()
 
         # Get user by username
-        result = cur.execute("SELECT * FROM users WHERE username = %s", [username])
+        result = cur.execute("SELECT * FROM Users WHERE username = %s", [username])
 
         if result > 0:
             # Get stored hash
@@ -300,6 +350,32 @@ def login():
     return render_template('login.html')
 
 
+# Delete Crawl
+@app.route('/delete_crawl', methods=['POST'])
+@is_logged_in
+def delete_crawl():
+
+        # Get Form Fields
+        cid = request.form['cid']
+
+        # Create cursor
+        cur = mysql.connection.cursor()
+
+        # Get user by username
+        result = cur.execute("DELETE FROM Crawls WHERE cid = %s" % cid)
+
+        # Commit to DB
+        mysql.connection.commit()
+
+        # Close connection
+        cur.close()
+
+        # FIXME check if successfull first, return message
+        flash('Crawl successfully removed', 'success')
+
+        return redirect(url_for('dashboard'))
+
+
 # Logout
 @app.route('/logout')
 @is_logged_in
@@ -318,7 +394,7 @@ def dashboard():
     cur = mysql.connection.cursor()
 
     # Get Crawls
-    result = cur.execute("SELECT crawl_date, pdf_crawled, pdf_processed, domain, url FROM Crawls")
+    result = cur.execute("SELECT cid, crawl_date, pdf_crawled, pdf_processed, domain, url FROM Crawls")
 
     crawls = cur.fetchall()
 
@@ -330,6 +406,7 @@ def dashboard():
 
     # Close connection FIXME is this code executed
     cur.close()
+
 
 if __name__ == '__main__':
     app.secret_key='Aj"$7PE#>3AC6W]`STXYLz*[G\gQWA'

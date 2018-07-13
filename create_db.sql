@@ -3,7 +3,7 @@ DROP TABLE IF EXISTS Users;
 DROP TABLE IF EXISTS Crawls;
 
 
-CREATE TABLE users
+CREATE TABLE Users
 (
 	id INT(11) AUTO_INCREMENT PRIMARY KEY, 
 	name VARCHAR(100), 
@@ -16,11 +16,15 @@ CREATE TABLE users
 
 CREATE TABLE Crawls
 (
-    crawl_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP PRIMARY KEY,
+    cid INT(11) AUTO_INCREMENT PRIMARY KEY,
+    crawl_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     pdf_crawled INT(11),
     pdf_processed INT(11),
+    process_errors INT(11),
     domain VARCHAR(100),
     url VARCHAR(100),
     hierarchy LONGTEXT,
-    stats LONGTEXT
+    stats LONGTEXT,
+    crawl_total_time INT(11),
+    proc_total_time INT(11)
 );
