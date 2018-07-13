@@ -1,7 +1,9 @@
 {% extends 'layout.html' %}
 
 {% block body %}
-<h1 class="page-header"> Statistics </h1>
+<h1 class="page-header"> Statistics
+    <div class="pull-right"> {{domain}}</div>
+</h1>
 <div class="row">
         <div class="col-lg-3 col-md-6">
             <div class="panel panel-primary">
@@ -321,7 +323,7 @@
         datapoints.push({
             x: stats[key].n_table_rows,
             y: stats[key].n_tables_pages,
-            r: stats[key].n_pages * 2
+            r: stats[key].n_pages / 3.0
         })
 
     }
@@ -405,7 +407,7 @@
     /*
      *  BAR CHART
      *  FIXME should work in the future too
-    */
+
     var ctx_bar = document.getElementById('bar').getContext('2d');
 
     // Create Datapoints
@@ -437,8 +439,7 @@
         data: data_bar,
         options: Chart.defaults.bar
     });
-
-
+    */
 
 </script>
 <style>
@@ -485,24 +486,18 @@
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-    d3.json("static/json/{{domain}}.json", function(error, flare) { // FIXME only works with static?
-        if (error) throw error;
 
-        root = flare;
-        root.x0 = height / 2;
-        root.y0 = 0;
+    /*
+        FIX YANN: serve json from mysql db instead of disk
+     */
+    var hierarchy = {{hierarchy | safe}};
 
-        function collapse(d) {
-            if (d.children) {
-                d._children = d.children;
-                d._children.forEach(collapse);
-                d.children = null;
-            }
-        }
+    root = hierarchy;
+    root.x0 = height / 2;
+    root.y0 = 0;
 
-        root.children.forEach(collapse);
-        update(root);
-    });
+    root.children.forEach(collapse);
+    update(root);
 
     d3.select(self.frameElement).style("height", "800px");
 

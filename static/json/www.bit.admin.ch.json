@@ -165,7 +165,13 @@
                                     "type": "directory"
                                 },
                                 {
-                                    "children": [],
+                                    "children": [
+                                        {
+                                            "name": "mein-bit-portfolio.html.tmp",
+                                            "npdf": 0,
+                                            "type": "file"
+                                        }
+                                    ],
                                     "name": "kundenbereich",
                                     "npdf": 0,
                                     "type": "directory"

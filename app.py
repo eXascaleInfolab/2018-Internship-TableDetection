@@ -143,13 +143,9 @@ def processing():
     # https://stackoverflow.com/questions/35959580/non-ascii-file-name-issue-with-os-walk works
     # https://stackoverflow.com/questions/2004137/unicodeencodeerror-on-joining-file-name doesn't work
     hierarchy_dict = path_dict(path)  # adding ur does not work as expected either
+    hierarchy_json = json.dumps(hierarchy_dict, sort_keys=True, indent=4)  # , encoding='cp1252' not needed in python3
 
-    hierarchy_stats = json.dumps(hierarchy_dict, sort_keys=True, indent=4)  # , encoding='cp1252' not needed in python3
-
-    # Store json file in corresponding directory
-    jason_file = open("static/json/%s.json" % (domain,), "w")
-    jason_file.write(hierarchy_stats)
-    jason_file.close()
+    # FIXME remove all session stores
 
     # STEP 2: Call helper function to count number of pdf files
     n_files = path_number_of_files(path)
@@ -164,24 +160,17 @@ def processing():
     stats_json = json.dumps(stats, sort_keys=True, indent=4)
     session['stats'] = stats_json
 
-    # Store json file in corresponding directory
-    jason_file = open("static/json/%s.stats.json" % (domain,), "w")
-    jason_file.write(hierarchy_stats)
-    jason_file.close()
-
     # STEP 5: Time Keeping
     proc_over_time = time.time()
     proc_total_time = proc_over_time - proc_start_time
 
     # STEP 6: Save query in DB
-    #TODO save time
-
     # Create cursor
     cur = mysql.connection.cursor()
 
     # Execute query
     cur.execute("INSERT INTO Crawls(cid, crawl_date, pdf_crawled, pdf_processed, process_errors, domain, url, hierarchy, stats, crawl_total_time, proc_total_time) VALUES(NULL, NULL, %s ,%s, %s, %s, %s, %s, %s, %s, %s)",
-                (n_files, n_success, n_error, domain, session.get('url', None), hierarchy_dict, stats_json, session.get('crawl_total_time', None), proc_total_time))
+                (n_files, n_success, n_error, domain, session.get('url', None), hierarchy_json, stats_json, session.get('crawl_total_time', None), proc_total_time))
 
     # Commit to DB
     mysql.connection.commit()
@@ -191,34 +180,22 @@ def processing():
 
     return render_template('processing.html', n_files=n_success, domain=domain, cid=0)
 
-# General Statistics
+# Last Crawl Statistics
 @app.route('/statistics')
 @is_logged_in
 def statistics():
+    # Create cursor
+    cur = mysql.connection.cursor()
 
-    n_files = session.get('n_files', None)
-    n_success = session.get('n_success', None)
-    domain = session.get('domain', None)
-    url = session.get('url', None)
-    n_success = session.get('n_success', None)
-    n_errors = session.get('n_error', None)
-    json_stats = json.loads(session.get('stats', None))
-    proc_total_time = session.get('proc_total_time', None)
-    crawl_total_time = session.get('crawl_total_time', None)
+    # Get user by username
+    result = cur.execute("SELECT cid FROM Crawls WHERE crawl_date = (SELECT max(crawl_date) FROM Crawls)")
 
-    # STEP 2: do some processing to retrieve interesting info from stats
-    n_tables = sum([subdict['n_tables_pages'] for filename, subdict in json_stats.items()])
-    n_rows = sum([subdict['n_table_rows'] for filename, subdict in json_stats.items()])
+    cid_last_crawl = cur.fetchone()["cid"]
 
-    medium_tables = sum([subdict['table_sizes']['medium'] for filename, subdict in json_stats.items()])
-    small_tables = sum([subdict['table_sizes']['small'] for filename, subdict in json_stats.items()])
-    large_tables = sum([subdict['table_sizes']['large'] for filename, subdict in json_stats.items()])
+    # Close connection
+    cur.close()
 
-    return render_template('statistics.html', n_files=n_files, n_success=n_success, n_tables=n_tables, n_rows=n_rows,
-                           n_errors=n_errors, domain=domain, small_tables=small_tables, medium_tables=medium_tables,
-                           large_tables=large_tables, stats=session.get('stats', None),
-                           end_time="42. October 1279", crawl_total_time=round(crawl_total_time / 60.0, 1),
-                           proc_total_time=round( proc_total_time / 60.0, 1))
+    return redirect(url_for("cid_statistics", cid=cid_last_crawl))
 
 
 # CID specific Statistics
@@ -233,11 +210,15 @@ def cid_statistics(cid):
     result = cur.execute('SELECT * FROM Crawls WHERE cid = %s' % cid)
     crawl = cur.fetchall()[0]
 
+    # Close connection
+    cur.close();
+
     print(session.get('stats', None))
     print(crawl['stats'])
 
     # STEP 2: do some processing to retrieve interesting info from stats
     json_stats = json.loads(crawl['stats'])
+    json_hierarchy = json.loads(crawl['hierarchy'])
     n_tables = sum([subdict['n_tables_pages'] for filename, subdict in json_stats.items()])
     n_rows = sum([subdict['n_table_rows'] for filename, subdict in json_stats.items()])
 
@@ -246,10 +227,10 @@ def cid_statistics(cid):
     large_tables = sum([subdict['table_sizes']['large'] for filename, subdict in json_stats.items()])
 
     return render_template('statistics.html', n_files=crawl['pdf_crawled'], n_success=crawl['pdf_processed'],
-                           n_tables=n_tables, n_rows=n_rows, n_errors=crawl['process_errors'], domain=['crawl.domain'],
+                           n_tables=n_tables, n_rows=n_rows, n_errors=crawl['process_errors'], domain=crawl['domain'],
                            small_tables=small_tables, medium_tables=medium_tables,
-                           large_tables=large_tables, stats=session.get('stats', None),
-                           end_time="42. October 1279", crawl_total_time=round(crawl['crawl_total_time'] / 60.0, 1),
+                           large_tables=large_tables, stats=json_stats, hierarchy=json_hierarchy,
+                           end_time=crawl['crawl_date'], crawl_total_time=round(crawl['crawl_total_time'] / 60.0, 1),
                            proc_total_time=round(crawl['proc_total_time'] / 60.0, 1))
 
 
