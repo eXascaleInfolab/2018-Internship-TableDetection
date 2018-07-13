@@ -98,3 +98,14 @@ def pdf_stats(path, n_pdf):
 
     return stats, n_error, n_success
 
+# PDF Creation Date Converter (from PDF format to datetime)
+# https://stackoverflow.com/questions/16503075/convert-creationtime-of-pdf-to-a-readable-format-in-python
+from datetime import datetime
+from time import mktime, strptime
+
+
+def pdf_date_format_to_datetime(str):
+    datestring = str[2:-7]
+    ts = strptime(datestring, "%Y%m%d%H%M%S")
+    dt = datetime.fromtimestamp(mktime(ts))
+    return dt

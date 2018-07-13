@@ -2,7 +2,7 @@ import subprocess
 import shlex
 import os
 import signal
-from helper import path_dict, path_number_of_files, pdf_stats
+from helper import path_dict, path_number_of_files, pdf_stats, pdf_date_format_to_datetime
 from heuristic_table_detection import count_tables_dir
 import tabula
 import json
@@ -29,7 +29,7 @@ mysql = MySQL(app)
 
 # CONSTANTS
 WGET_DATA_PATH = 'data'
-PDF_TO_PROCESS = 1
+PDF_TO_PROCESS = 4
 
 
 # Helper Function
@@ -219,19 +219,29 @@ def cid_statistics(cid):
     # STEP 2: do some processing to retrieve interesting info from stats
     json_stats = json.loads(crawl['stats'])
     json_hierarchy = json.loads(crawl['hierarchy'])
-    n_tables = sum([subdict['n_tables_pages'] for filename, subdict in json_stats.items()])
-    n_rows = sum([subdict['n_table_rows'] for filename, subdict in json_stats.items()])
 
-    medium_tables = sum([subdict['table_sizes']['medium'] for filename, subdict in json_stats.items()])
-    small_tables = sum([subdict['table_sizes']['small'] for filename, subdict in json_stats.items()])
-    large_tables = sum([subdict['table_sizes']['large'] for filename, subdict in json_stats.items()])
+    stats_items = json_stats.items()
+    n_tables = sum([subdict['n_tables_pages'] for filename, subdict in stats_items])
+    n_rows = sum([subdict['n_table_rows'] for filename, subdict in stats_items])
+
+    medium_tables = sum([subdict['table_sizes']['medium'] for filename, subdict in stats_items])
+    small_tables = sum([subdict['table_sizes']['small'] for filename, subdict in stats_items])
+    large_tables = sum([subdict['table_sizes']['large'] for filename, subdict in stats_items])
+
+    # Find some stats about creation dates
+    creation_dates_pdf = [subdict['creation_date'] for filename, subdict in stats_items]
+    creation_dates = list(map(lambda str : pdf_date_format_to_datetime(str), creation_dates_pdf))
+
+    oldest_pdf = min(creation_dates)
+    most_recent_pdf = max(creation_dates)
 
     return render_template('statistics.html', n_files=crawl['pdf_crawled'], n_success=crawl['pdf_processed'],
                            n_tables=n_tables, n_rows=n_rows, n_errors=crawl['process_errors'], domain=crawl['domain'],
                            small_tables=small_tables, medium_tables=medium_tables,
                            large_tables=large_tables, stats=json_stats, hierarchy=json_hierarchy,
                            end_time=crawl['crawl_date'], crawl_total_time=round(crawl['crawl_total_time'] / 60.0, 1),
-                           proc_total_time=round(crawl['proc_total_time'] / 60.0, 1))
+                           proc_total_time=round(crawl['proc_total_time'] / 60.0, 1),
+                           oldest_pdf=oldest_pdf, most_recent_pdf=most_recent_pdf)
 
 
 # Test site
@@ -258,6 +268,7 @@ class RegisterForm(Form):
     password = PasswordField('Password', [validators.DataRequired(),
                                           validators.EqualTo('confirm', message='Passwords do not match')])
     confirm = PasswordField('Confirm Password')
+
 
 # Register
 @app.route('/register', methods=['GET', 'POST'])
