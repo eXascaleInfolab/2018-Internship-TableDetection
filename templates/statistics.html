@@ -136,21 +136,24 @@
                             <span class="pull-right text-muted small"><em>{{most_recent_pdf}}</em>
                             </span>
                         </a>
-                        <a href="#" class="list-group-item">
-                            <i class="fa fa-navicon  fa-fw"></i> Small Tables found
-                            <span class="pull-right text-muted small"><em>{{small_tables}}</em>
+                        <button class="list-group-item" data-container="body" data-toggle="popover" data-placement="left" data-content="Tables with 10 rows or less">
+                            <i class="fa fa-navicon  fa-fw" ></i> Small Tables found
+                            <i class="fa fa-info-circle  fa-fw" ></i>
+                            <span class="pull-right text-muted small "><em>{{small_tables}}</em>
                             </span>
-                        </a>
-                        <a href="#" class="list-group-item">
+                        </button>
+                        <button class="list-group-item" data-container="body" data-toggle="popover" data-placement="left" data-content="Tables with 20 rows or less">
                             <i class="fa fa-th fa-fw"></i> Medium Tables found
+                            <i class="fa fa-info-circle  fa-fw" ></i>
                             <span class="pull-right text-muted small"><em>{{medium_tables}}</em>
                             </span>
-                        </a>
-                        <a href="#" class="list-group-item">
+                        </button>
+                        <button class="list-group-item" data-container="body" data-toggle="popover" data-placement="left" data-content="Tables with more than 20 rows">
                             <i class="fa fa-th-large  fa-fw"></i> Large Tables found
+                            <i class="fa fa-info-circle  fa-fw" ></i>
                             <span class="pull-right text-muted small"><em>{{large_tables}}</em>
                             </span>
-                        </a>
+                        </button>
                     </div>
                 </div>
                 <!-- /.panel-body -->
@@ -323,7 +326,7 @@
         datapoints.push({
             x: stats[key].n_table_rows,
             y: stats[key].n_tables_pages,
-            r: stats[key].n_pages / 3.0
+            r: stats[key].n_pages / 3.0 //FIXME
         })
 
     }
@@ -335,8 +338,19 @@
 
     var internalDataLength = datapoints.length;
     i = 0;
-    while (i <= internalDataLength) {
+    while (i < internalDataLength) {
+        var pages = datapoints[i]['r'];
         var baseColor = baseColors[Math.floor(Math.random()*baseColors.length)];
+
+        if (pages > 100) {
+            baseColor = baseColors[3];
+        } else if (pages > 50){
+            baseColor = baseColors[2];
+        } else if (pages > 10) {
+            baseColor = baseColors[1];
+        } else {
+            baseColor = baseColors[0];
+        }
 
         var randomR = baseColor[0];
         var randomG = baseColor[1];
@@ -618,8 +632,21 @@
             children.forEach(expand);
     }
 
+    function expandLevel(d, l){
+        if (l <= 0) {
+            return;
+        }
+        var children = (d.children)?d.children:d._children;
+        if (d._children) {
+            d.children = d._children;
+            d._children = null;
+        }
+        if(children)
+            children.map(d => {return expandLevel(d, l-1);});
+    }
+
     function expandAll(){
-        expand(root);
+        expandLevel(root, 5);
         update(root);
     }
 
@@ -639,7 +666,5 @@
 
 
 </script>
-
-
 
 {% endblock %}

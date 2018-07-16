@@ -12,6 +12,9 @@ MEDIUM_TABLE_LIMIT = 20
 def path_dict(path):
     #p = path.encode('cp1252')
     p = path
+    i = path
+
+    # while (len(os.listdir(i)) == 1):
 
     d = {'name': os.path.basename(p)}
     if os.path.isdir(p):
