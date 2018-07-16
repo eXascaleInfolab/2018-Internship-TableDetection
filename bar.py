@@ -16,6 +16,8 @@ from passlib.hash import sha256_crypt
 import time
 
 app = Flask(__name__)
+app.secret_key = 'Aj"$7PE#>3AC6W]`STXYLz*[G\gQWA'
+
 
 # Config MySQL
 app.config['MYSQL_HOST'] = 'localhost'
