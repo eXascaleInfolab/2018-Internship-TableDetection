@@ -321,71 +321,104 @@
     var ctx_bubble = document.getElementById('bubble').getContext('2d');
 
     // Create Datapoints
-    var datapoints = [];
+    var datapointsSmall = [];
+    var datapointsMedium = [];
+    var datapointsLarge = [];
+    var datapointsHuge = [];
+
     for (var key in stats) {
-        datapoints.push({
+        var bubble = {
             x: stats[key].n_table_rows,
             y: stats[key].n_tables_pages,
             r: stats[key].n_pages / 3.0 //FIXME
-        })
+        }
+
+        var pages = stats[key].n_pages;
+        if (pages > 100) {
+            datapointsHuge.push(bubble);
+        } else if (pages > 50) {
+            datapointsLarge.push(bubble);
+        } else if (pages > 10) {
+            datapointsMedium.push(bubble);
+        } else {
+            datapointsSmall.push(bubble);
+        }
 
     }
 
-    // Generate some colors
-    var graphColors = [];
-    var graphOutlines = [];
-    var hoverColor = [];
+    function generateColors(length, id) {
+        // Generate colors Small
+        var graphColors = [];
+        var graphOutlines = [];
+        var hoverColor = [];
 
-    var internalDataLength = datapoints.length;
-    i = 0;
-    while (i < internalDataLength) {
-        var pages = datapoints[i]['r'];
-        var baseColor = baseColors[Math.floor(Math.random()*baseColors.length)];
+        var internalDataLength = datapointsSmall.length + datapointsHuge.length + datapointsMedium.length
+                                    + datapointsLarge.length + 1;
+        i = 0;
+        while (i < internalDataLength) {
+            var baseColor = baseColors[id];
 
-        if (pages > 100) {
-            baseColor = baseColors[3];
-        } else if (pages > 50){
-            baseColor = baseColors[2];
-        } else if (pages > 10) {
-            baseColor = baseColors[1];
-        } else {
-            baseColor = baseColors[0];
+            var randomR = baseColor[0];
+            var randomG = baseColor[1];
+            var randomB = baseColor[2];
+
+            var graphBackground = "rgb("
+                + randomR + ", "
+                + randomG + ", "
+                + randomB + ")";
+            graphColors.push(graphBackground);
+
+            var graphOutline = "rgb("
+                + (randomR - 80) + ", "
+                + (randomG - 80) + ", "
+                + (randomB - 80) + ")";
+            graphOutlines.push(graphOutline);
+
+            var hoverColors = "rgb("
+                + (randomR + 25) + ", "
+                + (randomG + 25) + ", "
+                + (randomB + 25) + ")";
+            hoverColor.push(hoverColors);
+
+            i++;
         }
 
-        var randomR = baseColor[0];
-        var randomG = baseColor[1];
-        var randomB = baseColor[2];
-
-        var graphBackground = "rgb("
-            + randomR + ", "
-            + randomG + ", "
-            + randomB + ")";
-        graphColors.push(graphBackground);
-
-        var graphOutline = "rgb("
-            + (randomR - 80) + ", "
-            + (randomG - 80) + ", "
-            + (randomB - 80) + ")";
-        graphOutlines.push(graphOutline);
-
-        var hoverColors = "rgb("
-            + (randomR + 25) + ", "
-            + (randomG + 25) + ", "
-            + (randomB + 25) + ")";
-        hoverColor.push(hoverColors);
-
-        i++;
+        return [graphColors, graphOutlines, hoverColor]
     };
 
+    var generatedSmall = generateColors(datapointsSmall.length, 0);
+    var generatedMedium = generateColors(datapointsSmall.length, 1);
+    var generatedLarge= generateColors(datapointsSmall.length, 2);
+    var generatedHuge = generateColors(datapointsSmall.length, 3);
 
     var data_bubble = {
         datasets: [{
-            "label": ["Processed PDF's"],
-            "data": datapoints,
-            "backgroundColor": graphColors,
-            "hoverBackgroundColor": hoverColor,
-            "borderColor": graphOutlines
-        }],
+            "label": ["PDF < 10 pages"],
+            "data": datapointsSmall,
+            "backgroundColor": generatedSmall[0],
+            "hoverBackgroundColor": generatedSmall[2],
+            "borderColor": generatedSmall[1]
+            }, {
+            "label": ["PDF < 50 pages"],
+            "data": datapointsMedium,
+            "backgroundColor": generatedMedium[0],
+            "hoverBackgroundColor": generatedMedium[2],
+            "borderColor": generatedMedium[1]
+            }, {
+            "label": ["PDF < 100 pages"],
+            "data": datapointsLarge,
+            "backgroundColor": generatedLarge[0],
+            "hoverBackgroundColor": generatedLarge[2],
+            "borderColor": generatedLarge[1]
+            }, {
+            "label": ["PDF > 100 pages"],
+            "data": datapointsHuge,
+            "backgroundColor": generatedHuge[0],
+            "hoverBackgroundColor": generatedHuge[2],
+            "borderColor": generatedHuge[1]
+            }
+
+        ],
 
         // These labels appear in the legend and in the tooltips when hovering different arcs
         labels: [
