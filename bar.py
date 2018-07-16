@@ -232,8 +232,9 @@ def cid_statistics(cid):
     creation_dates_pdf = [subdict['creation_date'] for filename, subdict in stats_items]
     creation_dates = list(map(lambda str : pdf_date_format_to_datetime(str), creation_dates_pdf))
 
-    oldest_pdf = min(creation_dates)
-    most_recent_pdf = max(creation_dates)
+    if len(creation_dates) > 0:
+        oldest_pdf = min(creation_dates)
+        most_recent_pdf = max(creation_dates)
 
     return render_template('statistics.html', n_files=crawl['pdf_crawled'], n_success=crawl['pdf_processed'],
                            n_tables=n_tables, n_rows=n_rows, n_errors=crawl['process_errors'], domain=crawl['domain'],
