@@ -237,6 +237,9 @@ def cid_statistics(cid):
     if len(creation_dates) > 0:
         oldest_pdf = min(creation_dates)
         most_recent_pdf = max(creation_dates)
+    else:
+        oldest_pdf = "None"
+        most_recent_pdf = "None"
 
     return render_template('statistics.html', n_files=crawl['pdf_crawled'], n_success=crawl['pdf_processed'],
                            n_tables=n_tables, n_rows=n_rows, n_errors=crawl['process_errors'], domain=crawl['domain'],
