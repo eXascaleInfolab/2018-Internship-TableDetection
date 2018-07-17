@@ -11,21 +11,14 @@
 </div>
 
 <div class="col-lg-12">
-  <h1 class="page-header"> Data analysis. </h1>
-    {% if session.logged_in != NULL %}
-    <p class="lead">The tool is now performing table detection on the crawled PDF.</p>
-    <p class="lead">In this demo version only 10 files will be analysed, expect between 10 and 100 minutes processing time.</p>
-    {% endif %}
+  <h1 class="page-header"> Getting ready for Data Analysis.</h1>
+  {% if session.logged_in != NULL %}
+    <p class="lead">You have the option between starting table detection or choosing another URL.</p>
+
+    <a href="/" class="btn btn-info btn-lg">Back to the start</a>
+    <a href={{url_for("table_detection")}} class="btn btn-primary btn-lg">Perform Table Detection</a>
+
+  {% endif %}
+
 </div>
-
-<script>
-     window.setTimeout(function(){
-
-          // Move to a new location or you can do something else
-           window.location.href = '{{url_for("processing")}}';
-
-     }, {{wait}});
-
- </script>
-
 {% endblock %}

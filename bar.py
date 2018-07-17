@@ -96,27 +96,54 @@ def crawling():
 
     return render_template('crawling.html', max_crawling_duration=MAX_CRAWLING_DURATION)
 
-
-# End Crawling
+# End Crawling Manual
 @app.route('/crawling/end')
 @is_logged_in
 def end_crawling():
+
+    # STEP 1: Kill crawl process
     p_id = session.get('crawl_process_id', None)
-
-    #FIXME this way of handling the subprocess is quick and dirty
-    #FIXME for more control we could switch to Celery or another library
-
-    #TODO stop process after reaching a certain size like 2GB
     os.kill(p_id, signal.SIGTERM)
+
+    #session['crawl_process_id'] = -1
 
     # STEP 2: TimeKeeping
     crawl_start_time = session.get('crawl_start_time', None)
     session['crawl_total_time'] = time.time() - crawl_start_time
 
     # STEP 3: Successful interruption
-    flash('The crawler was successfully interrupted', 'success')
+    flash('You successfully interrupted the crawler', 'success')
 
-    return render_template('end_crawling.html', wait=WAIT_AFTER_CRAWLING)
+    return render_template('end_crawling.html')
+
+
+# End Crawling Auto
+@app.route('/crawling/autoend')
+@is_logged_in
+def autoend_crawling():
+    # STEP 0: Check if already interrupted
+    p_id = session.get('crawl_process_id', None)
+    if p_id < 0:
+        return
+    else:
+        # STEP 1: Kill crawl process
+        os.kill(p_id, signal.SIGTERM)
+
+        # STEP 2: TimeKeeping
+        crawl_start_time = session.get('crawl_start_time', None)
+        session['crawl_total_time'] = time.time() - crawl_start_time
+
+        # STEP 3: Successful interruption
+        flash('Time Limit reached - Crawler interrupted', 'success')
+
+        return redirect(url_for("table_detection"))
+
+
+# Start table detection
+@app.route('/table_detection')
+@is_logged_in
+def table_detection():
+    return render_template('table_detection.html', wait=WAIT_AFTER_CRAWLING)
 
 
 # About
