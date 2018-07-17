@@ -31,7 +31,7 @@ mysql = MySQL(app)
 # CONSTANTS
 WGET_DATA_PATH = 'data'
 PDF_TO_PROCESS = 10
-MAX_CRAWLING_DURATION = 1000 #15 * 60 * 1000 # 15 minutes
+MAX_CRAWLING_DURATION = 15 * 60 * 1000  # 15 minutes
 WAIT_AFTER_CRAWLING = 10000
 
 
@@ -419,5 +419,5 @@ def dashboard():
 
 if __name__ == '__main__':
     app.secret_key='Aj"$7PE#>3AC6W]`STXYLz*[G\gQWA'
-    app.run(debug=True) # application is in debug mode
+    app.run(host='0.0.0.0')
 
