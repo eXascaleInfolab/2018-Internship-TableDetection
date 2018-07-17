@@ -31,7 +31,7 @@ mysql = MySQL(app)
 # CONSTANTS
 WGET_DATA_PATH = 'data'
 PDF_TO_PROCESS = 10
-MAX_CRAWLING_DURATION = 15 * 60 * 1000 # 15 minutes
+MAX_CRAWLING_DURATION = 1000 #15 * 60 * 1000 # 15 minutes
 WAIT_AFTER_CRAWLING = 10000
 
 
@@ -124,7 +124,7 @@ def autoend_crawling():
     # STEP 0: Check if already interrupted
     p_id = session.get('crawl_process_id', None)
     if p_id < 0:
-        return
+        return "process already killed"
     else:
         # STEP 1: Kill crawl process
         os.kill(p_id, signal.SIGTERM)

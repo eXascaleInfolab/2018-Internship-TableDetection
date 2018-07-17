@@ -330,7 +330,7 @@
         var bubble = {
             x: stats[key].n_table_rows,
             y: stats[key].n_tables_pages,
-            r: stats[key].n_pages / 3.0 //FIXME
+            r: Math.round(0.8 * Math.log(stats[key].n_pages) / Math.log(1.05)) + 1//FIXME formula also 1/3 works
         }
 
         var pages = stats[key].n_pages;
