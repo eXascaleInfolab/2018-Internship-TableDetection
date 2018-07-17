@@ -4,7 +4,6 @@ import os
 import signal
 from helper import path_dict, path_number_of_files, pdf_stats, pdf_date_format_to_datetime
 from heuristic_table_detection import count_tables_dir
-import tabula
 import json
 from functools import wraps
 from urllib.parse import urlparse
@@ -31,7 +30,9 @@ mysql = MySQL(app)
 
 # CONSTANTS
 WGET_DATA_PATH = 'data'
-PDF_TO_PROCESS = 4
+PDF_TO_PROCESS = 10
+MAX_CRAWLING_DURATION = 15 * 60 * 1000 # 15 minutes
+WAIT_AFTER_CRAWLING = 10000
 
 
 # Helper Function
@@ -93,7 +94,7 @@ def crawling():
 
     exitCode = process.returncode
 
-    return render_template('crawling.html')
+    return render_template('crawling.html', max_crawling_duration=MAX_CRAWLING_DURATION)
 
 
 # End Crawling
@@ -113,9 +114,9 @@ def end_crawling():
     session['crawl_total_time'] = time.time() - crawl_start_time
 
     # STEP 3: Successful interruption
-    flash('You interrupted the crawler', 'success')
+    flash('The crawler was successfully interrupted', 'success')
 
-    return render_template('end_crawling.html')
+    return render_template('end_crawling.html', wait=WAIT_AFTER_CRAWLING)
 
 
 # About
@@ -248,23 +249,6 @@ def cid_statistics(cid):
                            end_time=crawl['crawl_date'], crawl_total_time=round(crawl['crawl_total_time'] / 60.0, 1),
                            proc_total_time=round(crawl['proc_total_time'] / 60.0, 1),
                            oldest_pdf=oldest_pdf, most_recent_pdf=most_recent_pdf)
-
-
-# Test site
-@app.route('/test1')
-def test1():
-    return render_template('stats.html', domain=session.get('domain',None))
-
-
-# Test site2
-@app.route('/test2')
-def test2():
-    return render_template('test2.html')
-
-# Test site3
-@app.route('/test3')
-def test3():
-    return render_template('index.html')
 
 
 class RegisterForm(Form):

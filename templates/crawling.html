@@ -18,12 +18,23 @@
       {% endif %}
 
       {% if session.logged_in != NULL %}
-      <p class="lead">The data is getting collected, if you want to interrupt the process preemptively, please do so. Otherwise the process will continue until all desired data is
-          collected or a limit of about 2GB exceeded (not implemented yet!).</p>
+      <p class="lead">The data is getting collected, if you want to interrupt the process preemptively, please do so.
+                        After 15 min the process will be automatically interrupted and this page will be redirected
+                        to perform Data Analysis.</p>
       <a href="/crawling/end" class="btn btn-primary btn-lg">Interrupt Crawling</a>
       {% endif %}
   </div>
 </div>
+
+<script>
+     window.setTimeout(function(){
+
+          // Move to a new location or you can do something else
+           window.location.href = '{{url_for("end_crawling")}}';
+
+     }, {{max_crawling_duration}});
+
+ </script>
 
 
 
