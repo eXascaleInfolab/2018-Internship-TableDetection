@@ -318,7 +318,8 @@
     /*
         BUBBLE CHART
      */
-    var ctx_bubble = document.getElementById('bubble').getContext('2d');
+    var canvas_bubble = document.getElementById('bubble')
+    var ctx_bubble = canvas_bubble.getContext('2d');
 
     // Create Datapoints
     var datapointsSmall = [];
@@ -330,7 +331,8 @@
         var bubble = {
             x: stats[key].n_table_rows,
             y: stats[key].n_tables_pages,
-            r: Math.round(1.2 * Math.log(stats[key].n_pages/30.0 + 1) / Math.log(1.05))//FIXME formula also 1/3 works
+            r: Math.round(1.2 * Math.log(stats[key].n_pages/30.0 + 1) / Math.log(1.05)), //FIXME formula also 1/3 works
+            url: stats[key].url
         }
 
         var pages = stats[key].n_pages;
@@ -343,7 +345,6 @@
         } else {
             datapointsSmall.push(bubble);
         }
-
     }
 
     function generateColors(length, id) {
@@ -418,12 +419,6 @@
             "borderColor": generatedHuge[1]
             }
 
-        ],
-
-        // These labels appear in the legend and in the tooltips when hovering different arcs
-        labels: [
-            'PDF with tables',
-            'PDF without tables'
         ]
     };
 
@@ -449,6 +444,13 @@
                 }
             }
         });
+
+    canvas_bubble.onclick = function(e) {
+        var activePoint = myBubbleChart.getElementAtEvent(e);
+        if (!activePoint.length) return; // return if not clicked on slice
+        // Get URL
+        window.open("http://" + myBubbleChart.data.datasets[activePoint[0]._datasetIndex].data[activePoint[0]._index].url.substring(5));
+    }
 
 
     /*

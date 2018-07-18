@@ -88,7 +88,7 @@ def pdf_stats(path, n_pdf):
                     creation_date = pdf_file.getDocumentInfo()['/CreationDate']
                     stats[fileName] = {'n_pages': n_pages, 'n_tables_pages': n_table_pages,
                                        'n_table_rows': n_table_rows, 'creation_date': creation_date,
-                                       'table_sizes': table_sizes}
+                                       'table_sizes': table_sizes, 'url': rel_file}
 
                     print("Tabula Conversion done for %s" % (fileName,))
                     n_success = n_success + 1
