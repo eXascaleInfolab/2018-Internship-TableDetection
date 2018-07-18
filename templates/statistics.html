@@ -615,6 +615,9 @@
             d.children = d._children;
             d._children = null;
         }
+        if (d.children == null) {
+            window.open("https://" + d.url);
+        }
         update(d);
     }
 

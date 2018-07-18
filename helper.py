@@ -26,6 +26,7 @@ def path_dict(path):
         d['type'] = "file"
         if ".pdf" in p:
             d['npdf'] = 1
+            d['url'] = p[5:] # FIXME remove if link not used
         else:
             d['npdf'] = 0
     return d
