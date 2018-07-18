@@ -2,6 +2,9 @@ import os
 import csv
 import tabula
 import PyPDF2
+from datetime import datetime
+from time import mktime, strptime
+
 
 # CONSTANTS
 SMALL_TABLE_LIMIT = 10
@@ -10,9 +13,7 @@ MEDIUM_TABLE_LIMIT = 20
 # Create a json string for given path
 # source: https://stackoverflow.com/questions/25226208/represent-directory-tree-as-json
 def path_dict(path):
-    #p = path.encode('cp1252')
     p = path
-    i = path
 
     # while (len(os.listdir(i)) == 1):
 
@@ -101,12 +102,9 @@ def pdf_stats(path, n_pdf):
 
     return stats, n_error, n_success
 
+
 # PDF Creation Date Converter (from PDF format to datetime)
 # https://stackoverflow.com/questions/16503075/convert-creationtime-of-pdf-to-a-readable-format-in-python
-from datetime import datetime
-from time import mktime, strptime
-
-
 def pdf_date_format_to_datetime(str):
     datestring = str[2:-7]
     ts = strptime(datestring, "%Y%m%d%H%M%S")

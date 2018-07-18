@@ -451,45 +451,6 @@
         // Get URL
         window.open("http://" + myBubbleChart.data.datasets[activePoint[0]._datasetIndex].data[activePoint[0]._index].url.substring(5));
     }
-
-
-    /*
-     *  BAR CHART
-     *  FIXME should work in the future too
-
-    var ctx_bar = document.getElementById('bar').getContext('2d');
-
-    // Create Datapoints
-    var datapoints_bar = {};
-    for (var key in stats) {
-        var year = parseInt(stats[key].creation_date.substring(2,6));
-        datapoints_bar[year] = (datapoints_bar[year]||0 + 1);
-    }
-
-    // Create Dates
-
-
-    //var datapoints_bar = [{x:new Date(2014,1,1), y:28}, {x:new Date(2015,1,1), y:62},{x:new Date(2011,4,7), y:100},{x:new Date(2019,1,10), y:10}]
-
-    var data_bar = {
-        datasets: [{
-            "label": ["Sample Dataset"],
-            "data": datapoints_bar,
-            "backgroundColor": graphColors,
-            "hoverBackgroundColor": hoverColor,
-            "borderColor": graphOutlines
-        }],
-        labels: [10,5,5]
-    };
-
-
-    var myBarChart = new Chart(ctx_bar, {
-        type: 'bar',
-        data: data_bar,
-        options: Chart.defaults.bar
-    });
-    */
-
 </script>
 <style>
     .node {

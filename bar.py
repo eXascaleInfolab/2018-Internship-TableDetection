@@ -3,7 +3,6 @@ import shlex
 import os
 import signal
 from helper import path_dict, path_number_of_files, pdf_stats, pdf_date_format_to_datetime
-from heuristic_table_detection import count_tables_dir
 import json
 from functools import wraps
 from urllib.parse import urlparse
@@ -31,7 +30,7 @@ mysql = MySQL(app)
 # CONSTANTS
 WGET_DATA_PATH = 'data'
 PDF_TO_PROCESS = 10
-MAX_CRAWLING_DURATION = 15 * 60 * 1000  # 15 minutes
+MAX_CRAWLING_DURATION =  6 # 15 minutes
 WAIT_AFTER_CRAWLING = 10000
 
 
@@ -81,7 +80,8 @@ def crawling():
     # STEP 1: Prepare WGET command
     url = session.get('url', None)
 
-    command = shlex.split("wget -r -A pdf %s" % (url,))
+    command = shlex.split("timeout %d wget -r -A pdf %s" % (MAX_CRAWLING_DURATION, url,)) #FIXME timeout remove
+    #command = shlex.split("wget -r -A pdf %s" % (url,))
 
     #TODO use celery
     #TODO give feedback how wget is doing
@@ -92,9 +92,8 @@ def crawling():
     process = subprocess.Popen(command, cwd=WGET_DATA_PATH)
     session['crawl_process_id'] = process.pid
 
-    exitCode = process.returncode
-
     return render_template('crawling.html', max_crawling_duration=MAX_CRAWLING_DURATION)
+
 
 # End Crawling Manual
 @app.route('/crawling/end')
@@ -105,7 +104,7 @@ def end_crawling():
     p_id = session.get('crawl_process_id', None)
     os.kill(p_id, signal.SIGTERM)
 
-    #session['crawl_process_id'] = -1
+    session['crawl_process_id'] = -1
 
     # STEP 2: TimeKeeping
     crawl_start_time = session.get('crawl_start_time', None)
@@ -117,10 +116,11 @@ def end_crawling():
     return render_template('end_crawling.html')
 
 
-# End Crawling Auto
+# End Crawling Automatic
 @app.route('/crawling/autoend')
 @is_logged_in
 def autoend_crawling():
+
     # STEP 0: Check if already interrupted
     p_id = session.get('crawl_process_id', None)
     if p_id < 0:
@@ -134,7 +134,7 @@ def autoend_crawling():
         session['crawl_total_time'] = time.time() - crawl_start_time
 
         # STEP 3: Successful interruption
-        flash('Time Limit reached - Crawler interrupted', 'success')
+        flash('Time Limit reached - Crawler interrupted automatically', 'success')
 
         return redirect(url_for("table_detection"))
 
@@ -420,4 +420,5 @@ def dashboard():
 if __name__ == '__main__':
     app.secret_key='Aj"$7PE#>3AC6W]`STXYLz*[G\gQWA'
     app.run(debug=True)
+    #app.run(host='0.0.0.0')
 
