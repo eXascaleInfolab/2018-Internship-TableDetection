@@ -615,7 +615,7 @@
             d.children = d._children;
             d._children = null;
         }
-        if (d.children == null) {
+        if (d.children == null && d.name.indexOf(".pdf") !== -1) {
             window.open("https://" + d.url);
         }
         update(d);
@@ -645,7 +645,7 @@
     }
 
     function expandAll(){
-        expandLevel(root, 5);
+        expandLevel(root, 4);
         update(root);
     }
 

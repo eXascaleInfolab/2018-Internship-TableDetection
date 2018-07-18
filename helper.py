@@ -10,14 +10,23 @@ from time import mktime, strptime
 SMALL_TABLE_LIMIT = 10
 MEDIUM_TABLE_LIMIT = 20
 
+
 # Create a json string for given path
 # source: https://stackoverflow.com/questions/25226208/represent-directory-tree-as-json
 def path_dict(path):
     p = path
+    name = os.path.basename(p)
 
-    # while (len(os.listdir(i)) == 1):
+    # SMALL CONSTRUCT TO SHORTEN HIERARCHY
+    # Check if there is only one directory inside
+    while os.path.isdir(p) and len(os.listdir(p)) == 1:
+        # If that's the case then append it to the name and go further inside
+        sole_dir = os.listdir(p)[0]
+        name = name + "/" + sole_dir
+        p = os.path.join(p, sole_dir)
 
-    d = {'name': os.path.basename(p)}
+    # ORIGINAL CONSTRUCT
+    d = {'name': name}
     if os.path.isdir(p):
         d['type'] = "directory"
         d['children'] = [path_dict(os.path.join(p, x)) for x in os.listdir(p)]
@@ -51,6 +60,12 @@ def pdf_stats(path, n_pdf):
 
         for fileName in files:
             if ".pdf" in fileName:
+
+                # Check if enough pdf already processed
+                if n_success >= n_pdf:
+                    return stats, n_error, n_success
+
+
                 rel_file = os.path.join(dir_, fileName)
                 print("Number errors: %d" % (n_error,))
                 print("Number successes: %d" % (n_success,))
@@ -95,8 +110,6 @@ def pdf_stats(path, n_pdf):
                     print("Tabula Conversion done for %s" % (fileName,))
                     n_success = n_success + 1
 
-                    if n_success >= n_pdf:
-                        return stats, n_error, n_success
                 except:
                     print("not successful!")
                     n_error += 1
