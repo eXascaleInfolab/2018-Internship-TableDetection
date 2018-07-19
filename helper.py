@@ -49,15 +49,15 @@ def path_number_of_files(path):
 
 
 # Uses Tabula to detect and extract tables from the pdf's
+# INPUT: path containing pdf's and the maximal number of pdf to analyse
 def pdf_stats(path, n_pdf):
     stats = {}
+
+    # Keep track of successful and unsuccessful files
     n_success = 0
     n_error = 0
 
     for dir_, _, files in os.walk(path):
-
-        # Keep track of successful and unsuccessful files
-
         for fileName in files:
             if ".pdf" in fileName:
 
@@ -65,34 +65,32 @@ def pdf_stats(path, n_pdf):
                 if n_success >= n_pdf:
                     return stats, n_error, n_success
 
-
-                rel_file = os.path.join(dir_, fileName)
                 print("Number errors: %d" % (n_error,))
                 print("Number successes: %d" % (n_success,))
                 print(stats)
 
-                try:
-                    # STEP 0: set all counter to 0
-                    n_pages = 0
-                    n_table_pages = 0
-                    n_table_rows = 0
-                    table_sizes = {'small': 0, 'medium': 0, 'large': 0}
+                # Get file location
+                rel_file = os.path.join(dir_, fileName)
 
-                    # STEP 1: count total number of pages
-                    pdf_file = PyPDF2.PdfFileReader(open(rel_file, mode='rb'))
-                    n_pages = pdf_file.getNumPages()
+                # STEP 0: set all counter to 0
+                n_table_pages = 0
+                n_table_rows = 0
+                table_sizes = {'small': 0, 'medium': 0, 'large': 0}
 
-                    # STEP 2: run TABULA to extract table from every page
-                    for i in range(1, n_pages+1):
-                        tabula.convert_into(rel_file, "output.csv", output_format='csv', pages="%d" % (i,))
+                # STEP 1: count total number of pages
+                pdf_file = PyPDF2.PdfFileReader(open(rel_file, mode='rb'))
+                n_pages = pdf_file.getNumPages()
 
-                        # STEP 3: count number of lines of csv
-                        fileObject = csv.reader(open("output.csv"))
-                        rows = sum(1 for _ in fileObject)
+                # STEP 2: run TABULA to extract table from every page
+                for i in range(1, n_pages+1):
+                    df = tabula.read_pdf(rel_file, pages="%d" % (i,))
+
+                    # STEP 3: count number of lines of dataframe
+                    if df is not None:
+                        rows = df.shape[0]
                         n_table_rows += rows
                         if rows > 0:
                             n_table_pages += 1
-
                             # Add table stats
                             if rows <= SMALL_TABLE_LIMIT:
                                 table_sizes['small'] += 1
@@ -101,18 +99,14 @@ def pdf_stats(path, n_pdf):
                             else:
                                 table_sizes['large'] += 1
 
-                    # STEP 4: save stats
-                    creation_date = pdf_file.getDocumentInfo()['/CreationDate']
-                    stats[fileName] = {'n_pages': n_pages, 'n_tables_pages': n_table_pages,
-                                       'n_table_rows': n_table_rows, 'creation_date': creation_date,
-                                       'table_sizes': table_sizes, 'url': rel_file}
+                # STEP 4: save stats
+                creation_date = pdf_file.getDocumentInfo()['/CreationDate']
+                stats[fileName] = {'n_pages': n_pages, 'n_tables_pages': n_table_pages,
+                                   'n_table_rows': n_table_rows, 'creation_date': creation_date,
+                                   'table_sizes': table_sizes, 'url': rel_file}
 
-                    print("Tabula Conversion done for %s" % (fileName,))
-                    n_success = n_success + 1
-
-                except:
-                    print("not successful!")
-                    n_error += 1
+                print("Tabula Conversion done for %s" % (fileName,))
+                n_success = n_success + 1
 
     return stats, n_error, n_success
 
