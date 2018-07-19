@@ -1,4 +1,4 @@
-data/
+data/*
 __pycache__/
 .idea/
 node_modules/
@@ -6,3 +6,5 @@ venv/
 pdftables/
 static/json/
 virtualenv/
+*.pyc
+log/*
