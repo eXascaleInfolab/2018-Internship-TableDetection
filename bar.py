@@ -218,14 +218,19 @@ def statistics():
     cur = mysql.connection.cursor()
 
     # Get user by username
-    result = cur.execute("SELECT cid FROM Crawls WHERE crawl_date = (SELECT max(crawl_date) FROM Crawls)")
+    cur.execute("SELECT cid FROM Crawls WHERE crawl_date = (SELECT max(crawl_date) FROM Crawls)")
 
-    cid_last_crawl = cur.fetchone()["cid"]
+    result = cur.fetchone()
 
     # Close connection
     cur.close()
 
-    return redirect(url_for("cid_statistics", cid=cid_last_crawl))
+    if result:
+        cid_last_crawl = result["cid"]
+        return redirect(url_for("cid_statistics", cid=cid_last_crawl))
+    else:
+        flash("There are no statistics to display, please start a new query and wait for it to complete.", "danger")
+        return redirect(url_for("index"))
 
 
 # CID specific Statistics
