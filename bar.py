@@ -199,8 +199,10 @@ def processing():
     cur = mysql.connection.cursor()
 
     # Execute query
-    cur.execute("INSERT INTO Crawls(cid, crawl_date, pdf_crawled, pdf_processed, process_errors, domain, url, hierarchy, stats, crawl_total_time, proc_total_time) VALUES(NULL, NULL, %s ,%s, %s, %s, %s, %s, %s, %s, %s)",
-                (n_files, n_success, n_error, domain, session.get('url', None), hierarchy_json, stats_json, session.get('crawl_total_time', None), proc_total_time))
+    cur.execute("""INSERT INTO Crawls(cid, crawl_date, pdf_crawled, pdf_processed, process_errors, domain, url, hierarchy, 
+                stats, crawl_total_time, proc_total_time) VALUES(NULL, NULL, %s ,%s, %s, %s, %s, %s, %s, %s, %s)""",
+                (n_files, n_success, n_error, domain, session.get('url', None), hierarchy_json,
+                stats_json, session.get('crawl_total_time', None), proc_total_time))
 
     # Commit to DB
     mysql.connection.commit()
@@ -218,7 +220,7 @@ def statistics():
     cur = mysql.connection.cursor()
 
     # Get user by username
-    cur.execute("SELECT cid FROM Crawls WHERE crawl_date = (SELECT max(crawl_date) FROM Crawls)")
+    cur.execute("""SELECT cid FROM Crawls WHERE crawl_date = (SELECT max(crawl_date) FROM Crawls)""")
 
     result = cur.fetchone()
 
@@ -242,7 +244,7 @@ def cid_statistics(cid):
     # Create cursor
     cur = mysql.connection.cursor()
 
-    result = cur.execute('SELECT * FROM Crawls WHERE cid = %s' % cid)
+    result = cur.execute("""SELECT * FROM Crawls WHERE cid = %s""", (cid,))
     crawl = cur.fetchall()[0]
 
     # Close connection
@@ -327,18 +329,21 @@ def register():
 def login():
     if request.method == 'POST':
         # Get Form Fields
-        username = request.form['username'] # FIXME SQL_injection danger?
+        username = request.form['username']
         password_candidate = request.form['password']
 
         # Create cursor
         cur = mysql.connection.cursor()
 
         # Get user by username
-        result = cur.execute("SELECT * FROM Users WHERE username = %s", [username])
+        result = cur.execute("""SELECT * FROM Users WHERE username = %s""", [username])
+
+        # Note: apparently this is safe from SQL injections see
+        # https://stackoverflow.com/questions/7929364/python-best-practice-and-securest-to-connect-to-mysql-and-execute-queries/7929438#7929438
 
         if result > 0:
             # Get stored hash
-            data = cur.fetchone() # FIXME fucking stupid username is not primary key
+            data = cur.fetchone() # FIXME why is username not primary key
             password = data['password']
 
             # Compare passwords
@@ -376,7 +381,7 @@ def delete_crawl():
         cur = mysql.connection.cursor()
 
         # Get user by username
-        result = cur.execute("DELETE FROM Crawls WHERE cid = %s" % cid)
+        result = cur.execute("""DELETE FROM Crawls WHERE cid = %s""" (cid,))
 
         # Commit to DB
         mysql.connection.commit()
@@ -408,7 +413,7 @@ def dashboard():
     cur = mysql.connection.cursor()
 
     # Get Crawls
-    result = cur.execute("SELECT cid, crawl_date, pdf_crawled, pdf_processed, domain, url FROM Crawls")
+    result = cur.execute("""SELECT cid, crawl_date, pdf_crawled, pdf_processed, domain, url FROM Crawls""")
 
     crawls = cur.fetchall()
 
