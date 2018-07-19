@@ -69,44 +69,48 @@ def pdf_stats(path, n_pdf):
                 print("Number successes: %d" % (n_success,))
                 print(stats)
 
-                # Get file location
-                rel_file = os.path.join(dir_, fileName)
+                try:
+                    # Get file location
+                    rel_file = os.path.join(dir_, fileName)
 
-                # STEP 0: set all counter to 0
-                n_table_pages = 0
-                n_table_rows = 0
-                table_sizes = {'small': 0, 'medium': 0, 'large': 0}
+                    # STEP 0: set all counter to 0
+                    n_table_pages = 0
+                    n_table_rows = 0
+                    table_sizes = {'small': 0, 'medium': 0, 'large': 0}
 
-                # STEP 1: count total number of pages
-                pdf_file = PyPDF2.PdfFileReader(open(rel_file, mode='rb'))
-                n_pages = pdf_file.getNumPages()
+                    # STEP 1: count total number of pages
+                    pdf_file = PyPDF2.PdfFileReader(open(rel_file, mode='rb'))
+                    n_pages = pdf_file.getNumPages()
 
-                # STEP 2: run TABULA to extract table from every page
-                for i in range(1, n_pages+1):
-                    df = tabula.read_pdf(rel_file, pages="%d" % (i,))
+                    # STEP 2: run TABULA to extract all tables into one dataframe
+                    df_array = tabula.read_pdf(rel_file, pages="all", multiple_tables=True)
 
-                    # STEP 3: count number of lines of dataframe
-                    if df is not None:
+                    # STEP 3: count number of rows in each dataframe
+                    for df in df_array:
                         rows = df.shape[0]
                         n_table_rows += rows
-                        if rows > 0:
-                            n_table_pages += 1
-                            # Add table stats
-                            if rows <= SMALL_TABLE_LIMIT:
-                                table_sizes['small'] += 1
-                            elif rows <= MEDIUM_TABLE_LIMIT:
-                                table_sizes['medium'] += 1
-                            else:
-                                table_sizes['large'] += 1
+                        n_table_pages += 1
 
-                # STEP 4: save stats
-                creation_date = pdf_file.getDocumentInfo()['/CreationDate']
-                stats[fileName] = {'n_pages': n_pages, 'n_tables_pages': n_table_pages,
-                                   'n_table_rows': n_table_rows, 'creation_date': creation_date,
-                                   'table_sizes': table_sizes, 'url': rel_file}
+                        # Add table stats
+                        if rows <= SMALL_TABLE_LIMIT:
+                            table_sizes['small'] += 1
+                        elif rows <= MEDIUM_TABLE_LIMIT:
+                            table_sizes['medium'] += 1
+                        else:
+                            table_sizes['large'] += 1
 
-                print("Tabula Conversion done for %s" % (fileName,))
-                n_success = n_success + 1
+                    # STEP 4: save stats
+                    creation_date = pdf_file.getDocumentInfo()['/CreationDate']
+                    stats[fileName] = {'n_pages': n_pages, 'n_tables_pages': n_table_pages,
+                                       'n_table_rows': n_table_rows, 'creation_date': creation_date,
+                                       'table_sizes': table_sizes, 'url': rel_file}
+
+                    print("Tabula Conversion done for %s" % (fileName,))
+                    n_success += 1
+
+                except:
+                    print("ERROR: Tabula Conversion failed for %s" % (fileName,))
+                    n_error += 1
 
     return stats, n_error, n_success
 

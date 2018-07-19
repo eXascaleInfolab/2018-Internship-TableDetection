@@ -218,6 +218,11 @@
     </div>
 </div>
 
+
+
+{% endblock %}
+
+{% block addscripts %}
 <!-- Chart.js JavaScript -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
 <script>
@@ -331,7 +336,7 @@
         var bubble = {
             x: stats[key].n_table_rows,
             y: stats[key].n_tables_pages,
-            r: Math.round(1.2 * Math.log(stats[key].n_pages/30.0 + 1) / Math.log(1.05)), //FIXME formula also 1/3 works
+            r: Math.round(Math.log(stats[key].n_pages/30.0 + 1) / Math.log(1.08)), //FIXME formula also 1/3 works
             url: stats[key].url
         }
 
@@ -664,5 +669,14 @@
     }
 
 </script>
-
+<script>
+   // tooltip demo
+    $('.tooltip-demo').tooltip({
+        selector: "[data-toggle=tooltip]",
+        container: "body"
+    })
+    // popover demo
+    $("[data-toggle=popover]")
+        .popover()
+</script>
 {% endblock %}
