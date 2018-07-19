@@ -22,7 +22,7 @@ CREATE TABLE Crawls
     pdf_processed INT(11),
     process_errors INT(11),
     domain VARCHAR(100),
-    url VARCHAR(100),
+    url LONGTEXT,
     hierarchy LONGTEXT,
     stats LONGTEXT,
     crawl_total_time INT(11),

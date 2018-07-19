@@ -29,9 +29,9 @@ mysql = MySQL(app)
 
 # CONSTANTS
 WGET_DATA_PATH = 'data'
-PDF_TO_PROCESS = 0
-MAX_CRAWLING_DURATION =  6 # 15 minutes
-WAIT_AFTER_CRAWLING = 1000
+PDF_TO_PROCESS = 10
+MAX_CRAWLING_DURATION = 15 * 60 # in seconds
+WAIT_AFTER_CRAWLING = 1000 # in miliseconds	
 
 
 # Helper Function
@@ -82,7 +82,7 @@ def crawling():
 
     command = shlex.split("timeout %d wget -r -A pdf %s" % (MAX_CRAWLING_DURATION, url,)) #FIXME timeout remove
     #command = shlex.split("wget -r -A pdf %s" % (url,))
-
+    #command = shlex.split("ping wwww.google.ch")
     #TODO use celery
     #TODO give feedback how wget is doing
 
@@ -419,6 +419,6 @@ def dashboard():
 
 if __name__ == '__main__':
     app.secret_key='Aj"$7PE#>3AC6W]`STXYLz*[G\gQWA'
-    app.run(debug=True)
-    #app.run(host='0.0.0.0')
+    #app.run(debug=True)
+    app.run(host='0.0.0.0')
 
