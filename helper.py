@@ -1,5 +1,4 @@
 import os
-import csv
 import tabula
 import PyPDF2
 from datetime import datetime
