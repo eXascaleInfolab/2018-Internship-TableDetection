@@ -62,7 +62,7 @@ def pdf_stats(path, n_pdf):
             if ".pdf" in fileName:
 
                 # Check if enough pdf already processed
-                if n_success >= n_pdf:
+                if n_success + n_error >= n_pdf:
                     return stats, n_error, n_success
 
                 print("Number errors: %d" % (n_error,))
@@ -108,6 +108,8 @@ def pdf_stats(path, n_pdf):
                     print("Tabula Conversion done for %s" % (fileName,))
                     n_success += 1
 
+                # FIXME more specific,
+                # FIXME otherwise it enters infinite loop if file not found for example / bad url was given
                 except:
                     print("ERROR: Tabula Conversion failed for %s" % (fileName,))
                     n_error += 1
