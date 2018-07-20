@@ -7,7 +7,7 @@ import json
 from functools import wraps
 from urllib.parse import urlparse
 
-from flask import Flask, render_template, flash, redirect, url_for, session, request, logging
+from flask import Flask, render_template, flash, redirect, url_for, session, request, logging, Response
 from flask_mysqldb import MySQL
 from wtforms import Form, StringField, TextAreaField, PasswordField, validators
 from passlib.hash import sha256_crypt
@@ -80,8 +80,7 @@ def crawling():
     # STEP 1: Prepare WGET command
     url = session.get('url', None)
 
-    command = shlex.split("timeout %d wget -r -A pdf %s" % (MAX_CRAWLING_DURATION, url,)) #FIXME timeout remove
-    #command = shlex.split("wget -r -A pdf %s" % (url,))
+    command = shlex.split("timeout %d wget -r -A pdf %s" % (MAX_CRAWLING_DURATION, url,))
 
     #TODO use celery
     #TODO give feedback how wget is doing
@@ -429,6 +428,6 @@ def dashboard():
 
 if __name__ == '__main__':
     app.secret_key='Aj"$7PE#>3AC6W]`STXYLz*[G\gQWA'
-    #app.run(debug=True)
+    # app.run(debug=True)
     app.run(host='0.0.0.0')
 

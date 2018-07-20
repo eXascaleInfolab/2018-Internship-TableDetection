@@ -18,10 +18,11 @@
       {% endif %}
 
       {% if session.logged_in != NULL %}
-      <p class="lead">The data is getting collected, if you want to interrupt the process preemptively, please do so.
-                        (In this demo version after 15 min the process will be automatically interrupted and this page will be redirected
-                        to perform Data Analysis. If you close this page the crawling will be performed and can be
-                        reused later, but the table detection will not start)</p>
+      <p class="lead">The data is getting collected, if you want to interrupt the process preemptively, please do so. </p>
+      <div>(In this demo version after 15 min the process will be automatically interrupted and this page will be redirected
+          to perform Table Detection. If you close this page the crawling will be performed and can be
+          reused later, but the table detection will not start) </div>
+      <hr>
       <a href="/crawling/end" class="btn btn-primary btn-lg">Interrupt Crawling</a>
       {% endif %}
   </div>
