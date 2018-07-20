@@ -30,8 +30,8 @@ mysql = MySQL(app)
 # CONSTANTS
 WGET_DATA_PATH = 'data'
 PDF_TO_PROCESS = 10
-MAX_CRAWLING_DURATION = 60 # 15 minutes
-WAIT_AFTER_CRAWLING = 1000
+MAX_CRAWLING_DURATION = 60 * 15 # in secondss
+WAIT_AFTER_CRAWLING = 1000 # in miliseconds
 
 
 # Helper Function
