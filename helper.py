@@ -1,7 +1,7 @@
 import os
 import tabula
 import PyPDF2
-from datetime import datetime
+import datetime
 from time import mktime, strptime
 
 
@@ -122,8 +122,8 @@ def pdf_date_format_to_datetime(str):
     datestring = str[2:-7]
     try :
         ts = strptime(datestring, "%Y%m%d%H%M%S")
-        dt = datetime.fromtimestamp(mktime(ts))
+        dt = datetime.datetime.fromtimestamp(mktime(ts))
     except ValueError:
         print("Unable to convert time for string: " + str)
-        dt = "Error: Couldn't read pdf creation date"
+        dt = datetime.time(0, 0, 0)
     return dt
