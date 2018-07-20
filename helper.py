@@ -125,5 +125,5 @@ def pdf_date_format_to_datetime(str):
         dt = datetime.datetime.fromtimestamp(mktime(ts))
     except ValueError:
         print("Unable to convert time for string: " + str)
-        dt = datetime.time(0, 0, 0)
+        dt = datetime.datetime.strptime("01/01/1970", '%m/%d/%Y')
     return dt
