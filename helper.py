@@ -120,6 +120,10 @@ def pdf_stats(path, n_pdf):
 # https://stackoverflow.com/questions/16503075/convert-creationtime-of-pdf-to-a-readable-format-in-python
 def pdf_date_format_to_datetime(str):
     datestring = str[2:-7]
-    ts = strptime(datestring, "%Y%m%d%H%M%S")
-    dt = datetime.fromtimestamp(mktime(ts))
+    try :
+        ts = strptime(datestring, "%Y%m%d%H%M%S")
+        dt = datetime.fromtimestamp(mktime(ts))
+    except ValueError:
+        print("Unable to convert time for string: " + str)
+        dt = "Error: Couldn't read pdf creation date"
     return dt

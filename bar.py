@@ -308,7 +308,7 @@ def register():
         cur = mysql.connection.cursor()
 
         # Execute query
-        cur.execute("INSERT INTO Users(name, email, username, password) VALUES(%s, %s, %s, %s)",
+        cur.execute("""INSERT INTO Users(name, email, username, password) VALUES(%s, %s, %s, %s)""",
                     (name, email, username, password))
 
         # Commit to DB
@@ -381,7 +381,7 @@ def delete_crawl():
         cur = mysql.connection.cursor()
 
         # Get user by username
-        result = cur.execute("""DELETE FROM Crawls WHERE cid = %s""" (cid,))
+        result = cur.execute("""DELETE FROM Crawls WHERE cid = %s""", (cid,))
 
         # Commit to DB
         mysql.connection.commit()
