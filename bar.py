@@ -13,8 +13,69 @@ from wtforms import Form, StringField, TextAreaField, PasswordField, validators
 from passlib.hash import sha256_crypt
 import time
 
+from threading import Lock
+from flask import Flask, render_template, session, request
+from flask_socketio import SocketIO, emit, join_room, leave_room, \
+    close_room, rooms, disconnect
+
+# Set this variable to "threading", "eventlet" or "gevent" to test the
+# different async modes, or leave it set to None for the application to choose
+# the best option based on installed packages.
+async_mode = None
+
 app = Flask(__name__)
 app.secret_key = 'Aj"$7PE#>3AC6W]`STXYLz*[G\gQWA'
+socketio = SocketIO(app, async_mode=async_mode)
+thread = None
+thread_lock = Lock()
+
+
+def background_thread_processing(domain, url, crawl_total_time, mysql):
+    with app.app_context():
+        # STEP 0: Time keeping
+        proc_start_time = time.time()
+
+        path = "data/%s" % (domain,)
+
+        # STEP 1: Call Helper function to create Json string
+
+        # FIXME workaround to weird file system bug with latin/ cp1252 encoding..
+        # https://stackoverflow.com/questions/35959580/non-ascii-file-name-issue-with-os-walk works
+        # https://stackoverflow.com/questions/2004137/unicodeencodeerror-on-joining-file-name doesn't work
+        hierarchy_dict = path_dict(path)  # adding ur does not work as expected either
+        hierarchy_json = json.dumps(hierarchy_dict, sort_keys=True, indent=4)  # , encoding='cp1252' not needed in python3
+
+        # STEP 2: Call helper function to count number of pdf files
+        n_files = path_number_of_files(path)
+
+        # STEP 3: Extract tables from pdf's
+        stats, n_error, n_success = pdf_stats(path, PDF_TO_PROCESS, socketio)
+
+        # STEP 4: Save stats
+        stats_json = json.dumps(stats, sort_keys=True, indent=4)
+
+        # STEP 5: Time Keeping
+        proc_over_time = time.time()
+        proc_total_time = proc_over_time - proc_start_time
+
+        # STEP 6: Save query in DB
+        # Create cursor
+        cur = mysql.connection.cursor()
+
+        # Execute query
+        cur.execute("""INSERT INTO Crawls(cid, crawl_date, pdf_crawled, pdf_processed, process_errors, domain, url, hierarchy, 
+                    stats, crawl_total_time, proc_total_time) VALUES(NULL, NULL, %s ,%s, %s, %s, %s, %s, %s, %s, %s)""",
+                    (n_files, n_success, n_error, domain, url, hierarchy_json,
+                    stats_json, crawl_total_time, proc_total_time))
+
+        # Commit to DB
+        cur.connection.commit()
+
+        # Close connection
+        cur.close()
+
+        # Send message asynchronously
+        socketio.emit('redirect', {'url': '/processing'})
 
 
 # Config MySQL
@@ -29,8 +90,8 @@ mysql = MySQL(app)
 
 # CONSTANTS
 WGET_DATA_PATH = 'data'
-PDF_TO_PROCESS = 10
-MAX_CRAWLING_DURATION = 10 # in secondss
+PDF_TO_PROCESS = 1
+MAX_CRAWLING_DURATION = 10 * 60 # in seconds
 WAIT_AFTER_CRAWLING = 1000 # in miliseconds
 
 
@@ -164,68 +225,29 @@ def autoend_crawling():
 @app.route('/table_detection')
 @is_logged_in
 def table_detection():
-    return render_template('table_detection.html', wait=WAIT_AFTER_CRAWLING)
+    domain = session.get('domain', None)
+    global thread
+    with thread_lock:
+        if thread is None:
+            cursor = mysql.connection.cursor()
+            print("Connection established:")
+            print(cursor)
+            thread = socketio.start_background_task(target=background_thread_processing, url=session.get('url', None),
+                                                    domain=domain, mysql=mysql,
+                                                    crawl_total_time=session.get('crawl_total_time', 0))
 
+    # Other option
+    #socketio.on_event('processing_over', processing)
 
-# About
-@app.route('/about')
-def about():
-    return render_template('about.html')
+    return render_template('table_detection.html')
 
 
 # PDF processing
 @app.route('/processing')
 @is_logged_in
 def processing():
+    return render_template('processing.html')
 
-    # STEP 0: Time keeping
-    proc_start_time = time.time()
-
-    domain = session.get('domain', None)
-    if domain == None:
-        pass
-        # TODO think of bad cases
-
-    path = "data/%s" % (domain,)
-
-    # STEP 1: Call Helper function to create Json string
-
-    # FIXME workaround to weird file system bug with latin/ cp1252 encoding..
-    # https://stackoverflow.com/questions/35959580/non-ascii-file-name-issue-with-os-walk works
-    # https://stackoverflow.com/questions/2004137/unicodeencodeerror-on-joining-file-name doesn't work
-    hierarchy_dict = path_dict(path)  # adding ur does not work as expected either
-    hierarchy_json = json.dumps(hierarchy_dict, sort_keys=True, indent=4)  # , encoding='cp1252' not needed in python3
-
-    # STEP 2: Call helper function to count number of pdf files
-    n_files = path_number_of_files(path)
-
-    # STEP 3: Extract tables from pdf's
-    stats, n_error, n_success = pdf_stats(path, PDF_TO_PROCESS)
-
-    # STEP 4: Save stats
-    stats_json = json.dumps(stats, sort_keys=True, indent=4)
-
-    # STEP 5: Time Keeping
-    proc_over_time = time.time()
-    proc_total_time = proc_over_time - proc_start_time
-
-    # STEP 6: Save query in DB
-    # Create cursor
-    cur = mysql.connection.cursor()
-
-    # Execute query
-    cur.execute("""INSERT INTO Crawls(cid, crawl_date, pdf_crawled, pdf_processed, process_errors, domain, url, hierarchy, 
-                stats, crawl_total_time, proc_total_time) VALUES(NULL, NULL, %s ,%s, %s, %s, %s, %s, %s, %s, %s)""",
-                (n_files, n_success, n_error, domain, session.get('url', None), hierarchy_json,
-                stats_json, session.get('crawl_total_time', None), proc_total_time))
-
-    # Commit to DB
-    mysql.connection.commit()
-
-    # Close connection
-    cur.close()
-
-    return render_template('processing.html', n_files=n_success, domain=domain, cid=0)
 
 # Last Crawl Statistics
 @app.route('/statistics')
@@ -442,7 +464,22 @@ def dashboard():
     cur.close()
 
 
+# About
+@app.route('/about')
+def about():
+    return render_template('about.html')
+
+
+# Asynchronous Communication wrappers
+@socketio.on('connect')
+def test_connect():
+    emit('my_response', {'data': 'Connected', 'count': 0})
+
+
+@socketio.on('disconnect')
+def test_disconnect():
+    print('Client disconnected', request.sid)
+
+
 if __name__ == '__main__':
-    app.secret_key='Aj"$7PE#>3AC6W]`STXYLz*[G\gQWA'
-    app.run(debug=True)
-    #app.run(host='0.0.0.0')
+    socketio.run(app, debug=True)

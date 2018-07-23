@@ -16,15 +16,11 @@
     <p class="lead">The tool is now performing table detection on the crawled PDF.</p>
     <p class="lead">In this demo version only 10 files will be analysed, expect between 10 and 100 minutes processing time. </p>
     <p class="lead">If you want you can now close this page and come back later to see the results in the Statistics tab. </p>
+
+    <h2>Receive:</h2>
+    <div id="log"></div>
+
     {% endif %}
 </div>
-
-<script>
-     window.setTimeout(function(){
-          // Move to a new location or you can do something else
-           window.location.href = '{{url_for("processing")}}';
-     }, {{wait}});
-
- </script>
 
 {% endblock %}

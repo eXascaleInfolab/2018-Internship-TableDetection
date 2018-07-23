@@ -5,6 +5,7 @@ import datetime
 from time import mktime, strptime
 
 
+
 # CONSTANTS
 SMALL_TABLE_LIMIT = 10
 MEDIUM_TABLE_LIMIT = 20
@@ -49,8 +50,10 @@ def path_number_of_files(path):
 
 # Uses Tabula to detect and extract tables from the pdf's
 # INPUT: path containing pdf's and the maximal number of pdf to analyse
-def pdf_stats(path, n_pdf):
+def pdf_stats(path, n_pdf, socketio):
     stats = {}
+
+    socketio.emit('my_response', {'data': 'Processing', 'count': 0})
 
     # Keep track of successful and unsuccessful files
     n_success = 0
@@ -106,6 +109,9 @@ def pdf_stats(path, n_pdf):
 
                     print("Tabula Conversion done for %s" % (fileName,))
                     n_success += 1
+
+                    # STEP 5: Send message asynchronously
+                    socketio.emit('my_response', {'data': 'I successfully performed table detection', 'count': 42})
 
                 # FIXME more specific,
                 # FIXME otherwise it enters infinite loop if file not found for example / bad url was given
