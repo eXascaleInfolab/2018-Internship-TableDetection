@@ -24,6 +24,12 @@
           reused later, but the table detection will not start) </div>
       <hr>
       <a href="/crawling/end" class="btn btn-primary btn-lg">Interrupt Crawling</a>
+      <br>
+      <div class="pre-scrollable">
+          {% for item in debug %}
+          <p>{{ item }}</p>
+          {% endfor %}
+      </div>
       {% endif %}
   </div>
 </div>

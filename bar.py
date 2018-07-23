@@ -30,7 +30,7 @@ mysql = MySQL(app)
 # CONSTANTS
 WGET_DATA_PATH = 'data'
 PDF_TO_PROCESS = 10
-MAX_CRAWLING_DURATION = 60 * 15 # in secondss
+MAX_CRAWLING_DURATION = 10 # in secondss
 WAIT_AFTER_CRAWLING = 1000 # in miliseconds
 
 
@@ -46,6 +46,15 @@ def is_logged_in(f):
             flash('Unauthorized, Please login', 'danger')
             return redirect(url_for('login'))
     return wrap
+
+
+# Ability to stream a template
+def stream_template(template_name, **context):
+    app.update_template_context(context)
+    t = app.jinja_env.get_template(template_name)
+    rv = t.stream(context)
+    rv.disable_buffering()
+    return rv
 
 
 # Index
@@ -74,24 +83,37 @@ def index():
 @app.route('/crawling')
 @is_logged_in
 def crawling():
+
     # STEP 0: TimeKeeping
     session['crawl_start_time'] = time.time()
 
     # STEP 1: Prepare WGET command
     url = session.get('url', None)
 
-    command = shlex.split("timeout %d wget -r -A pdf %s" % (MAX_CRAWLING_DURATION, url,))
+    command = shlex.split("timeout %d wget -r -A -q -nv pdf %s" % (MAX_CRAWLING_DURATION, url,))
+    #command = shlex.split("timeout %d wget -r -A pdf %s" % (MAX_CRAWLING_DURATION, url,))
 
     #TODO use celery
     #TODO give feedback how wget is doing
 
     #TODO https://stackoverflow.com/questions/15041620/how-to-continuously-display-python-output-in-a-webpage
+    # http://flask.pocoo.org/docs/1.0/patterns/streaming/
+    # https://gist.github.com/huiliu/46be335427605960fa84
 
     # STEP 2: Execute command in subdirectory
-    process = subprocess.Popen(command, cwd=WGET_DATA_PATH)
+    process = subprocess.Popen(command, cwd=WGET_DATA_PATH, stderr=subprocess.PIPE)
     session['crawl_process_id'] = process.pid
 
-    return render_template('crawling.html', max_crawling_duration=MAX_CRAWLING_DURATION)
+    def generator():
+        i = 0
+        for stderr_line in iter(process.stderr.readline, ""):
+            i += 1
+            if i < 100:
+                yield str(stderr_line)
+
+    return Response(stream_template('crawling.html', max_crawling_duration=MAX_CRAWLING_DURATION, debug=generator(),
+                                    stream=True))
+    #return render_template('crawling.html', max_crawling_duration=MAX_CRAWLING_DURATION)
 
 
 # End Crawling Manual
@@ -428,6 +450,5 @@ def dashboard():
 
 if __name__ == '__main__':
     app.secret_key='Aj"$7PE#>3AC6W]`STXYLz*[G\gQWA'
-    # app.run(debug=True)
-    app.run(host='0.0.0.0')
-
+    app.run(debug=True)
+    #app.run(host='0.0.0.0')

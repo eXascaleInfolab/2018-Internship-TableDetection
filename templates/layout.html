@@ -44,7 +44,9 @@
         <!-- Page Content -->
         <div id="page-wrapper">
             <div class="container-fluid">
-                {% include 'includes/_messages.html' %}
+                {% if not stream %}
+                {%include 'includes/_messages.html' %}
+                {% endif %}
                 {% block body %}{% endblock %}
             </div>
         </div>
