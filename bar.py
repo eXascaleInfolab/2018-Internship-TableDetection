@@ -196,20 +196,14 @@ def processing():
     hierarchy_dict = path_dict(path)  # adding ur does not work as expected either
     hierarchy_json = json.dumps(hierarchy_dict, sort_keys=True, indent=4)  # , encoding='cp1252' not needed in python3
 
-    # FIXME remove all session stores
-
     # STEP 2: Call helper function to count number of pdf files
     n_files = path_number_of_files(path)
-    session['n_files'] = n_files
 
     # STEP 3: Extract tables from pdf's
     stats, n_error, n_success = pdf_stats(path, PDF_TO_PROCESS)
 
     # STEP 4: Save stats
-    session['n_error'] = n_error
-    session['n_success'] = n_success
     stats_json = json.dumps(stats, sort_keys=True, indent=4)
-    session['stats'] = stats_json
 
     # STEP 5: Time Keeping
     proc_over_time = time.time()
