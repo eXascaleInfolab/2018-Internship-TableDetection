@@ -83,8 +83,10 @@ def tabula_task(self, file_path='', post_url=''):
         # STEP 2: run TABULA to extract all tables into one dataframe
         df_array = tabula.read_pdf(file_path, pages="all", multiple_tables=True)
     except:
+        post(post_url, json={'event': 'tabula_failure', 'data': {'pdf_name': file_path, }})
+
         print("ERROR: Tabula Conversion failed for %s" % (file_path,))
-        return 'error'
+        return 'error',
 
     # STEP 3: count number of rows in each dataframe
     for df in df_array:
@@ -134,8 +136,14 @@ def pdf_stats(self, tabula_list, domain='', url='', crawl_total_time=0, post_url
 
         # STEP 3: Treat result from Tabula tasks
         stats = {}
+        n_success = 0
+        n_errors = 0
         for stat in tabula_list:
-            stats[stat[0]] = stat[1]
+            if stat[0] == 'error':
+                n_errors += 1
+            else:
+                n_success += 1
+                stats[stat[0]] = stat[1]
 
         # STEP 4: Save stats
         stats_json = json.dumps(stats, sort_keys=True, indent=4)
@@ -147,7 +155,7 @@ def pdf_stats(self, tabula_list, domain='', url='', crawl_total_time=0, post_url
         # Execute query
         cur.execute("""INSERT INTO Crawls(cid, crawl_date, pdf_crawled, pdf_processed, process_errors, domain, url, hierarchy, 
                     stats, crawl_total_time, proc_total_time) VALUES(NULL, NULL, %s ,%s, %s, %s, %s, %s, %s, %s, %s)""",
-                    (n_files, -1, -1, domain, url, hierarchy_json,
+                    (n_files, n_success, n_errors, domain, url, hierarchy_json,
                         stats_json, crawl_total_time, -99))
 
         # Commit to DB

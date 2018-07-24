@@ -63,7 +63,11 @@
             // to the client. The data is then displayed in the "Received"
             // section of the page.
             socket.on('tabula_success', function(msg) {
-                $('#log').append('<br>' + $('<div/>').text('Received #' + msg.count + ': ' + msg.data + ', pdf analysed number: ' + msg.success).html());
+                $('#log').append('<br>' + $('<div/>').text('Tabula PDF success: ' + msg.tables + ' tables found on ' + msg.pages + ' page(s).').html());
+            });
+
+            socket.on('tabula_failure', function(msg) {
+                $('#log').append('<br>' + $('<div/>').text('Tabula PDF failure of pdf: ' + msg.pdf_name).html());
             });
 
             socket.on('redirect', function (data) {
