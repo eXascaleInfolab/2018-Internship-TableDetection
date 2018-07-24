@@ -17,8 +17,12 @@ from threading import Lock
 from flask import Flask, render_template, session, request
 from flask_socketio import SocketIO, emit
 
-from celery import Celery
+from celery import Celery, chord
 from requests import post
+
+import tabula
+import PyPDF2
+
 
 # Set this variable to "threading", "eventlet" or "gevent" to test the
 # different async modes, or leave it set to None for the application to choose
@@ -56,14 +60,110 @@ mysql = MySQL(app)
 
 # CONSTANTS
 WGET_DATA_PATH = 'data'
-PDF_TO_PROCESS = 2
+PDF_TO_PROCESS = 20
 MAX_CRAWLING_DURATION = 10 * 60 # in seconds
 WAIT_AFTER_CRAWLING = 1000 # in miliseconds
-
+SMALL_TABLE_LIMIT = 10
+MEDIUM_TABLE_LIMIT = 20
 
 
 @celery.task(bind=True)
-def long_task(self, domain, url, crawl_total_time, post_url):
+def tabula_task(self, file_path='', post_url=''):
+
+    # STEP 0: set all counter to 0
+    n_tables = 0
+    n_table_rows = 0
+    table_sizes = {'small': 0, 'medium': 0, 'large': 0}
+
+    # STEP 1: count total number of pages
+    pdf_file = PyPDF2.PdfFileReader(open(file_path, mode='rb'))
+    n_pages = pdf_file.getNumPages()
+
+    try:
+        # STEP 2: run TABULA to extract all tables into one dataframe
+        df_array = tabula.read_pdf(file_path, pages="all", multiple_tables=True)
+    except:
+        print("ERROR: Tabula Conversion failed for %s" % (file_path,))
+        return 'error'
+
+    # STEP 3: count number of rows in each dataframe
+    for df in df_array:
+        rows = df.shape[0]
+        n_table_rows += rows
+        n_tables += 1
+
+        # Add table stats
+        if rows <= SMALL_TABLE_LIMIT:
+            table_sizes['small'] += 1
+        elif rows <= MEDIUM_TABLE_LIMIT:
+            table_sizes['medium'] += 1
+        else:
+            table_sizes['large'] += 1
+
+    # STEP 4: save stats
+    creation_date = pdf_file.getDocumentInfo()['/CreationDate']
+    stat = (file_path, {'n_pages': n_pages, 'n_tables': n_tables,
+                        'n_table_rows': n_table_rows, 'creation_date': creation_date,
+                        'table_sizes': table_sizes, 'url': file_path})
+
+    print("Tabula Conversion done for %s" % (file_path,))
+
+    # STEP 5: Send message asynchronously
+    post(post_url, json={'event': 'tabula_success', 'data':
+        {'data': 'I successfully performed table detection', 'pages': n_pages, 'tables': n_tables}})
+
+    # STEP 6: Return stats
+    return stat
+
+
+@celery.task(bind=True)
+def pdf_stats(self, tabula_list, domain='', url='', crawl_total_time=0, post_url=''):
+    """Background task that runs a long function with progress reports."""
+    with app.app_context():
+        # STEP 0: Time keeping
+        path = "data/%s" % (domain,)
+
+        # STEP 1: Call Helper function to create Json string
+        # https://stackoverflow.com/questions/35959580/non-ascii-file-name-issue-with-os-walk works
+        # https://stackoverflow.com/questions/2004137/unicodeencodeerror-on-joining-file-name doesn't work
+        hierarchy_dict = path_dict(path)  # adding ur does not work as expected either
+        hierarchy_json = json.dumps(hierarchy_dict, sort_keys=True, indent=4)  # , encoding='cp1252' not needed in python3
+
+        # STEP 2: Call helper function to count number of pdf files
+        n_files = path_number_of_files(path)
+
+        # STEP 3: Treat result from Tabula tasks
+        stats = {}
+        for stat in tabula_list:
+            stats[stat[0]] = stat[1]
+
+        # STEP 4: Save stats
+        stats_json = json.dumps(stats, sort_keys=True, indent=4)
+
+        # STEP 5: Save query in DB
+        # Create cursor
+        cur = mysql.connection.cursor()
+
+        # Execute query
+        cur.execute("""INSERT INTO Crawls(cid, crawl_date, pdf_crawled, pdf_processed, process_errors, domain, url, hierarchy, 
+                    stats, crawl_total_time, proc_total_time) VALUES(NULL, NULL, %s ,%s, %s, %s, %s, %s, %s, %s, %s)""",
+                    (n_files, -1, -1, domain, url, hierarchy_json,
+                        stats_json, crawl_total_time, -99))
+
+        # Commit to DB
+        cur.connection.commit()
+
+        # Close connection
+        cur.close()
+
+        # Send message asynchronously
+        post(post_url, json={'event': 'redirect', 'data': {'url': '/processing'}})
+
+        return 'success'
+
+
+@celery.task(bind=True)
+def original(self, domain='', url='', crawl_total_time=0, post_url=''):
     """Background task that runs a long function with progress reports."""
     with app.app_context():
         # STEP 0: Time keeping
@@ -255,8 +355,26 @@ def table_detection():
     domain = session.get('domain', None)
     url = session.get('url', None)
     crawl_total_time = session.get('crawl_total_time', 0)
+    post_url = url_for('event', _external=True)
 
-    task = long_task.delay(domain, url, crawl_total_time, url_for('event', _external=True))
+    path = "data/%s" % (domain,)
+    count = 0
+    file_array = []
+
+    # STEP 1: Find PDF we want to process
+    for dir_, _, files in os.walk(path):
+        for fileName in files:
+            if ".pdf" in fileName and count < PDF_TO_PROCESS:
+                rel_file = os.path.join(dir_, fileName)
+                file_array.append(rel_file)
+                count += 1
+
+    # STEP 2: Prepare a celery task for every pdf and then a callback to store result in db
+    header = (tabula_task.s(f, post_url) for f in file_array)
+    callback = pdf_stats.s(domain=domain, url=url, crawl_total_time=crawl_total_time, post_url=post_url)
+
+    # STEP 3: Run the celery Chord
+    result = chord(header)(callback)
 
     return render_template('table_detection.html')
 
@@ -314,7 +432,7 @@ def cid_statistics(cid):
     json_hierarchy = json.loads(crawl['hierarchy'])
 
     stats_items = json_stats.items()
-    n_tables = sum([subdict['n_tables_pages'] for filename, subdict in stats_items])
+    n_tables = sum([subdict['n_tables'] for filename, subdict in stats_items])
     n_rows = sum([subdict['n_table_rows'] for filename, subdict in stats_items])
 
     medium_tables = sum([subdict['table_sizes']['medium'] for filename, subdict in stats_items])

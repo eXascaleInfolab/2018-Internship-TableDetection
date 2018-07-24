@@ -9,8 +9,7 @@ from requests import post
 
 
 # CONSTANTS
-SMALL_TABLE_LIMIT = 10
-MEDIUM_TABLE_LIMIT = 20
+
 
 
 # Create a json string for given path

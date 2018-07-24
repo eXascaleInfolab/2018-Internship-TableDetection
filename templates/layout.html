@@ -62,7 +62,7 @@
             // The callback function is invoked whenever the server emits data
             // to the client. The data is then displayed in the "Received"
             // section of the page.
-            socket.on('my_response', function(msg) {
+            socket.on('tabula_success', function(msg) {
                 $('#log').append('<br>' + $('<div/>').text('Received #' + msg.count + ': ' + msg.data + ', pdf analysed number: ' + msg.success).html());
             });
 
