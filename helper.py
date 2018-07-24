@@ -3,6 +3,8 @@ import tabula
 import PyPDF2
 import datetime
 from time import mktime, strptime
+from requests import post
+
 
 
 
@@ -50,10 +52,8 @@ def path_number_of_files(path):
 
 # Uses Tabula to detect and extract tables from the pdf's
 # INPUT: path containing pdf's and the maximal number of pdf to analyse
-def pdf_stats(path, n_pdf, socketio):
+def pdf_stats(path, n_pdf, post_url):
     stats = {}
-
-    socketio.emit('my_response', {'data': 'Processing', 'count': 0})
 
     # Keep track of successful and unsuccessful files
     n_success = 0
@@ -111,8 +111,8 @@ def pdf_stats(path, n_pdf, socketio):
                     n_success += 1
 
                     # STEP 5: Send message asynchronously
-                    socketio.emit('my_response', {'data': 'I successfully performed table detection',
-                                                  'success': n_success, 'count': 1})
+                    post(post_url, json={'event':'my_response', 'data':
+                        {'data': 'I successfully performed table detection', 'success': n_success, 'count': 1}})
 
                 # FIXME more specific,
                 # FIXME otherwise it enters infinite loop if file not found for example / bad url was given

@@ -17,19 +17,54 @@ from threading import Lock
 from flask import Flask, render_template, session, request
 from flask_socketio import SocketIO, emit
 
+from celery import Celery
+from requests import post
+
 # Set this variable to "threading", "eventlet" or "gevent" to test the
 # different async modes, or leave it set to None for the application to choose
 # the best option based on installed packages.
 async_mode = None
 
 app = Flask(__name__)
+app.debug = True
 app.secret_key = 'Aj"$7PE#>3AC6W]`STXYLz*[G\gQWA'
+
+# Celery configuration
+app.config['CELERY_BROKER_URL'] = 'redis://localhost:6379/0'
+app.config['CELERY_RESULT_BACKEND'] = 'redis://localhost:6379/0'
+
+# SocketIO
 socketio = SocketIO(app, async_mode=async_mode)
+
+# Deprecated
 thread = None
 thread_lock = Lock()
 
+# Initialize Celery
+celery = Celery(app.name, broker=app.config['CELERY_BROKER_URL'])
+celery.conf.update(app.config)
 
-def background_thread_processing(domain, url, crawl_total_time, mysql):
+# Config MySQL
+app.config['MYSQL_HOST'] = 'localhost'
+app.config['MYSQL_USER'] = 'root'
+app.config['MYSQL_PASSWORD'] = 'mountain'
+app.config['MYSQL_DB'] = 'bar'
+app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
+
+# init MySQL
+mysql = MySQL(app)
+
+# CONSTANTS
+WGET_DATA_PATH = 'data'
+PDF_TO_PROCESS = 2
+MAX_CRAWLING_DURATION = 10 * 60 # in seconds
+WAIT_AFTER_CRAWLING = 1000 # in miliseconds
+
+
+
+@celery.task(bind=True)
+def long_task(self, domain, url, crawl_total_time, post_url):
+    """Background task that runs a long function with progress reports."""
     with app.app_context():
         # STEP 0: Time keeping
         proc_start_time = time.time()
@@ -48,7 +83,7 @@ def background_thread_processing(domain, url, crawl_total_time, mysql):
         n_files = path_number_of_files(path)
 
         # STEP 3: Extract tables from pdf's
-        stats, n_error, n_success = pdf_stats(path, PDF_TO_PROCESS, socketio)
+        stats, n_error, n_success = pdf_stats(path, PDF_TO_PROCESS, post_url)
 
         # STEP 4: Save stats
         stats_json = json.dumps(stats, sort_keys=True, indent=4)
@@ -74,28 +109,21 @@ def background_thread_processing(domain, url, crawl_total_time, mysql):
         cur.close()
 
         # Send message asynchronously
-        socketio.emit('redirect', {'url': '/processing'})
+        post(post_url, json={'event': 'redirect', 'data': {'url': '/processing'}})
+
+        return 'success'
 
 
-# Config MySQL
-app.config['MYSQL_HOST'] = 'localhost'
-app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = 'mountain'
-app.config['MYSQL_DB'] = 'bar'
-app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
-
-# init MySQL
-mysql = MySQL(app)
-
-# CONSTANTS
-WGET_DATA_PATH = 'data'
-PDF_TO_PROCESS = 2
-MAX_CRAWLING_DURATION = 10 * 60 # in seconds
-WAIT_AFTER_CRAWLING = 1000 # in miliseconds
+@app.route('/event/', methods=['POST'])
+def event():
+    data = request.json
+    if data:
+        socketio.emit(data['event'], data['data'])
+        return 'ok'
+    return 'error', 404
 
 
 # Helper Function
-
 # Check if user logged in
 def is_logged_in(f):
     @wraps(f)
@@ -225,18 +253,10 @@ def autoend_crawling():
 @is_logged_in
 def table_detection():
     domain = session.get('domain', None)
-    global thread
-    with thread_lock:
-        if thread is None:
-            cursor = mysql.connection.cursor()
-            print("Connection established:")
-            print(cursor)
-            thread = socketio.start_background_task(target=background_thread_processing, url=session.get('url', None),
-                                                    domain=domain, mysql=mysql,
-                                                    crawl_total_time=session.get('crawl_total_time', 0))
+    url = session.get('url', None)
+    crawl_total_time = session.get('crawl_total_time', 0)
 
-    # Other option
-    #socketio.on_event('processing_over', processing)
+    task = long_task.delay(domain, url, crawl_total_time, url_for('event', _external=True))
 
     return render_template('table_detection.html')
 
@@ -481,4 +501,4 @@ def test_disconnect():
 
 
 if __name__ == '__main__':
-    socketio.run(app, debug=True)
+    socketio.run(app)
