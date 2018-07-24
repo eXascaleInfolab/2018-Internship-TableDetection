@@ -11,10 +11,7 @@
     <title>PDF Crawl App</title>
 
     <!-- Bootstrap Core CSS ISSUE: https://forums.adobe.com/thread/2422430-->
-    <!-- <link href="../static/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet"> -->
-
-    <!-- Minified Bootstrap 3 CSS-->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link href="../static/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- MetisMenu CSS -->
     <link href="../static/vendor/metisMenu/metisMenu.min.css" rel="stylesheet">
@@ -35,48 +32,7 @@
     <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
 
-    <!-- SOCKET IO required -->
-    <script type="text/javascript" src="//code.jquery.com/jquery-1.4.2.min.js"></script>
-    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.5/socket.io.min.js"></script>
-    <script type="text/javascript" charset="utf-8">
-        $(document).ready(function() {
-            // Use a "/test" namespace.
-            // An application can open a connection on multiple namespaces, and
-            // Socket.IO will multiplex all those connections on a single
-            // physical channel. If you don't care about multiple channels, you
-            // can set the namespace to an empty string.
-
-            // Connect to the Socket.IO server.
-            // The connection URL has the following format:
-            //     http[s]://<domain>:<port>[/<namespace>]
-            var socket = io.connect();
-
-            // Event handler for new connections.
-            // The callback function is invoked when a connection with the
-            // server is established.
-            socket.on('connect', function() {
-                socket.emit('my_event', {data: 'I\'m connected!'});
-            });
-
-            // Event handler for server sent data.
-            // The callback function is invoked whenever the server emits data
-            // to the client. The data is then displayed in the "Received"
-            // section of the page.
-            socket.on('tabula_success', function(msg) {
-                $('#log').append('<br>' + $('<div/>').text('Tabula PDF success: ' + msg.tables + ' tables found on ' + msg.pages + ' page(s).').html());
-            });
-
-            socket.on('tabula_failure', function(msg) {
-                $('#log').append('<br>' + $('<div/>').text('Tabula PDF failure of pdf: ' + msg.pdf_name).html());
-            });
-
-            socket.on('redirect', function (data) {
-                window.location = data.url;
-            });
-        });
-    </script>
-
-
+    {% block headerscripts %}{% endblock %}
 </head>
 
 <body>

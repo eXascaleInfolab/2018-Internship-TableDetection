@@ -119,7 +119,7 @@ def tabula_task(self, file_path='', post_url=''):
 
 
 @celery.task(bind=True)
-def pdf_stats(self, tabula_list, domain='', url='', crawl_total_time=0, post_url=''):
+def pdf_stats(self, tabula_list, domain='', url='', crawl_total_time=0, post_url='', processing_start_time=0):
     """Background task that runs a long function with progress reports."""
     with app.app_context():
         # STEP 0: Time keeping
@@ -148,6 +148,9 @@ def pdf_stats(self, tabula_list, domain='', url='', crawl_total_time=0, post_url
         # STEP 4: Save stats
         stats_json = json.dumps(stats, sort_keys=True, indent=4)
 
+        # STEP 5: compute final processing time
+        processing_total_time = time.time() - processing_start_time
+
         # STEP 5: Save query in DB
         # Create cursor
         cur = mysql.connection.cursor()
@@ -156,7 +159,7 @@ def pdf_stats(self, tabula_list, domain='', url='', crawl_total_time=0, post_url
         cur.execute("""INSERT INTO Crawls(cid, crawl_date, pdf_crawled, pdf_processed, process_errors, domain, url, hierarchy, 
                     stats, crawl_total_time, proc_total_time) VALUES(NULL, NULL, %s ,%s, %s, %s, %s, %s, %s, %s, %s)""",
                     (n_files, n_success, n_errors, domain, url, hierarchy_json,
-                        stats_json, crawl_total_time, -99))
+                        stats_json, crawl_total_time, processing_total_time))
 
         # Commit to DB
         cur.connection.commit()
@@ -287,10 +290,6 @@ def crawling():
     url = session.get('url', None)
 
     command = shlex.split("timeout %d wget -r -A -q -nv pdf %s" % (MAX_CRAWLING_DURATION, url,))
-    #command = shlex.split("timeout %d wget -r -A pdf %s" % (MAX_CRAWLING_DURATION, url,))
-
-    #TODO use celery
-    #TODO give feedback how wget is doing
 
     #TODO https://stackoverflow.com/questions/15041620/how-to-continuously-display-python-output-in-a-webpage
     # http://flask.pocoo.org/docs/1.0/patterns/streaming/
@@ -309,6 +308,7 @@ def crawling():
 
     return Response(stream_template('crawling.html', max_crawling_duration=MAX_CRAWLING_DURATION, debug=generator(),
                                     stream=True))
+
     #return render_template('crawling.html', max_crawling_duration=MAX_CRAWLING_DURATION)
 
 
@@ -360,6 +360,8 @@ def autoend_crawling():
 @app.route('/table_detection')
 @is_logged_in
 def table_detection():
+    # Step 0: take start time and prepare arguments
+    processing_start_time = time.time()
     domain = session.get('domain', None)
     url = session.get('url', None)
     crawl_total_time = session.get('crawl_total_time', 0)
@@ -379,7 +381,8 @@ def table_detection():
 
     # STEP 2: Prepare a celery task for every pdf and then a callback to store result in db
     header = (tabula_task.s(f, post_url) for f in file_array)
-    callback = pdf_stats.s(domain=domain, url=url, crawl_total_time=crawl_total_time, post_url=post_url)
+    callback = pdf_stats.s(domain=domain, url=url, crawl_total_time=crawl_total_time, post_url=post_url,
+                           processing_start_time=processing_start_time)
 
     # STEP 3: Run the celery Chord
     result = chord(header)(callback)
