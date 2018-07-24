@@ -15,8 +15,7 @@ import time
 
 from threading import Lock
 from flask import Flask, render_template, session, request
-from flask_socketio import SocketIO, emit, join_room, leave_room, \
-    close_room, rooms, disconnect
+from flask_socketio import SocketIO, emit
 
 # Set this variable to "threading", "eventlet" or "gevent" to test the
 # different async modes, or leave it set to None for the application to choose
@@ -90,7 +89,7 @@ mysql = MySQL(app)
 
 # CONSTANTS
 WGET_DATA_PATH = 'data'
-PDF_TO_PROCESS = 1
+PDF_TO_PROCESS = 2
 MAX_CRAWLING_DURATION = 10 * 60 # in seconds
 WAIT_AFTER_CRAWLING = 1000 # in miliseconds
 

@@ -111,7 +111,8 @@ def pdf_stats(path, n_pdf, socketio):
                     n_success += 1
 
                     # STEP 5: Send message asynchronously
-                    socketio.emit('my_response', {'data': 'I successfully performed table detection', 'count': 42})
+                    socketio.emit('my_response', {'data': 'I successfully performed table detection',
+                                                  'success': n_success, 'count': 1})
 
                 # FIXME more specific,
                 # FIXME otherwise it enters infinite loop if file not found for example / bad url was given
