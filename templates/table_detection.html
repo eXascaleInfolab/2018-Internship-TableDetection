@@ -56,12 +56,13 @@
   <h1 class="page-header"> Data analysis. </h1>
     {% if session.logged_in != NULL %}
     <p class="lead">The tool is now performing table detection on the crawled PDF.</p>
-    <p class="lead">In this demo version only 10 files will be analysed, expect between 10 and 100 minutes processing time. </p>
+    <p class="lead">For every PDF a seperate Celery task is scheduled which allows for easy parallelism. The amount of
+    pdf files that should be processed can be changed.</p>
     <p class="lead">If you want you can now close this page and come back later to see the results in the Statistics tab. </p>
-
-    <h2>Receive:</h2>
-    <div id="log"></div>
-
+    <div class="well well-lg">
+         <h4>Messages received from Celery Tasks:</h4>
+         <div id="log"></div>
+    </div>
     {% endif %}
 </div>
 

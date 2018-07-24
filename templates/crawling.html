@@ -60,16 +60,14 @@
           reused later, but the table detection will not start) </div>
       <hr>
       <a href="/crawling/end" class="btn btn-primary btn-lg">Interrupt Crawling</a>
-      <br>
-      <div class="pre-scrollable">
-          {% for item in debug %}
-          <p>{{ item }}</p>
-          {% endfor %}
+      <div class="well well-lg"
+           <h4> First 100 lines of wget stderr</h4>
+          <div class="pre-scrollable">
+              {% for item in debug %}
+              <p>{{ item }}</p>
+              {% endfor %}
+          </div>
       </div>
-
-      <h2>Receive:</h2>
-      <div id="log"></div>
-
       {% endif %}
 
 
