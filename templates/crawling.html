@@ -46,7 +46,7 @@
 </div>
 <div class="col-lg-8">
   <div>
-      <h1 class="page-header"> Crawling website ... </h1>
+      <h1 class="page-header"> Crawling website. </h1>
       {% if session.logged_in == NULL %}
       <p class="lead">Log in to be able to crawl a domain.</p>
       <a href="/register" class="btn btn-primary btn-lg">Register</a>
@@ -60,8 +60,8 @@
           reused later, but the table detection will not start) </div>
       <hr>
       <a href="/crawling/end" class="btn btn-primary btn-lg">Interrupt Crawling</a>
-      <div class="well well-lg"
-           <h4> First 100 lines of wget stderr</h4>
+      <div class="well well-lg">
+          <h4> First 100 lines of wget stderr</h4>
           <div class="pre-scrollable">
               {% for item in debug %}
               <p>{{ item }}</p>

@@ -30,6 +30,14 @@
         // section of the page.
         socket.on('tabula_success', function(msg) {
             $('#log').append('<br>' + $('<div/>').text('Tabula PDF success: ' + msg.tables + ' tables found on ' + msg.pages + ' page(s).').html());
+            var count_pdf = document.getElementById('count_pdf');
+            var number = count_pdf.innerHTML;
+            number++;
+            count_pdf.innerHTML = number;
+            // TODO where should progress bar start? here I assume 40% (design choice)
+            var percentage = 40 + (60.0 / {{total_pdf}}) * number;
+            $('.progress-bar').css('width', percentage+'%').attr('aria-valuenow', percentage);
+
         });
 
         socket.on('tabula_failure', function(msg) {
@@ -56,12 +64,17 @@
   <h1 class="page-header"> Data analysis. </h1>
     {% if session.logged_in != NULL %}
     <p class="lead">The tool is now performing table detection on the crawled PDF.</p>
-    <p class="lead">For every PDF a seperate Celery task is scheduled which allows for easy parallelism. The amount of
+    <p>For every PDF a seperate Celery task is scheduled which allows for easy parallelism. The amount of
     pdf files that should be processed can be changed.</p>
-    <p class="lead">If you want you can now close this page and come back later to see the results in the Statistics tab. </p>
+    <p>If you want you can now close this page and come back later to see the results in the Statistics tab. </p>
+
     <div class="well well-lg">
-         <h4>Messages received from Celery Tasks:</h4>
-         <div id="log"></div>
+        <div class="row">
+            <h4 class="pull-left">Messages received from Celery Tasks: </h4>
+            <h4 class="pull-right"> / {{total_pdf}} processed.</h4>
+            <h4 class="pull-right" id="count_pdf">0</h4>
+        </div>
+        <div id="log"></div>
     </div>
     {% endif %}
 </div>

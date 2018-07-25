@@ -60,7 +60,7 @@ mysql = MySQL(app)
 
 # CONSTANTS
 WGET_DATA_PATH = 'data'
-PDF_TO_PROCESS = 2
+PDF_TO_PROCESS = 8
 MAX_CRAWLING_DURATION = 10 * 60 # in seconds
 WAIT_AFTER_CRAWLING = 1000 # in miliseconds
 SMALL_TABLE_LIMIT = 10
@@ -387,14 +387,14 @@ def table_detection():
     # STEP 3: Run the celery Chord
     result = chord(header)(callback)
 
-    return render_template('table_detection.html')
+    return render_template('table_detection.html', total_pdf=PDF_TO_PROCESS)
 
 
 # PDF processing
 @app.route('/processing')
 @is_logged_in
 def processing():
-    return render_template('processing.html')
+    return render_template('processing.html', n_files=PDF_TO_PROCESS, domain=session.get('domain', ''), )
 
 
 # Last Crawl Statistics
