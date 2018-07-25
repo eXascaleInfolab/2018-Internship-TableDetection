@@ -67,6 +67,17 @@ SMALL_TABLE_LIMIT = 10
 MEDIUM_TABLE_LIMIT = 20
 
 
+@celery.task(bind=True, time_limit=MAX_CRAWLING_DURATION) #TODO testing of this feature
+def crawling_task(self, url='', post_url='', ):
+
+    command = shlex.split("timeout %d wget -r -A -q -nv pdf %s" % (MAX_CRAWLING_DURATION, url,))
+    #command = shlex.split("ping www.google.ch")
+    process = subprocess.Popen(command, cwd=WGET_DATA_PATH, stderr=subprocess.PIPE)
+    #session['crawl_process_id'] = process.pid
+
+    for stderr_line in iter(process.stderr.readline, ""):
+        post(post_url, json={'event': 'crawl_update', 'data': stderr_line.decode("utf-8")})
+
 @celery.task(bind=True)
 def tabula_task(self, file_path='', post_url=''):
 
@@ -288,28 +299,13 @@ def crawling():
 
     # STEP 1: Prepare WGET command
     url = session.get('url', None)
+    post_url = url_for('event', _external=True)
 
-    command = shlex.split("timeout %d wget -r -A -q -nv pdf %s" % (MAX_CRAWLING_DURATION, url,))
+    # STEP 2: Schedule celery task
+    result = crawling_task.delay(url=url, post_url=post_url)
+    return render_template('crawling.html', max_crawling_duration=MAX_CRAWLING_DURATION)
 
-    #TODO https://stackoverflow.com/questions/15041620/how-to-continuously-display-python-output-in-a-webpage
-    # http://flask.pocoo.org/docs/1.0/patterns/streaming/
-    # https://gist.github.com/huiliu/46be335427605960fa84
-
-    # STEP 2: Execute command in subdirectory
-    process = subprocess.Popen(command, cwd=WGET_DATA_PATH, stderr=subprocess.PIPE)
-    session['crawl_process_id'] = process.pid
-
-    def generator():
-        i = 0
-        for stderr_line in iter(process.stderr.readline, ""):
-            i += 1
-            if i < 100:
-                yield str(stderr_line)
-
-    return Response(stream_template('crawling.html', max_crawling_duration=MAX_CRAWLING_DURATION, debug=generator(),
-                                    stream=True))
-
-    #return render_template('crawling.html', max_crawling_duration=MAX_CRAWLING_DURATION)
+    #return Response(stream_template('crawling.html', max_crawling_duration=MAX_CRAWLING_DURATION, debug=generator(), stream=True))
 
 
 # End Crawling Manual

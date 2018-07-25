@@ -29,7 +29,7 @@
         // to the client. The data is then displayed in the "Received"
         // section of the page.
         socket.on('crawl_update', function(msg) {
-            $('#log').append('<br>' + $('<div/>').text(msg).html());
+            $('#log').text('<br>' + $('<div/>').text(msg).html());
         });
     });
 </script>
@@ -58,17 +58,14 @@
       <div>(In this demo version after 15 min the process will be automatically interrupted and this page will be redirected
           to perform Table Detection. If you close this page the crawling will be performed and can be
           reused later, but the table detection will not start) </div>
-      <hr>
       <a href="/crawling/end" class="btn btn-primary btn-lg">Interrupt Crawling</a>
+      <hr>
       <div class="well well-lg">
-          <h4> First 100 lines of wget stderr</h4>
-          <div class="pre-scrollable">
-              {% for item in debug %}
-              <p>{{ item }}</p>
-              {% endfor %}
-          </div>
+          <h4> Crawler output: </h4>
+           <div id="log"></div>
       </div>
       {% endif %}
+
 
 
   </div>
