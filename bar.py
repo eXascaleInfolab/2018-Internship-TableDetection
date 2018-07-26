@@ -61,7 +61,7 @@ mysql = MySQL(app)
 # CONSTANTS
 WGET_DATA_PATH = 'data'
 PDF_TO_PROCESS = 8
-MAX_CRAWLING_DURATION = 10 * 60         # in seconds
+MAX_CRAWLING_DURATION =      60         # in seconds
 WAIT_AFTER_CRAWLING = 1000              # in milliseconds
 SMALL_TABLE_LIMIT = 10                  # defines what is considered a small table
 MEDIUM_TABLE_LIMIT = 20                 # defines what is considered a medium table
@@ -76,7 +76,7 @@ def crawling_task(self, url='', post_url='', domain=''):
     process = subprocess.Popen(command, cwd=WGET_DATA_PATH, stderr=subprocess.PIPE)
 
     # Set the pid in the state
-    self.update_state(state='PROGRESS', meta={'pid': process.pid})
+    self.update_state(state='PROGRESS', meta={'pid': process.pid, })
 
     # STEP 2: send crawl stderr through WebSocket
     while True:
@@ -155,7 +155,6 @@ def tabula_task(self, file_path='', post_url=''):
 
     # STEP 6: Return stats
     return stat
-    session['crawling_id'] = 0
 
 
 @celery.task(bind=True)
@@ -330,8 +329,8 @@ def crawling():
     # STEP -1: check no crawling in progress
     if session.get('crawling_id', 0) is not 0:
         flash("Crawling already in progress, please wait before "
-              "running another query", 'danger')
-        return render_template('home.html')
+              "running another query", 'danger') #TODO link to killing query
+        return redirect(url_for('index'))
 
     # STEP 0: TimeKeeping
     session['crawl_start_time'] = time.time()
@@ -346,28 +345,35 @@ def crawling():
 
     return render_template('crawling.html', max_crawling_duration=MAX_CRAWLING_DURATION)
 
+    # FIXME porblem with automatic redirection if task not started yet
+
 
 # End Crawling Manual
 @app.route('/crawling/end')
 @is_logged_in
 def end_crawling():
 
-
     # STEP 0: check crawling process exists
     if session.get('crawling_id', 0) is 0:
         flash("There is no crawling process to kill", 'danger')
         render_template('crawling.html', max_crawling_duration=MAX_CRAWLING_DURATION)
 
-    # STEP 1: Kill crawl process
-    celery.revoke(session.get('crawling_id', 0))
-    session['crawling_id'] = 0
+    # STEP 1: Kill only subprocess, and the celery process will then recognize it and terminate too
+    celery_id = session.get('crawling_id', 0)                       # get saved celery task id
+    try:
+        pid = crawling_task.AsyncResult(celery_id).info.get('pid')      # get saved subprocess id
+        os.kill(pid, signal.SIGTERM)                                    # kill subprocess
+    except AttributeError:
+        flash("Either the task was not scheduled yet or is already over and thus interruption is not possible", 'danger')
+        return redirect(url_for('index'))
 
     # STEP 2: TimeKeeping
     crawl_start_time = session.get('crawl_start_time', None)
     session['crawl_total_time'] = time.time() - crawl_start_time
 
     # STEP 3: Successful interruption
-    flash('You successfully started table detection without interrupting the crawler', 'success')
+    session['crawling_id'] = 0                                      # allow crawling again
+    flash('You successfully manually interrupted the crawler.', 'success')
 
     return render_template('end_crawling.html')
 
