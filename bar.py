@@ -60,8 +60,8 @@ mysql = MySQL(app)
 
 # CONSTANTS
 WGET_DATA_PATH = 'data'
-PDF_TO_PROCESS = 8
-MAX_CRAWLING_DURATION =      60         # in seconds
+PDF_TO_PROCESS = 40
+MAX_CRAWLING_DURATION = 15 * 60         # in seconds
 WAIT_AFTER_CRAWLING = 1000              # in milliseconds
 SMALL_TABLE_LIMIT = 10                  # defines what is considered a small table
 MEDIUM_TABLE_LIMIT = 20                 # defines what is considered a medium table
@@ -72,7 +72,7 @@ MAX_CRAWL_SIZE = 1024 * 1024 * 500      # in bytes (500MB)
 def crawling_task(self, url='', post_url='', domain=''):
 
     # STEP 1: Start the wget subprocess
-    command = shlex.split("timeout %d wget -r -A -q -nv pdf %s" % (MAX_CRAWLING_DURATION, url,))
+    command = shlex.split("timeout %d wget -r -A pdf %s" % (MAX_CRAWLING_DURATION, url,))
     process = subprocess.Popen(command, cwd=WGET_DATA_PATH, stderr=subprocess.PIPE)
 
     # Set the pid in the state
@@ -102,6 +102,7 @@ def crawling_task(self, url='', post_url='', domain=''):
     # STEP 4: Return the exit code
     output = process.communicate()[0]
     exitCode = process.returncode
+    post(post_url, json={'event': 'redirect', 'data': {'url': '/crawling/autoend'}})
 
     return exitCode
 
@@ -194,7 +195,6 @@ def pdf_stats(self, tabula_list, domain='', url='', crawl_total_time=0, post_url
         # STEP 5: Save query in DB
         # Create cursor
         cur = mysql.connection.cursor()
-
 
         # Execute query
         cur.execute("""INSERT INTO Crawls(cid, crawl_date, pdf_crawled, pdf_processed, process_errors, domain, disk_size, 
@@ -383,14 +383,18 @@ def table_detection():
     # STEP 3: Run the celery Chord
     result = chord(header)(callback)
 
-    return render_template('table_detection.html', total_pdf=PDF_TO_PROCESS)
+    # STEP 4: If query was empty go straight further
+    if count == 0:
+        return redirect(url_for('processing'))
+
+    return render_template('table_detection.html', total_pdf=count)
 
 
 # PDF processing
 @app.route('/processing')
 @is_logged_in
 def processing():
-    return render_template('processing.html', n_files=PDF_TO_PROCESS, domain=session.get('domain', ''), )
+    return render_template('processing.html', domain=session.get('domain', ''), )
 
 
 # Last Crawl Statistics

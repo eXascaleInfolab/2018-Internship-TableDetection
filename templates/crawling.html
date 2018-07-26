@@ -31,6 +31,10 @@
         socket.on('crawl_update', function(msg) {
             $('#log').text('<br>' + $('<div/>').text(msg).html());
         });
+
+        socket.on('redirect', function (data) {
+            window.location = data.url;
+        });
     });
 </script>
 <script type="text/javascript">
