@@ -186,6 +186,7 @@ def pdf_stats(self, tabula_list, domain='', url='', crawl_total_time=0, post_url
 
         # STEP 4: Save stats
         stats_json = json.dumps(stats, sort_keys=True, indent=4)
+        disk_size = dir_size(WGET_DATA_PATH + "/" + domain)
 
         # STEP 5: compute final processing time
         processing_total_time = time.time() - processing_start_time
@@ -194,63 +195,13 @@ def pdf_stats(self, tabula_list, domain='', url='', crawl_total_time=0, post_url
         # Create cursor
         cur = mysql.connection.cursor()
 
+
         # Execute query
-        cur.execute("""INSERT INTO Crawls(cid, crawl_date, pdf_crawled, pdf_processed, process_errors, domain, url, hierarchy, 
-                    stats, crawl_total_time, proc_total_time) VALUES(NULL, NULL, %s ,%s, %s, %s, %s, %s, %s, %s, %s)""",
-                    (n_files, n_success, n_errors, domain, url, hierarchy_json,
+        cur.execute("""INSERT INTO Crawls(cid, crawl_date, pdf_crawled, pdf_processed, process_errors, domain, disk_size, 
+                    url, hierarchy, stats, crawl_total_time, proc_total_time) 
+                    VALUES(NULL, NULL, %s ,%s, %s, %s, %s, %s, %s, %s, %s, %s)""",
+                    (n_files, n_success, n_errors, domain, disk_size, url, hierarchy_json,
                         stats_json, crawl_total_time, processing_total_time))
-
-        # Commit to DB
-        cur.connection.commit()
-
-        # Close connection
-        cur.close()
-
-        # Send message asynchronously
-        post(post_url, json={'event': 'redirect', 'data': {'url': '/processing'}})
-
-        return 'success'
-
-
-@celery.task(bind=True)
-def original(self, domain='', url='', crawl_total_time=0, post_url=''):
-    """Background task that runs a long function with progress reports."""
-    with app.app_context():
-        # STEP 0: Time keeping
-        proc_start_time = time.time()
-
-        path = "data/%s" % (domain,)
-
-        # STEP 1: Call Helper function to create Json string
-
-        # FIXME workaround to weird file system bug with latin/ cp1252 encoding..
-        # https://stackoverflow.com/questions/35959580/non-ascii-file-name-issue-with-os-walk works
-        # https://stackoverflow.com/questions/2004137/unicodeencodeerror-on-joining-file-name doesn't work
-        hierarchy_dict = path_dict(path)  # adding ur does not work as expected either
-        hierarchy_json = json.dumps(hierarchy_dict, sort_keys=True, indent=4)  # , encoding='cp1252' not needed in python3
-
-        # STEP 2: Call helper function to count number of pdf files
-        n_files = path_number_of_files(path)
-
-        # STEP 3: Extract tables from pdf's
-        stats, n_error, n_success = pdf_stats(path, PDF_TO_PROCESS, post_url)
-
-        # STEP 4: Save stats
-        stats_json = json.dumps(stats, sort_keys=True, indent=4)
-
-        # STEP 5: Time Keeping
-        proc_over_time = time.time()
-        proc_total_time = proc_over_time - proc_start_time
-
-        # STEP 6: Save query in DB
-        # Create cursor
-        cur = mysql.connection.cursor()
-
-        # Execute query
-        cur.execute("""INSERT INTO Crawls(cid, crawl_date, pdf_crawled, pdf_processed, process_errors, domain, url, hierarchy, 
-                    stats, crawl_total_time, proc_total_time) VALUES(NULL, NULL, %s ,%s, %s, %s, %s, %s, %s, %s, %s)""",
-                    (n_files, n_success, n_error, domain, url, hierarchy_json,
-                    stats_json, crawl_total_time, proc_total_time))
 
         # Commit to DB
         cur.connection.commit()
@@ -498,6 +449,7 @@ def cid_statistics(cid):
     # Find some stats about creation dates
     creation_dates_pdf = [subdict['creation_date'] for filename, subdict in stats_items]
     creation_dates = list(map(lambda str : pdf_date_format_to_datetime(str), creation_dates_pdf))
+    disk_size = round(crawl['disk_size'] / (1024*1024), 1)
 
     if len(creation_dates) > 0:
         oldest_pdf = min(creation_dates)
@@ -512,7 +464,7 @@ def cid_statistics(cid):
                            large_tables=large_tables, stats=json_stats, hierarchy=json_hierarchy,
                            end_time=crawl['crawl_date'], crawl_total_time=round(crawl['crawl_total_time'] / 60.0, 1),
                            proc_total_time=round(crawl['proc_total_time'] / 60.0, 1),
-                           oldest_pdf=oldest_pdf, most_recent_pdf=most_recent_pdf)
+                           oldest_pdf=oldest_pdf, most_recent_pdf=most_recent_pdf, disk_size=disk_size)
 
 
 class RegisterForm(Form):
