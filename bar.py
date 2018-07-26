@@ -2,7 +2,7 @@ import subprocess
 import shlex
 import os
 import signal
-from helper import path_dict, path_number_of_files, pdf_stats, pdf_date_format_to_datetime
+from helper import path_dict, path_number_of_files, pdf_stats, pdf_date_format_to_datetime, dir_size, exists
 import json
 from functools import wraps
 from urllib.parse import urlparse
@@ -61,22 +61,50 @@ mysql = MySQL(app)
 # CONSTANTS
 WGET_DATA_PATH = 'data'
 PDF_TO_PROCESS = 8
-MAX_CRAWLING_DURATION = 10 * 60 # in seconds
-WAIT_AFTER_CRAWLING = 1000 # in miliseconds
-SMALL_TABLE_LIMIT = 10
-MEDIUM_TABLE_LIMIT = 20
+MAX_CRAWLING_DURATION = 10 * 60         # in seconds
+WAIT_AFTER_CRAWLING = 1000              # in milliseconds
+SMALL_TABLE_LIMIT = 10                  # defines what is considered a small table
+MEDIUM_TABLE_LIMIT = 20                 # defines what is considered a medium table
+MAX_CRAWL_SIZE = 1024 * 1024 * 500      # in bytes (500MB)
 
 
-@celery.task(bind=True, time_limit=MAX_CRAWLING_DURATION) #TODO testing of this feature
-def crawling_task(self, url='', post_url='', ):
+@celery.task(bind=True)                 # time_limit=MAX_CRAWLING_DURATION other possibility
+def crawling_task(self, url='', post_url='', domain=''):
 
+    # STEP 1: Start the wget subprocess
     command = shlex.split("timeout %d wget -r -A -q -nv pdf %s" % (MAX_CRAWLING_DURATION, url,))
-    #command = shlex.split("ping www.google.ch")
     process = subprocess.Popen(command, cwd=WGET_DATA_PATH, stderr=subprocess.PIPE)
-    #session['crawl_process_id'] = process.pid
 
-    for stderr_line in iter(process.stderr.readline, ""):
-        post(post_url, json={'event': 'crawl_update', 'data': stderr_line.decode("utf-8")})
+    # Set the pid in the state
+    self.update_state(state='PROGRESS', meta={'pid': process.pid})
+
+    # STEP 2: send crawl stderr through WebSocket
+    while True:
+        next_line = process.stderr.readline()
+        next_line = next_line.decode("utf-8")
+
+        if process.poll() is not None:
+            # Subprocess is finished
+            break
+
+        # TODO
+        #crawled_size = dir_size(WGET_DATA_PATH + "/" + domain)
+        #if crawled_size is not None and crawled_size > MAX_CRAWL_SIZE:
+            # threshold reached
+        #    break
+
+        post(post_url, json={'event': 'crawl_update', 'data': next_line})
+
+    # STEP 3: Kill the subprocess if still alive
+    if process.poll() is None:
+        os.kill(process.pid, signal.SIGTERM)
+
+    # STEP 4: Return the exit code
+    output = process.communicate()[0]
+    exitCode = process.returncode
+
+    return exitCode
+
 
 @celery.task(bind=True)
 def tabula_task(self, file_path='', post_url=''):
@@ -127,6 +155,7 @@ def tabula_task(self, file_path='', post_url=''):
 
     # STEP 6: Return stats
     return stat
+    session['crawling_id'] = 0
 
 
 @celery.task(bind=True)
@@ -277,12 +306,16 @@ def index():
 
         # Get Form Fields and save
         url = request.form['url']
+
+        # Check if valid URL
+        if not exists(url):
+            flash('This URL does not exists. Please try another.', 'danger')
+            return render_template('home.html')
+
         parsed = urlparse(url)
 
         session['domain'] = parsed.netloc
         session['url'] = url
-
-        # TODO use WTForms to get validation
 
         return redirect(url_for('crawling'))
 
@@ -294,6 +327,12 @@ def index():
 @is_logged_in
 def crawling():
 
+    # STEP -1: check no crawling in progress
+    if session.get('crawling_id', 0) is not 0:
+        flash("Crawling already in progress, please wait before "
+              "running another query", 'danger')
+        return render_template('home.html')
+
     # STEP 0: TimeKeeping
     session['crawl_start_time'] = time.time()
 
@@ -302,10 +341,10 @@ def crawling():
     post_url = url_for('event', _external=True)
 
     # STEP 2: Schedule celery task
-    result = crawling_task.delay(url=url, post_url=post_url)
-    return render_template('crawling.html', max_crawling_duration=MAX_CRAWLING_DURATION)
+    result = crawling_task.delay(url=url, post_url=post_url, domain=session.get('domain', ''))
+    session['crawling_id'] = result.id
 
-    #return Response(stream_template('crawling.html', max_crawling_duration=MAX_CRAWLING_DURATION, debug=generator(), stream=True))
+    return render_template('crawling.html', max_crawling_duration=MAX_CRAWLING_DURATION)
 
 
 # End Crawling Manual
@@ -313,18 +352,22 @@ def crawling():
 @is_logged_in
 def end_crawling():
 
-    # STEP 1: Kill crawl process
-    p_id = session.get('crawl_process_id', None)
-    os.kill(p_id, signal.SIGTERM)
 
-    session['crawl_process_id'] = -1
+    # STEP 0: check crawling process exists
+    if session.get('crawling_id', 0) is 0:
+        flash("There is no crawling process to kill", 'danger')
+        render_template('crawling.html', max_crawling_duration=MAX_CRAWLING_DURATION)
+
+    # STEP 1: Kill crawl process
+    celery.revoke(session.get('crawling_id', 0))
+    session['crawling_id'] = 0
 
     # STEP 2: TimeKeeping
     crawl_start_time = session.get('crawl_start_time', None)
     session['crawl_total_time'] = time.time() - crawl_start_time
 
     # STEP 3: Successful interruption
-    flash('You successfully interrupted the crawler', 'success')
+    flash('You successfully started table detection without interrupting the crawler', 'success')
 
     return render_template('end_crawling.html')
 
@@ -334,22 +377,22 @@ def end_crawling():
 @is_logged_in
 def autoend_crawling():
 
-    # STEP 0: Check if already interrupted
-    p_id = session.get('crawl_process_id', None)
-    if p_id < 0:
-        return "process already killed"
-    else:
-        # STEP 1: Kill crawl process
-        os.kill(p_id, signal.SIGTERM)
+    # STEP 1: TimeKeeping
+    crawl_start_time = session.get('crawl_start_time', None)
+    total_time = time.time() - crawl_start_time
+    session['crawl_total_time'] = total_time
 
-        # STEP 2: TimeKeeping
-        crawl_start_time = session.get('crawl_start_time', None)
-        session['crawl_total_time'] = time.time() - crawl_start_time
+    # STEP 2: Successful interruption
+    if total_time > MAX_CRAWLING_DURATION:
+        flash('Time limit reached - Crawler interrupted automatically', 'success')
 
-        # STEP 3: Successful interruption
-        flash('Time Limit reached - Crawler interrupted automatically', 'success')
+    crawled_size = dir_size(WGET_DATA_PATH + "/" + session.get('domain'))
+    if crawled_size > MAX_CRAWL_SIZE:
+        flash("Size limit reached - Crawler interrupted automatically", 'success')
 
-        return redirect(url_for("table_detection"))
+    session['crawling_id'] = 0
+
+    return redirect(url_for("table_detection"))
 
 
 # Start table detection

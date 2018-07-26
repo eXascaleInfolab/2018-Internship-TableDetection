@@ -4,7 +4,7 @@ import PyPDF2
 import datetime
 from time import mktime, strptime
 from requests import post
-
+import requests
 
 
 
@@ -47,6 +47,16 @@ def path_dict(path):
 def path_number_of_files(path):
     n_files = sum([len(list(filter(lambda f: ".pdf" in f, files))) for r, d, files in os.walk(path)])
     return n_files
+
+
+# Returns the size of the directory in bytes
+def dir_size(path):
+    total_size = 0
+    for dirpath, dirnames, filenames in os.walk(path):
+        for f in filenames:
+            fp = os.path.join(dirpath, f)
+            total_size += os.path.getsize(fp)
+    return total_size
 
 
 # Uses Tabula to detect and extract tables from the pdf's
@@ -133,3 +143,13 @@ def pdf_date_format_to_datetime(str):
         print("Unable to convert time for string: " + str)
         dt = datetime.datetime.strptime("01/01/1970", '%m/%d/%Y')
     return dt
+
+
+# Checks if a URL exists
+def exists(url):
+    try:
+        r = requests.head(url)
+        return r.status_code == requests.codes.ok
+    except:
+        return False
+

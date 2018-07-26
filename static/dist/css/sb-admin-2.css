@@ -279,6 +279,10 @@ table.dataTable thead .sorting:after {
 .panel-yellow > a:hover {
   color: #df8a13;
 }
+.progress-bar {
+    -webkit-transition: none !important;
+    transition: none !important;
+}
 .timeline {
   position: relative;
   padding: 20px 0 20px;
