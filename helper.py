@@ -7,11 +7,6 @@ from requests import post
 import requests
 
 
-
-# CONSTANTS
-
-
-
 # Create a json string for given path
 # source: https://stackoverflow.com/questions/25226208/represent-directory-tree-as-json
 def path_dict(path):

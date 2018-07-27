@@ -23,6 +23,8 @@ from requests import post
 import tabula
 import PyPDF2
 
+import traceback
+
 
 # Set this variable to "threading", "eventlet" or "gevent" to test the
 # different async modes, or leave it set to None for the application to choose
@@ -60,8 +62,8 @@ mysql = MySQL(app)
 
 # CONSTANTS
 WGET_DATA_PATH = 'data'
-PDF_TO_PROCESS = 40
-MAX_CRAWLING_DURATION = 15 * 60         # in seconds
+PDF_TO_PROCESS = 1000
+MAX_CRAWLING_DURATION = 20              # in seconds
 WAIT_AFTER_CRAWLING = 1000              # in milliseconds
 SMALL_TABLE_LIMIT = 10                  # defines what is considered a small table
 MEDIUM_TABLE_LIMIT = 20                 # defines what is considered a medium table
@@ -116,17 +118,23 @@ def tabula_task(self, file_path='', post_url=''):
     table_sizes = {'small': 0, 'medium': 0, 'large': 0}
 
     # STEP 1: count total number of pages
-    pdf_file = PyPDF2.PdfFileReader(open(file_path, mode='rb'))
-    n_pages = pdf_file.getNumPages()
-
     try:
-        # STEP 2: run TABULA to extract all tables into one dataframe
-        df_array = tabula.read_pdf(file_path, pages="all", multiple_tables=True)
-    except:
-        post(post_url, json={'event': 'tabula_failure', 'data': {'pdf_name': file_path, }})
+        pdf_file = PyPDF2.PdfFileReader(open(file_path, mode='rb'))
+        n_pages = pdf_file.getNumPages()
+    except EOFError:
+        post(post_url, json={'event': 'processing_failure', 'data': {'pdf_name': file_path,
+                                                                     'text': 'PyPDF error on file : ',
+                                                                     'trace': traceback.print_exc()}})
+        return 'error'
 
-        print("ERROR: Tabula Conversion failed for %s" % (file_path,))
-        return 'error',
+    # STEP 2: run TABULA to extract all tables into one dataframe
+    try:
+        df_array = tabula.read_pdf(file_path, pages="all", multiple_tables=True)
+    except Exception as e:
+        post(post_url, json={'event': 'processing_failure', 'data': {'pdf_name': file_path,
+                                                                     'text': 'Tabula error on file : ',
+                                                                     'trace': traceback.print_exc()}})
+        return 'error'
 
     # STEP 3: count number of rows in each dataframe
     for df in df_array:
@@ -143,12 +151,17 @@ def tabula_task(self, file_path='', post_url=''):
             table_sizes['large'] += 1
 
     # STEP 4: save stats
-    creation_date = pdf_file.getDocumentInfo()['/CreationDate']
-    stat = (file_path, {'n_pages': n_pages, 'n_tables': n_tables,
-                        'n_table_rows': n_table_rows, 'creation_date': creation_date,
-                        'table_sizes': table_sizes, 'url': file_path})
+    try:
+        creation_date = pdf_file.getDocumentInfo()['/CreationDate']
+        stat = (file_path, {'n_pages': n_pages, 'n_tables': n_tables,
+                            'n_table_rows': n_table_rows, 'creation_date': creation_date,
+                            'table_sizes': table_sizes, 'url': file_path})
 
-    print("Tabula Conversion done for %s" % (file_path,))
+    except:
+        post(post_url, json={'event': 'processing_failure', 'data': {'pdf_name': file_path,
+                                                                     'text': 'Getting document info error on file: ',
+                                                                     'trace': traceback.print_exc()}})
+        return 'error'
 
     # STEP 5: Send message asynchronously
     post(post_url, json={'event': 'tabula_success', 'data':

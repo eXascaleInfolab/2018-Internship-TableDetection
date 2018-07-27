@@ -40,8 +40,8 @@
 
         });
 
-        socket.on('tabula_failure', function(msg) {
-            $('#log').append('<br>' + $('<div/>').text('Tabula PDF failure of pdf: ' + msg.pdf_name).html());
+        socket.on('processing_failure', function(msg) {
+            $('#log').append('<br>' + $('<div/>').text(msg.text + msg.pdf_name + ' traceback: ' + msg.trace).html());
         });
 
         socket.on('redirect', function (data) {
