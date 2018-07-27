@@ -125,16 +125,16 @@ def tabula_task(self, file_path='', post_url=''):
         post(post_url, json={'event': 'processing_failure', 'data': {'pdf_name': file_path,
                                                                      'text': 'PyPDF error on file : ',
                                                                      'trace': traceback.print_exc()}})
-        return 'error'
+        return 'error',     # important to return tuple
 
     # STEP 2: run TABULA to extract all tables into one dataframe
     try:
         df_array = tabula.read_pdf(file_path, pages="all", multiple_tables=True)
-    except Exception as e:
+    except:
         post(post_url, json={'event': 'processing_failure', 'data': {'pdf_name': file_path,
                                                                      'text': 'Tabula error on file : ',
                                                                      'trace': traceback.print_exc()}})
-        return 'error'
+        return 'error',      # important to return tuple
 
     # STEP 3: count number of rows in each dataframe
     for df in df_array:
@@ -161,7 +161,7 @@ def tabula_task(self, file_path='', post_url=''):
         post(post_url, json={'event': 'processing_failure', 'data': {'pdf_name': file_path,
                                                                      'text': 'Getting document info error on file: ',
                                                                      'trace': traceback.print_exc()}})
-        return 'error'
+        return 'error',      # important to return tuple
 
     # STEP 5: Send message asynchronously
     post(post_url, json={'event': 'tabula_success', 'data':
@@ -448,14 +448,12 @@ def cid_statistics(cid):
     # Close connection
     cur.close();
 
-    print(session.get('stats', None))
-    print(crawl['stats'])
-
     # STEP 2: do some processing to retrieve interesting info from stats
     json_stats = json.loads(crawl['stats'])
     json_hierarchy = json.loads(crawl['hierarchy'])
 
     stats_items = json_stats.items()
+    print(stats_items)
     n_tables = sum([subdict['n_tables'] for filename, subdict in stats_items])
     n_rows = sum([subdict['n_table_rows'] for filename, subdict in stats_items])
 
