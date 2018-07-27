@@ -62,7 +62,7 @@ mysql = MySQL(app)
 
 # CONSTANTS
 WGET_DATA_PATH = 'data'
-PDF_TO_PROCESS = 1000
+PDF_TO_PROCESS = 12
 MAX_CRAWLING_DURATION = 20              # in seconds
 WAIT_AFTER_CRAWLING = 1000              # in milliseconds
 SMALL_TABLE_LIMIT = 10                  # defines what is considered a small table
