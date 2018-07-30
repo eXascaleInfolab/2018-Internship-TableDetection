@@ -591,7 +591,7 @@ def delete_crawl():
         cur = mysql.connection.cursor()
 
         # Get user by username
-        result = cur.execute("""DELETE FROM Crawls WHERE cid = %s""", (cid,))
+        cur.execute("""DELETE FROM Crawls WHERE cid = %s""", (cid,))
 
         # Commit to DB
         mysql.connection.commit()
