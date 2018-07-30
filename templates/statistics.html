@@ -1,9 +1,25 @@
 {% extends 'layout.html' %}
 
+{% block headerscripts %}
+<!-- Social Buttons CSS -->
+<link href="../static/vendor/bootstrap-social/bootstrap-social.css" rel="stylesheet">
+<script>
+    function copyToClipboard() {
+        el = document.createElement('textarea');
+        el.value = window.location.href;
+        document.body.appendChild(el);
+        el.select();
+        document.execCommand('copy');
+        document.body.removeChild(el);
+    };
+</script>
+{% endblock %}
+
+
 {% block body %}
 <h1 class="page-header"> <strong>Statistics</strong>
-    <div class="pull-right"> {{domain}}</div>
-    <div>Crawl-ID: {{cid}} <div class="pull-right"> {{end_time}}</div></div>
+    <div class="pull-right">{{domain}}</div>
+    <div>Crawl-ID: {{cid}} <!--<div class="pull-right"> {{end_time}}</div>--></div>
 
 </h1>
 <div class="row">
@@ -205,6 +221,18 @@
         <!-- /.panel -->
     </div>
 </div>
+
+<hr>
+    <div class="text-center">
+        <a onclick="copyToClipboard()" class="btn btn-social-icon btn-dropbox"><i class="fa fa-save "></i></a>
+        <a title="Email a friend" href="#" onclick="javascript:window.location='mailto:?subject=PDF Crawl App&body=Have a look at these statistics: ' + window.location;"  class="btn btn-social-icon btn-vk"><i class="fa fa-envelope"></i></a>
+
+        <!-- Could add more buttons to share here !
+        <a class="btn btn-social-icon btn-facebook"><i class="fa fa-facebook"></i></a>
+        <a class="btn btn-social-icon btn-linkedin"><i class="fa fa-linkedin"></i></a>
+        <a class="btn btn-social-icon btn-twitter"><i class="fa fa-twitter"></i></a>
+        -->
+    </div>
 
 {% endblock %}
 
