@@ -106,6 +106,21 @@
         <div class="col-lg-4">
             <div class="panel panel-default">
                 <div class="panel-heading">
+                    <i class="fa fa-gear fa-fw"></i> Download selected PDFs
+                </div>
+                <!-- /.panel-heading -->
+                <div class="panel-body">
+                </div>
+                <!-- /.panel-body -->
+            </div>
+            <!-- /.panel -->
+        </div>
+        <!-- /.col-lg-4 -->
+    </div>
+<div class="row">
+    <div class="col-lg-4">
+            <div class="panel panel-default">
+                <div class="panel-heading">
                     <i class="fa fa-gear fa-fw"></i> Additional Statistics: raw numbers
                 </div>
                 <!-- /.panel-heading -->
@@ -177,10 +192,7 @@
             </div>
             <!-- /.panel -->
         </div>
-        <!-- /.col-lg-4 -->
-    </div>
-<div class="row">
-  <div class="col-sm-4">
+    <div class="col-sm-4">
       <div class="panel panel-default">
           <div class="panel-heading">
               <i class="fa fa-bar-chart-o fa-fw"></i> Tables Sizes
@@ -191,20 +203,8 @@
           <!-- /.panel-body -->
       </div>
       <!-- /.panel -->
-  </div>
-  <div class="col-sm-4">
-      <div class="panel panel-default">
-          <div class="panel-heading">
-              <i class="fa fa-bar-chart-o fa-fw"></i> Number of Tables compared to Number of Pages processed
-          </div>
-          <div class="panel-body">
-              <canvas id = "donut2"></canvas>
-          </div>
-          <!-- /.panel-body -->
-      </div>
-      <!-- /.panel -->
-  </div>
-  <div class="col-sm-4">
+    </div>
+    <div class="col-sm-4">
       <div class="panel panel-default">
           <div class="panel-heading">
               <i class="fa fa-bar-chart-o fa-fw"></i> Total PDF with Tables
@@ -278,7 +278,7 @@
 
 
     /*
-     *  CHART 2 & 3: Donut TABLE RATIO and PAGE Ratio
+     *  CHART 2: Donut TABLE RATIO and PAGE Ratio
      */
     var total_pages = 0;
     var table_pages = 0;
@@ -297,22 +297,10 @@
         }
     }
 
-    var ctx2 = document.getElementById('donut2').getContext('2d');
-    var ctx3 = document.getElementById('donut3').getContext('2d');
+    var ctx2 = document.getElementById('donut3').getContext('2d');
 
 
     data2 = {
-        datasets: [{
-            "label":"Processed PDF",
-            "data": [table_pages, total_pages - table_pages],
-            "backgroundColor": ["rgb(92, 184, 92)", "rgb(51, 122, 183)", "rgb(240, 173, 78)", "rgb(217, 83, 79)"]
-        }],
-        labels: [
-            'Number of Tables detected',
-            'The entire circle represents the total amount of PDF pages'
-        ]
-    };
-    data3 = {
         datasets: [{
             "label":"Table Ratio",
             "data": [pdf_with_tables, pdf_without_tables],
@@ -329,11 +317,6 @@
     var myDoughnutChart2 = new Chart(ctx2, {
         type: 'doughnut',
         data: data2,
-        options: Chart.defaults.doughnut
-    });
-    var myDoughnutChart3 = new Chart(ctx3, {
-        type: 'doughnut',
-        data: data3,
         options: Chart.defaults.doughnut
     });
 
