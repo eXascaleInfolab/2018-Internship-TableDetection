@@ -1,8 +1,10 @@
 {% extends 'layout.html' %}
 
 {% block body %}
-<h1 class="page-header"> Statistics
+<h1 class="page-header"> <strong>Statistics</strong>
     <div class="pull-right"> {{domain}}</div>
+    <div>Crawl-ID: {{cid}} <div class="pull-right"> {{end_time}}</div></div>
+
 </h1>
 <div class="row">
         <div class="col-lg-3 col-md-6">
@@ -203,8 +205,6 @@
         <!-- /.panel -->
     </div>
 </div>
-
-
 
 {% endblock %}
 

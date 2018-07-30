@@ -486,7 +486,7 @@ def cid_statistics(cid):
         oldest_pdf = "None"
         most_recent_pdf = "None"
 
-    return render_template('statistics.html', n_files=crawl['pdf_crawled'], n_success=crawl['pdf_processed'],
+    return render_template('statistics.html', cid=cid, n_files=crawl['pdf_crawled'], n_success=crawl['pdf_processed'],
                            n_tables=n_tables, n_rows=n_rows, n_errors=crawl['process_errors'], domain=crawl['domain'],
                            small_tables=small_tables, medium_tables=medium_tables,
                            large_tables=large_tables, stats=json_stats, hierarchy=json_hierarchy,
