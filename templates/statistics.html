@@ -4,6 +4,7 @@
 <!-- Social Buttons CSS -->
 <link href="../static/vendor/bootstrap-social/bootstrap-social.css" rel="stylesheet">
 <script>
+    // Taken from https://hackernoon.com/copying-text-to-clipboard-with-javascript-df4d4988697f
     function copyToClipboard() {
         el = document.createElement('textarea');
         el.value = window.location.href;
@@ -227,7 +228,7 @@
         <a onclick="copyToClipboard()" class="btn btn-social-icon btn-dropbox"><i class="fa fa-save "></i></a>
         <a title="Email a friend" href="#" onclick="javascript:window.location='mailto:?subject=PDF Crawl App&body=Have a look at these statistics: ' + window.location;"  class="btn btn-social-icon btn-vk"><i class="fa fa-envelope"></i></a>
 
-        <!-- Could add more buttons to share here !
+        <!-- Could add more buttons to share on different platforms here !
         <a class="btn btn-social-icon btn-facebook"><i class="fa fa-facebook"></i></a>
         <a class="btn btn-social-icon btn-linkedin"><i class="fa fa-linkedin"></i></a>
         <a class="btn btn-social-icon btn-twitter"><i class="fa fa-twitter"></i></a>

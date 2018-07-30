@@ -63,11 +63,15 @@ mysql = MySQL(app)
 
 # CONSTANTS
 WGET_DATA_PATH = 'data'
-PDF_TO_PROCESS = 10
-MAX_CRAWLING_DURATION = 60              # in seconds
+PDF_TO_PROCESS = 100
+MAX_CRAWLING_DURATION = 60 * 15             # in seconds
 WAIT_AFTER_CRAWLING = 1000              # in milliseconds
 SMALL_TABLE_LIMIT = 10                  # defines what is considered a small table
 MEDIUM_TABLE_LIMIT = 20                 # defines what is considered a medium table
+# Note that when checking for size folders are not taken into account and thus
+# the effective size can be up to 10% higher, also leave enough room for other requests,
+# like downloading pdf's from stats page. For those reasons I would not recommend
+# using more than 50 % of available disk space.
 MAX_CRAWL_SIZE = 1024 * 1024 * 500      # in bytes (500MB)
 
 
@@ -92,11 +96,10 @@ def crawling_task(self, url='', post_url='', domain=''):
             # Subprocess is finished
             break
 
-        # TODO
-        #crawled_size = dir_size(WGET_DATA_PATH + "/" + domain)
-        #if crawled_size is not None and crawled_size > MAX_CRAWL_SIZE:
+        crawled_size = dir_size(WGET_DATA_PATH + "/" + domain)
+        if crawled_size is not None and crawled_size > MAX_CRAWL_SIZE:
             # threshold reached
-        #    break
+            break
 
         post(post_url, json={'event': 'crawl_update', 'data': next_line})
 
@@ -364,14 +367,15 @@ def autoend_crawling():
     crawl_start_time = session.get('crawl_start_time', None)
     total_time = time.time() - crawl_start_time
     session['crawl_total_time'] = total_time
+    crawled_size = dir_size(WGET_DATA_PATH + "/" + session.get('domain'))
 
     # STEP 2: Successful interruption
     if total_time > MAX_CRAWLING_DURATION:
         flash('Time limit reached - Crawler interrupted automatically', 'success')
-
-    crawled_size = dir_size(WGET_DATA_PATH + "/" + session.get('domain'))
-    if crawled_size > MAX_CRAWL_SIZE:
+    elif crawled_size > MAX_CRAWL_SIZE:
         flash("Size limit reached - Crawler interrupted automatically", 'success')
+    else:
+        flash("Crawled all PDFs until depth of 5 - Crawler interrupted automatically", 'success')
 
     session['crawling_id'] = 0
 

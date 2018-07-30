@@ -29,7 +29,7 @@
         // to the client. The data is then displayed in the "Received"
         // section of the page.
         socket.on('crawl_update', function(msg) {
-            $('#log').text('<br>' + $('<div/>').text(msg).html());
+            $('#log').text($('<div/>').text(msg).html());
         });
 
         socket.on('redirect', function (data) {

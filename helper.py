@@ -50,7 +50,11 @@ def dir_size(path):
     for dirpath, dirnames, filenames in os.walk(path):
         for f in filenames:
             fp = os.path.join(dirpath, f)
-            total_size += os.path.getsize(fp)
+            try:
+                total_size += os.path.getsize(fp)
+            except:
+                # Probably temporary file got removed or other error due to crawling in progress, ignore size
+                pass
     return total_size
 
 
