@@ -48,6 +48,7 @@
             window.location = data.url;
         });
     });
+
 </script>
 {% endblock %}
 
@@ -70,11 +71,11 @@
 
     <div class="well well-lg">
         <div class="row">
-            <h4 class="pull-left">Messages received from Celery Tasks: </h4>
+            <h4 class="pull-left">Status Updates: </h4>
             <h4 class="pull-right"> / {{total_pdf}} processed.</h4>
             <h4 class="pull-right" id="count_pdf">0</h4>
         </div>
-        <div id="log"></div>
+        <div id="log" class="pre-scrollable"></div>
     </div>
     {% endif %}
 </div>

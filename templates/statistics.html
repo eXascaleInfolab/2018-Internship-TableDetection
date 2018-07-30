@@ -164,7 +164,7 @@
   <div class="col-sm-4">
       <div class="panel panel-default">
           <div class="panel-heading">
-              <i class="fa fa-bar-chart-o fa-fw"></i> Table Pages vs Text only Pages
+              <i class="fa fa-bar-chart-o fa-fw"></i> Number of Tables compared to Number of Pages processed
           </div>
           <div class="panel-body">
               <canvas id = "donut2"></canvas>
@@ -277,8 +277,8 @@
             "backgroundColor": ["rgb(92, 184, 92)", "rgb(51, 122, 183)", "rgb(240, 173, 78)", "rgb(217, 83, 79)"]
         }],
         labels: [
-            'Total pages with tables',
-            'Total pages without tables'
+            'Number of Tables detected',
+            'The entire circle represents the total amount of PDF pages'
         ]
     };
     data3 = {
@@ -636,7 +636,7 @@
     }
 
     function expandAll(){
-        expandLevel(root, 4);
+        expandLevel(root, 2);
         update(root);
     }
 

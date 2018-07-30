@@ -66,7 +66,7 @@
 
       {% if session.logged_in != NULL %}
       <p class="lead">The data is getting collected, in this demo version it will do so until
-          15 minutes have passed or a depth of 5 has been reached. (Note: these parameter could of course be user input.) </p>
+          {{max_crawling_duration / 60}} minutes have passed or a depth of 5 has been reached. (Note: these parameter could of course be user input.) </p>
       <div> If you close this page the crawling will be performed and can be
           reused later, but the table detection will not start.
           Similarly you can choose to preemptively start table detection.</div>

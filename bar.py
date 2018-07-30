@@ -24,6 +24,7 @@ import tabula
 import PyPDF2
 
 import traceback
+import shutil
 
 
 # Set this variable to "threading", "eventlet" or "gevent" to test the
@@ -42,7 +43,7 @@ app.config['CELERY_RESULT_BACKEND'] = 'redis://localhost:6379/0'
 # SocketIO
 socketio = SocketIO(app, async_mode=async_mode)
 
-# Deprecated
+# Deprecated FIXME have another
 thread = None
 thread_lock = Lock()
 
@@ -62,13 +63,15 @@ mysql = MySQL(app)
 
 # CONSTANTS
 WGET_DATA_PATH = 'data'
-PDF_TO_PROCESS = 12
-MAX_CRAWLING_DURATION = 20              # in seconds
+PDF_TO_PROCESS = 10
+MAX_CRAWLING_DURATION = 60              # in seconds
 WAIT_AFTER_CRAWLING = 1000              # in milliseconds
 SMALL_TABLE_LIMIT = 10                  # defines what is considered a small table
 MEDIUM_TABLE_LIMIT = 20                 # defines what is considered a medium table
 MAX_CRAWL_SIZE = 1024 * 1024 * 500      # in bytes (500MB)
 
+
+# CELERY TASKS
 
 @celery.task(bind=True)                 # time_limit=MAX_CRAWLING_DURATION other possibility
 def crawling_task(self, url='', post_url='', domain=''):
@@ -121,7 +124,7 @@ def tabula_task(self, file_path='', post_url=''):
     try:
         pdf_file = PyPDF2.PdfFileReader(open(file_path, mode='rb'))
         n_pages = pdf_file.getNumPages()
-    except EOFError:
+    except:
         post(post_url, json={'event': 'processing_failure', 'data': {'pdf_name': file_path,
                                                                      'text': 'PyPDF error on file : ',
                                                                      'trace': traceback.print_exc()}})
@@ -228,16 +231,8 @@ def pdf_stats(self, tabula_list, domain='', url='', crawl_total_time=0, post_url
         return 'success'
 
 
-@app.route('/event/', methods=['POST'])
-def event():
-    data = request.json
-    if data:
-        socketio.emit(data['event'], data['data'])
-        return 'ok'
-    return 'error', 404
+# HELPER FUNCTION
 
-
-# Helper Function
 # Check if user logged in
 def is_logged_in(f):
     @wraps(f)
@@ -250,13 +245,25 @@ def is_logged_in(f):
     return wrap
 
 
-# Ability to stream a template
+# Ability to stream a template (can be used with python generator)
 def stream_template(template_name, **context):
     app.update_template_context(context)
     t = app.jinja_env.get_template(template_name)
     rv = t.stream(context)
     rv.disable_buffering()
     return rv
+
+
+# APP ROUTES
+
+# Used to easily emit WebSocket messages from inside tasks
+@app.route('/event/', methods=['POST'])
+def event():
+    data = request.json
+    if data:
+        socketio.emit(data['event'], data['data'])
+        return 'ok'
+    return 'error', 404
 
 
 # Index
@@ -290,6 +297,12 @@ def index():
 @is_logged_in
 def crawling():
 
+    # STEP -3: delete previously crawled data
+    delete_data()
+
+    # STEP -2: create directory for data
+    os.mkdir(WGET_DATA_PATH)
+
     # STEP -1: check no crawling in progress
     if session.get('crawling_id', 0) is not 0:
         flash("Crawling already in progress, please wait before "
@@ -312,7 +325,7 @@ def crawling():
     # FIXME porblem with automatic redirection if task not started yet
 
 
-# End Crawling Manual
+# End Crawling manually
 @app.route('/crawling/end')
 @is_logged_in
 def end_crawling():
@@ -342,7 +355,7 @@ def end_crawling():
     return render_template('end_crawling.html')
 
 
-# End Crawling Automatic
+# End Crawling automatically
 @app.route('/crawling/autoend')
 @is_logged_in
 def autoend_crawling():
@@ -403,7 +416,7 @@ def table_detection():
     return render_template('table_detection.html', total_pdf=count)
 
 
-# PDF processing
+# end of PDF processing (FIXME name not very representative anymore)
 @app.route('/processing')
 @is_logged_in
 def processing():
@@ -540,11 +553,11 @@ def login():
 
         if result > 0:
             # Get stored hash
-            data = cur.fetchone() # FIXME why is username not primary key
+            data = cur.fetchone()                                       # FIXME why is username not primary key
             password = data['password']
 
             # Compare passwords
-            if sha256_crypt.verify(password_candidate, password): # FIXME how does sha256 work?
+            if sha256_crypt.verify(password_candidate, password):       # FIXME how does sha256 work?
 
                 # Check was successful -> create session variables
                 session['logged_in'] = True
@@ -560,8 +573,8 @@ def login():
             error = 'Username not found'
             return render_template('login.html', error=error)
 
-        # Close connection
-        cur.close() # FIXME shouldn't that happen before return?
+        # Note: Closing connection not necessary when using flask mysql db extension
+        # cur.close()
 
     return render_template('login.html')
 
@@ -630,7 +643,16 @@ def about():
     return render_template('about.html')
 
 
+# Delete Crawled PDFs
+@app.route('/delete_data', methods=['GET', 'POST'])
+@is_logged_in
+def delete_data():
+    shutil.rmtree(WGET_DATA_PATH)
+    return "Crawled data deleted successfully"
+
+
 # Asynchronous Communication wrappers
+# Note: these are not crucial as of yet
 @socketio.on('connect')
 def test_connect():
     emit('my_response', {'data': 'Connected', 'count': 0})
