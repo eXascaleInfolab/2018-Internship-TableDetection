@@ -5,7 +5,7 @@
 <!-- <link href="../static/vendor/bootstrap-social/bootstrap-social.css" rel="stylesheet"> -->
 <script>
     // Taken from https://hackernoon.com/copying-text-to-clipboard-with-javascript-df4d4988697f
-    function copyToClipboard() {
+    function copyCurrentUrlToClipboard() {
         el = document.createElement('textarea');
         el.value = window.location.href;
         document.body.appendChild(el);
@@ -13,6 +13,18 @@
         document.execCommand('copy');
         document.body.removeChild(el);
     };
+    function copyUrlToClipboard() {
+        el = document.createElement('textarea');
+        el.value = document.getElementById('pdf-url').innerText;
+        document.body.appendChild(el);
+        el.select();
+        document.execCommand('copy');
+        document.body.removeChild(el);
+    };
+    function openURL(url) {
+        var url = document.getElementById('pdf-url').innerText;
+       window.open("http://" + url)    //FIXME https? none at all?
+    }
 </script>
 {% endblock %}
 
@@ -110,6 +122,42 @@
                 </div>
                 <!-- /.panel-heading -->
                 <div class="panel-body">
+                    <div class="text-center">
+                        <div class="btn-group" role="group" aria-label="Basic example">
+                            <button type="button" onclick="changeOnClick('single')" class="btn btn-outline btn-primary">Sinlge</button>
+                            <button type="button" onclick="changeOnClick('multiple')" class="btn btn-outline btn-primary">Multiple</button>
+                            <button type="button" onclick="changeOnClick('dataset')" class="btn btn-outline btn-primary">Dataset</button>
+                        </div>
+                    </div>
+                    <br>
+                    <div id="single" class="list-group" style="display:none;">
+                        <a href="#" class="list-group-item">
+                            <i class="fa fa-search fa-fw"></i> Name of PDF clicked
+                            <br>
+                            <span class="text-muted small"><em id="pdf-name"></em>
+                            </span>
+                        </a>
+                        <a href="#" class="list-group-item">
+                            <i class="fa fa-globe  fa-fw"></i> URL of PDF
+                            <br>
+                            <div class="text-muted small uneditable-textarea" id="pdf-url"></div>
+                        </a>
+
+                        <a onclick="copyUrlToClipboard()" class="list-group-item btn btn-social-icon"><i class="fa fa-save "></i></a>
+                        <a onclick="openURL()" class="list-group-item btn btn-social-icon"><i class="fa  fa-download "></i></a>
+
+                    </div>
+                    <div id="multiple" class="" style="display:none;">
+                        <div class="pre-scrollable list-group" id="dynamic-list">
+                        </div>
+
+                        <div class="text-center">
+                            <button type="button" onclick="cancelSelection()" class="btn btn-outline btn-default btn-sm">Cancel Selection</button>
+                            <button type="button" onclick="downloadAll()" class="btn btn-outline btn-success btn-sm">Download All</button>
+                        </div>
+                    </div>
+                    <div id="dataset" class="list-group" style="display:none;">
+                    </div>
                 </div>
                 <!-- /.panel-body -->
             </div>
@@ -177,8 +225,8 @@
                         <div class="list-group-item">
                             <i class="fa fa-share-alt  fa-fw"></i> Share this page
                             <span class="pull-right">
-                            <a onclick="copyToClipboard()" class="btn btn-social-icon btn-dropbox"><i class="fa fa-save "></i></a>
-                            <a title="Email a friend" href="#" onclick="javascript:window.location='mailto:?subject=PDF Crawl App&body=Have a look at these statistics: ' + window.location;"  class="btn btn-social-icon btn-vk"><i class="fa fa-envelope"></i></a>
+                            <a onclick="copyCurrentUrlToClipboard()" class="btn btn-social-icon"><i class="fa fa-save "></i></a>
+                            <a title="Email a friend" href="#" onclick="javascript:window.location='mailto:?subject=PDF Crawl App&body=Have a look at these statistics: ' + window.location;"  class="btn btn-social-icon"><i class="fa fa-envelope"></i></a>
 
                                 <!-- Could add more buttons to share on different platforms here !
                             <a class="btn btn-social-icon btn-facebook"><i class="fa fa-facebook"></i></a>
@@ -243,9 +291,131 @@
 <!-- Chart.js JavaScript -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
 <script>
+    /*
+     * DOWNLOAD Section JS
+     */
+
+    // JQuery snippet to keep only one mode active
+    $(".btn-group > .btn").click(function(){
+        $(this).addClass("active").siblings().removeClass("active");
+    });
+
+    // Keep list of pdf in set to download
+    var pdfArray = [];
+
+    // retrieves Pdf name from url
+    function getPDFName(url) {
+        var n = url.lastIndexOf('/');
+        var name = url.substring(n + 1);
+        return name;
+    }
+
+    // concels selection
+    function cancelSelection() {
+        pdfArray = []
+        document.getElementById("dynamic-list").innerHTML = "";
+    }
+
+    /**
+     * Download a list of files.
+     * @author speedplane
+     * https://stackoverflow.com/questions/2339440/download-multiple-files-with-a-single-action
+     */
+    function downloadAll() {
+        var files = pdfArray;
+        function download_next(i) {
+            if (i >= files.length) {
+              return;
+            }
+            var a = document.createElement('a');
+            a.href = files[i];
+            a.target = '_parent';
+            // Use a.download if available, it prevents plugins from opening.
+            if ('download' in a) {
+              a.download = files[i];
+            }
+            // Add a to the doc for click to work.
+            (document.body || document.documentElement).appendChild(a);
+            if (a.click) {
+              a.click(); // The click method is supported by most browsers.
+            } else {
+              $(a).click(); // Backup using jquery
+            }
+            // Delete the temporary link.
+            a.parentNode.removeChild(a);
+            // Download the next file with a small timeout. The timeout is necessary
+            // for IE, which will otherwise only download the first file.
+            setTimeout(function() {
+              download_next(i + 1);
+            }, 500);
+        }
+
+        // Initiate the first download.
+        download_next(0);
+    }
+
+    // Function to change onclick function
+    function changeOnClick(mode) {
+        switch (mode) {
+            case "single":
+                // Display div and hide others
+                document.getElementById('single').style.display = "block";
+                document.getElementById('multiple').style.display = "none";
+                document.getElementById('dataset').style.display = "none";
+
+                canvas_bubble.onclick = function download(e) {
+                    var activePoint = myBubbleChart.getElementAtEvent(e);
+                    if (!activePoint.length) return; // return if not clicked on slice
+                    // Get URL
+                    var object = myBubbleChart.data.datasets[activePoint[0]._datasetIndex].data[activePoint[0]._index];
+                    var url = object.url.substring(5);
+
+                    // Display info on webpage
+                    document.getElementById('pdf-url').innerHTML = url;
+                    document.getElementById('pdf-name').innerHTML = getPDFName(url);
+                }
+                break;
+            case "multiple":
+                 // Display div and hide others
+                document.getElementById('single').style.display = "none";
+                document.getElementById('multiple').style.display = "block";
+                document.getElementById('dataset').style.display = "none";
+
+                canvas_bubble.onclick = function download(e) {
+                    var activePoint = myBubbleChart.getElementAtEvent(e);
+                    if (!activePoint.length) return; // return if not clicked on slice
+
+                    // Get URL and add it to list and screen
+                    var object = myBubbleChart.data.datasets[activePoint[0]._datasetIndex].data[activePoint[0]._index];
+                    var url = "http://" + object.url.substring(5);
+
+                    if (! pdfArray.includes(url)) {
+                        pdfArray.push(url);
+                        var ul = document.getElementById("dynamic-list");
+                        var li = document.createElement("li");
+                        li.setAttribute('class', 'list-group-item');
+                        li.appendChild(document.createTextNode(getPDFName(url)));
+                        ul.appendChild(li);
+                    }
+                };
+                break;
+            case "dataset":
+                 // Display div and hide others
+                document.getElementById('single').style.display = "none";
+                document.getElementById('multiple').style.display = "none";
+                document.getElementById('dataset').style.display = "block";
+
+                canvas_bubble.onclick = function download(e) {
+                    console.log("Action dataset")
+
+                }
+                break;
+            default:
+        }
+    }
 
     /*
-    Constants
+     *  Constants
      */
     var stats = {{ stats|safe }};
     var baseColors = [[51, 122, 183], [92, 184, 92], [240, 173, 78], [217, 83, 79]];
@@ -278,7 +448,7 @@
 
 
     /*
-     *  CHART 2: Donut TABLE RATIO and PAGE Ratio
+     *  CHART 2: Donut TABLE RATIO
      */
     var total_pages = 0;
     var table_pages = 0;
@@ -321,7 +491,7 @@
     });
 
     /*
-        BUBBLE CHART
+        Chart 3: Bubble Chart
      */
     var canvas_bubble = document.getElementById('bubble')
     var ctx_bubble = canvas_bubble.getContext('2d');
@@ -450,12 +620,7 @@
             }
         });
 
-    canvas_bubble.onclick = function(e) {
-        var activePoint = myBubbleChart.getElementAtEvent(e);
-        if (!activePoint.length) return; // return if not clicked on slice
-        // Get URL
-        window.open("http://" + myBubbleChart.data.datasets[activePoint[0]._datasetIndex].data[activePoint[0]._index].url.substring(5));
-    }
+
 </script>
 <style>
     .node {
