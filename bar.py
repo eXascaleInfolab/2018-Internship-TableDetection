@@ -195,7 +195,7 @@ def tabula_task(self, file_path='', post_url=''):
             mysql.connection.commit()
 
             # Get ID from insert
-            insert_id = mysql.connection.insert_id()
+            insert_id = cur.lastrowid
 
             # Close connection
             cur.close()
@@ -511,13 +511,21 @@ def cid_statistics(cid):
     cur = mysql.connection.cursor()
 
     result = cur.execute("""SELECT * FROM Crawls WHERE cid = %s""", (cid,))
-    crawl = cur.fetchall()[0]
+    crawl = cur.fetchone()
+
+    # Get stats by getting all individual files
+    result = cur.execute("""SELECT url, stats FROM Files f JOIN Crawlfiles cf ON f.fid = cf.fid WHERE cid = %s""",
+                         (cid,))
+    stats_db = cur.fetchall()
+    stats = {}
+    for stat in stats_db:
+        stats[stat['url']] = json.loads(stat['stats'])
 
     # Close connection
     cur.close();
 
     # STEP 2: do some processing to retrieve interesting info from stats
-    json_stats = json.loads(crawl['stats'])
+    json_stats = stats #FIXME rename
     json_hierarchy = json.loads(crawl['hierarchy'])
 
     stats_items = json_stats.items()
