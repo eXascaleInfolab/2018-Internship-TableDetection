@@ -395,7 +395,7 @@
                     if (!activePoint.length) return; // return if not clicked on slice
                     // Get URL
                     var object = myBubbleChart.data.datasets[activePoint[0]._datasetIndex].data[activePoint[0]._index];
-                    var url = object.url.substring(5);
+                    var url = object.url;
 
                     // Display info on webpage
                     document.getElementById('pdf-url').innerHTML = url;
@@ -417,7 +417,7 @@
 
                     // Get URL and add it to list and screen
                     var object = myBubbleChart.data.datasets[activePoint[0]._datasetIndex].data[activePoint[0]._index];
-                    var url = "http://" + object.url.substring(5);
+                    var url = "http://" + object.url;
 
                     if (! multipleUrlArray.includes(url)) {
                         multipleUrlArray.push(url);
@@ -454,7 +454,7 @@
                     datasetUrlArray = [];
                     var datasetLength = dataset.length;
                     for (var i = 0; i < datasetLength; i++) {
-                        var url = "http://" + dataset[i].url.substring(5);
+                        var url = "http://" + dataset[i].url;
                          if (! multipleUrlArray.includes(url)) {
                              datasetUrlArray.push(url);
                          }
@@ -566,7 +566,7 @@
             x: stats[key].n_table_rows,
             y: stats[key].n_tables,
             r: Math.round(Math.log(stats[key].n_pages/30.0 + 1) / Math.log(1.08)), //FIXME formula also 1/3 works
-            url: stats[key].url
+            url: key
         }
 
         var pages = stats[key].n_pages;

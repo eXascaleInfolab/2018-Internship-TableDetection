@@ -29,7 +29,7 @@
         // to the client. The data is then displayed in the "Received"
         // section of the page.
         socket.on('tabula_success', function(msg) {
-            $('#log').append('<br>' + $('<div/>').text('Tabula PDF success: ' + msg.tables + ' tables found on ' + msg.pages + ' page(s).').html());
+            $('#log').append('<br>' + $('<div/>').text(msg.data + msg.tables + ' tables found on ' + msg.pages + ' page(s).').html());
             var count_pdf = document.getElementById('count_pdf');
             var number = count_pdf.innerHTML;
             number++;

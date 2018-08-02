@@ -124,19 +124,30 @@ def tabula_task(self, file_path='', post_url=''):
     url = file_path[(len(WGET_DATA_PATH) + 1):]
     print(url) #FIXME debug
 
-    with app.app_context():
-        # Create cursor
-        cur = mysql.connection.cursor()
+    try:
+        with app.app_context():
+            # Create cursor
+            cur = mysql.connection.cursor()
 
-        # Get Crawls
-        result = cur.execute("""SELECT fid, stats FROM Files WHERE url=%s""", (url,))
-        crawls = cur.fetchone()
+            # Get Crawls
+            result = cur.execute("""SELECT fid, stats FROM Files WHERE url=%s""", (url,))
+            file = cur.fetchone()
 
-        # If there was a result then return stats directly
-        # TODO time limit on how long ago pdf was processed?
+            # If there was a result then return stats directly
+            # TODO time limit on how long ago pdf was processed?
 
-        if result > 0:
-            return crawls['fid'] #TODO test extensively
+            if result > 0:
+                stats = json.loads(file['stats'])
+                post(post_url, json={'event': 'tabula_success', 'data':
+                    {'data': 'Processing time saved, document was already processed at an earlier time',
+                     'pages': stats['n_pages'], 'tables': stats['n_tables']}})
+
+                return file['fid'] #TODO test extensively
+    except Exception as e:
+        post(post_url, json={'event': 'processing_failure', 'data': {'pdf_name': file_path,
+                                                                     'text': 'PyPDF error on file : ',
+                                                                     'trace': str(e)}})
+        return -1
 
     # STEP 0: Otherwise proceed, set all counter to 0
     n_tables = 0
@@ -181,7 +192,7 @@ def tabula_task(self, file_path='', post_url=''):
         creation_date = pdf_file.getDocumentInfo()['/CreationDate']
         stats = {'n_pages': n_pages, 'n_tables': n_tables,
                             'n_table_rows': n_table_rows, 'creation_date': creation_date,
-                            'table_sizes': table_sizes, 'url': file_path}
+                            'table_sizes': table_sizes}
 
         with app.app_context():
             # Create cursor
@@ -208,7 +219,7 @@ def tabula_task(self, file_path='', post_url=''):
 
     # STEP 5: Send message asynchronously
     post(post_url, json={'event': 'tabula_success', 'data':
-        {'data': 'I successfully performed table detection', 'pages': n_pages, 'tables': n_tables}})
+        {'data': 'Tabula PDF success: ', 'pages': n_pages, 'tables': n_tables}})
 
     # STEP 6: Return stats
     return insert_id
@@ -333,7 +344,7 @@ def index():
         # Check if valid URL
         if not exists(url):
             flash('This URL does not exists. Please try another.', 'danger')
-            return render_template('home.html')
+            return render_template('home.html', most_recent_url="/statistics")
 
         parsed = urlparse(url)
 
@@ -342,7 +353,7 @@ def index():
 
         return redirect(url_for('crawling'))
 
-    return render_template('home.html')
+    return render_template('home.html', most_recent_url="none")
 
 
 # Crawling
@@ -375,7 +386,7 @@ def crawling():
 
     return render_template('crawling.html', max_crawling_duration=MAX_CRAWLING_DURATION)
 
-    # FIXME porblem with automatic redirection if task not started yet
+    # FIXME problem with automatic redirection if task not started yet
 
 
 # End Crawling manually
@@ -522,13 +533,12 @@ def cid_statistics(cid):
         stats[stat['url']] = json.loads(stat['stats'])
 
     # Close connection
-    cur.close();
+    cur.close()
 
     # STEP 2: do some processing to retrieve interesting info from stats
-    json_stats = stats #FIXME rename
     json_hierarchy = json.loads(crawl['hierarchy'])
 
-    stats_items = json_stats.items()
+    stats_items = stats.items()
     print(stats_items)
     n_tables = sum([subdict['n_tables'] for filename, subdict in stats_items])
     n_rows = sum([subdict['n_table_rows'] for filename, subdict in stats_items])
@@ -552,8 +562,9 @@ def cid_statistics(cid):
     return render_template('statistics.html', cid=cid, n_files=crawl['pdf_crawled'], n_success=crawl['pdf_processed'],
                            n_tables=n_tables, n_rows=n_rows, n_errors=crawl['process_errors'], domain=crawl['domain'],
                            small_tables=small_tables, medium_tables=medium_tables,
-                           large_tables=large_tables, stats=json_stats, hierarchy=json_hierarchy,
-                           end_time=crawl['crawl_date'], crawl_total_time=round(crawl['crawl_total_time'] / 60.0, 1),
+                           large_tables=large_tables, stats=json.dumps(stats, sort_keys=True, indent=4),
+                           hierarchy=json_hierarchy, end_time=crawl['crawl_date'],
+                           crawl_total_time=round(crawl['crawl_total_time'] / 60.0, 1),
                            proc_total_time=round(crawl['proc_total_time'] / 60.0, 1),
                            oldest_pdf=oldest_pdf, most_recent_pdf=most_recent_pdf, disk_size=disk_size)
 

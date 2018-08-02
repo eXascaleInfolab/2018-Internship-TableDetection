@@ -13,11 +13,12 @@
   <p class="lead">Please select which URL to crawl: </p>
   <form action="" method="POST">
     <div class="form-group ">
-      <label>URL</label>
-      <input type="text" name="url" class="form-control" value='https://www.bit.admin.ch'>
-      <!-- <input type="text" name="url" class="form-control" value={{request.form.url}}> -->
-    </div>
-    <button type="crawl" class="btn btn-primary btn-lg btn-block">Crawl</button>
+        <label>URL</label>
+        <input type="text" name="url" class="form-control" value='https://www.bit.admin.ch'>
+        <!-- <input type="text" name="url" class="form-control" value={{request.form.url}}> -->
+        </div>
+        <button id="crawl-btn" type="crawl" class="btn btn-primary btn-lg btn-block">Crawl</button>
+        <a id="recent-btn" href={{most_recent_url}}} style="display:none;" type="crawl" class="btn btn-success btn-lg btn-block">View most recent crawl statistics of this domain</a>
   </form>
 
 {% endif %}
@@ -42,4 +43,18 @@
         <!-- /.panel -->
     </div>
     <!-- /.col-lg-4 -->
+
+{% endblock %}
+
+{% block addscripts %}
+<script>
+    $(document).ready(function() {
+        if ("{{most_recent_url}}" != "none") {
+            document.getElementById("crawl-btn").innerHTML = "Crawl Again"
+            document.getElementById("recent-btn").style.display = "block";
+            console.log("heeelllooo")
+        }
+        console.log("if did not succeed")
+    });
+</script>
 {% endblock %}
