@@ -25,7 +25,29 @@ CREATE TABLE Crawls
     disk_size BIGINT UNSIGNED,
     url LONGTEXT,
     hierarchy LONGTEXT,
-    stats LONGTEXT,
-    crawl_total_time INT(11),
-    proc_total_time INT(11)
+    crawl_total_time BIGINT,
+    proc_total_time BIGINT
+);
+
+
+CREATE TABLE Files
+(
+	fid INT(11) AUTO_INCREMENT PRIMARY KEY, 
+	url LONGTEXT,
+	stats LONGTEXT,
+	processing_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
+CREATE TABLE Crawlfiles
+(
+	fid INT(11),
+	cid INT(11),
+	PRIMARY KEY(fid, cid),
+	FOREIGN KEY (fid)
+      	REFERENCES Files(fid)
+	ON DELETE CASCADE,
+	FOREIGN KEY (cid)
+      	REFERENCES Crawls(cid)
+	ON DELETE CASCADE
 );
