@@ -120,7 +120,25 @@ def crawling_task(self, url='', post_url='', domain=''):
 @celery.task(bind=True)
 def tabula_task(self, file_path='', post_url=''):
 
-    # STEP 0: set all counter to 0
+    # STEP -1: check if file is already in db
+    url = file_path[(len(WGET_DATA_PATH) + 1):]
+    print(url) #FIXME debug
+
+    with app.app_context():
+        # Create cursor
+        cur = mysql.connection.cursor()
+
+        # Get Crawls
+        result = cur.execute("""SELECT fid, stats FROM Files WHERE url=%s""", (url,))
+        crawls = cur.fetchone()
+
+        # If there was a result then return stats directly
+        # TODO time limit on how long ago pdf was processed?
+
+        if result > 0:
+            return crawls['fid'] #TODO test extensively
+
+    # STEP 0: Otherwise proceed, set all counter to 0
     n_tables = 0
     n_table_rows = 0
     table_sizes = {'small': 0, 'medium': 0, 'large': 0}
@@ -129,20 +147,20 @@ def tabula_task(self, file_path='', post_url=''):
     try:
         pdf_file = PyPDF2.PdfFileReader(open(file_path, mode='rb'))
         n_pages = pdf_file.getNumPages()
-    except:
+    except Exception as e:
         post(post_url, json={'event': 'processing_failure', 'data': {'pdf_name': file_path,
                                                                      'text': 'PyPDF error on file : ',
-                                                                     'trace': traceback.print_exc()}})
-        return 'error',     # important to return tuple
+                                                                     'trace': str(e)}})
+        return -1
 
     # STEP 2: run TABULA to extract all tables into one dataframe
     try:
         df_array = tabula.read_pdf(file_path, pages="all", multiple_tables=True)
-    except:
+    except Exception as e:
         post(post_url, json={'event': 'processing_failure', 'data': {'pdf_name': file_path,
                                                                      'text': 'Tabula error on file : ',
-                                                                     'trace': traceback.print_exc()}})
-        return 'error',      # important to return tuple
+                                                                     'trace': str(e)}})
+        return -1
 
     # STEP 3: count number of rows in each dataframe
     for df in df_array:
@@ -161,22 +179,39 @@ def tabula_task(self, file_path='', post_url=''):
     # STEP 4: save stats
     try:
         creation_date = pdf_file.getDocumentInfo()['/CreationDate']
-        stat = (file_path, {'n_pages': n_pages, 'n_tables': n_tables,
+        stats = {'n_pages': n_pages, 'n_tables': n_tables,
                             'n_table_rows': n_table_rows, 'creation_date': creation_date,
-                            'table_sizes': table_sizes, 'url': file_path})
+                            'table_sizes': table_sizes, 'url': file_path}
 
-    except:
+        with app.app_context():
+            # Create cursor
+            cur = mysql.connection.cursor()
+
+            # Execute query
+            cur.execute("""INSERT INTO Files(fid, processing_date, url, stats) VALUES(NULL, NULL, %s, %s)""",
+                        (url, json.dumps(stats, sort_keys=True, indent=4)))
+
+            # Commit to DB
+            mysql.connection.commit()
+
+            # Get ID from insert
+            insert_id = mysql.connection.insert_id()
+
+            # Close connection
+            cur.close()
+
+    except Exception as e:
         post(post_url, json={'event': 'processing_failure', 'data': {'pdf_name': file_path,
-                                                                     'text': 'Getting document info error on file: ',
-                                                                     'trace': traceback.print_exc()}})
-        return 'error',      # important to return tuple
+                                                                     'text': 'Cannot save stats of file : ',
+                                                                     'trace': str(e)}})
+        return -1
 
     # STEP 5: Send message asynchronously
     post(post_url, json={'event': 'tabula_success', 'data':
         {'data': 'I successfully performed table detection', 'pages': n_pages, 'tables': n_tables}})
 
     # STEP 6: Return stats
-    return stat
+    return insert_id
 
 
 @celery.task(bind=True)
@@ -196,18 +231,17 @@ def pdf_stats(self, tabula_list, domain='', url='', crawl_total_time=0, post_url
         n_files = path_number_of_files(path)
 
         # STEP 3: Treat result from Tabula tasks
-        stats = {}
         n_success = 0
         n_errors = 0
-        for stat in tabula_list:
-            if stat[0] == 'error':
+        fid_array = []
+        for fid in tabula_list:
+            if fid < 0:
                 n_errors += 1
             else:
                 n_success += 1
-                stats[stat[0]] = stat[1]
+                fid_array.append(fid)
 
-        # STEP 4: Save stats
-        stats_json = json.dumps(stats, sort_keys=True, indent=4)
+        # STEP 4: Save some additional stats
         disk_size = dir_size(WGET_DATA_PATH + "/" + domain)
 
         # STEP 5: compute final processing time
@@ -219,13 +253,27 @@ def pdf_stats(self, tabula_list, domain='', url='', crawl_total_time=0, post_url
 
         # Execute query
         cur.execute("""INSERT INTO Crawls(cid, crawl_date, pdf_crawled, pdf_processed, process_errors, domain, disk_size, 
-                    url, hierarchy, stats, crawl_total_time, proc_total_time) 
-                    VALUES(NULL, NULL, %s ,%s, %s, %s, %s, %s, %s, %s, %s, %s)""",
+                    url, hierarchy, crawl_total_time, proc_total_time) 
+                    VALUES(NULL, NULL, %s ,%s, %s, %s, %s, %s, %s, %s, %s)""",
                     (n_files, n_success, n_errors, domain, disk_size, url, hierarchy_json,
-                        stats_json, crawl_total_time, processing_total_time))
+                        crawl_total_time, processing_total_time))
 
         # Commit to DB
-        cur.connection.commit()
+        mysql.connection.commit()
+
+        # Get Crawl ID
+        cid = cur.lastrowid
+
+        print("cid is: " + str(cid))
+
+        # STEP 6: link all pdf files to this query
+        insert_tuples = [(fid, cid) for fid in fid_array]
+
+        cur.executemany("""INSERT INTO Crawlfiles(fid, cid) VALUES (%s, %s)""",
+                        insert_tuples)
+
+        # Commit to DB
+        mysql.connection.commit()
 
         # Close connection
         cur.close()
@@ -395,7 +443,8 @@ def table_detection():
     crawl_total_time = session.get('crawl_total_time', 0)
     post_url = url_for('event', _external=True)
 
-    path = "data/%s" % (domain,)
+    path = WGET_DATA_PATH + '/' + domain
+
     count = 0
     file_array = []
 
