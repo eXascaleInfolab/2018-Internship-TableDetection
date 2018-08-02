@@ -7,7 +7,7 @@ import json
 from functools import wraps
 from urllib.parse import urlparse
 
-from flask import Flask, render_template, flash, redirect, url_for, session, request, logging, Response
+from flask import Flask, render_template, flash, redirect, url_for, session, request, logging, Response, send_file
 from flask_mysqldb import MySQL
 from wtforms import Form, StringField, TextAreaField, PasswordField, validators
 from passlib.hash import sha256_crypt
@@ -26,6 +26,8 @@ import PyPDF2
 import traceback
 import shutil
 
+import io
+import csv
 
 # Set this variable to "threading", "eventlet" or "gevent" to test the
 # different async modes, or leave it set to None for the application to choose
@@ -64,7 +66,7 @@ mysql = MySQL(app)
 # CONSTANTS
 WGET_DATA_PATH = 'data'
 PDF_TO_PROCESS = 100
-MAX_CRAWLING_DURATION = 60 * 15             # in seconds
+MAX_CRAWLING_DURATION = 60 * 15         # in seconds
 WAIT_AFTER_CRAWLING = 1000              # in milliseconds
 SMALL_TABLE_LIMIT = 10                  # defines what is considered a small table
 MEDIUM_TABLE_LIMIT = 20                 # defines what is considered a medium table
@@ -654,6 +656,26 @@ def delete_data():
     shutil.rmtree(WGET_DATA_PATH)
     return "Crawled data deleted successfully"
 
+
+# Download JSON hierarchy
+@app.route('/hierarchy/<int:cid>')
+def hierarchy_download(cid):
+
+    # Get JSON string
+    # Create cursor
+    cur = mysql.connection.cursor()
+
+    # Get Crawls
+    result = cur.execute("""SELECT hierarchy FROM Crawls WHERE cid = %s""", (cid,))
+    if not result > 0:
+        return
+
+    hierarchy = cur.fetchone()['hierarchy']
+
+    json_string = "{'number': 0}"
+    return Response(hierarchy,
+                    mimetype='application/json',
+                    headers={'Content-Disposition': 'attachment;filename=hierarchy.json'})
 
 # Asynchronous Communication wrappers
 # Note: these are not crucial as of yet
