@@ -142,21 +142,38 @@
                             <br>
                             <div class="text-muted small uneditable-textarea" id="pdf-url"></div>
                         </a>
-
-                        <a onclick="copyUrlToClipboard()" class="list-group-item btn btn-social-icon"><i class="fa fa-save "></i></a>
-                        <a onclick="openURL()" class="list-group-item btn btn-social-icon"><i class="fa  fa-download "></i></a>
+                        <br>
+                        <div class="text-center">
+                            <button type="button" onclick="copyUrlToClipboard()" class="btn btn-outline btn-success btn-sm"><i class="fa fa-save "></i> Copy URL to clipboard</button>
+                            <button type="button" onclick="openURL()" class="btn btn-outline btn-success btn-sm"><i class="fa  fa-download "></i> Download</button>
+                        </div>
 
                     </div>
                     <div id="multiple" class="" style="display:none;">
+                        <div class="list-group-item-info text-center" style="display:block;" id="multiple-info"> Select multiple files by clicking on their bubbles.</div>
                         <div class="pre-scrollable list-group" id="dynamic-list">
                         </div>
 
-                        <div class="text-center">
+                        <div class="text-center" id="multiple-buttons" style="display:none;">
                             <button type="button" onclick="cancelSelection()" class="btn btn-outline btn-default btn-sm">Cancel Selection</button>
-                            <button type="button" onclick="downloadAll()" class="btn btn-outline btn-success btn-sm">Download All</button>
+                            <button type="button" onclick="downloadAll(multipleUrlArray)" class="btn btn-outline btn-success btn-sm"><i class="fa  fa-download "></i> Download All</button>
                         </div>
                     </div>
                     <div id="dataset" class="list-group" style="display:none;">
+                        <div class="list-group-item-info text-center" style="display:block;" id="dataset-info"> Select a dataset by clicking on one of its members. </div>
+                        <a href="#" class="list-group-item">
+                            <i class="fa fa-search fa-fw"></i> Label of Dataset clicked
+                            <span class="text-muted small pull-right"><em id="dataset-selection"></em>
+                            </span>
+                        </a>
+                        <a href="#" class="list-group-item">
+                            <i class="fa fa-folder fa-fw"></i> Number of PDF in Dataset
+                            <div class="text-muted small pull-right" id="dataset-number"></div>
+                        </a>
+                        <br>
+                        <div class="text-center">
+                            <button type="button" onclick="downloadAll(datasetUrlArray)" class="btn btn-outline btn-success btn-sm"><i class="fa  fa-download "></i> Download All</button>
+                        </div>
                     </div>
                 </div>
                 <!-- /.panel-body -->
@@ -301,7 +318,8 @@
     });
 
     // Keep list of pdf in set to download
-    var pdfArray = [];
+    var multipleUrlArray = []; //used for multiple
+    var datasetUrlArray = []; //used for dataset
 
     // retrieves Pdf name from url
     function getPDFName(url) {
@@ -312,8 +330,13 @@
 
     // concels selection
     function cancelSelection() {
-        pdfArray = []
+        multipleUrlArray = []
         document.getElementById("dynamic-list").innerHTML = "";
+        //Remove buttons
+        document.getElementById('multiple-buttons').style.display = "none";
+        //Add info
+        document.getElementById('multiple-info').style.display = "block";
+
     }
 
     /**
@@ -321,8 +344,8 @@
      * @author speedplane
      * https://stackoverflow.com/questions/2339440/download-multiple-files-with-a-single-action
      */
-    function downloadAll() {
-        var files = pdfArray;
+    function downloadAll(files) {
+        //var files = multipleUrlArray;
         function download_next(i) {
             if (i >= files.length) {
               return;
@@ -354,7 +377,7 @@
         download_next(0);
     }
 
-    // Function to change onclick function
+    // Function to change onclick function depending on mode and show correct buttons pressed
     function changeOnClick(mode) {
         switch (mode) {
             case "single":
@@ -389,14 +412,20 @@
                     var object = myBubbleChart.data.datasets[activePoint[0]._datasetIndex].data[activePoint[0]._index];
                     var url = "http://" + object.url.substring(5);
 
-                    if (! pdfArray.includes(url)) {
-                        pdfArray.push(url);
+                    if (! multipleUrlArray.includes(url)) {
+                        multipleUrlArray.push(url);
                         var ul = document.getElementById("dynamic-list");
                         var li = document.createElement("li");
                         li.setAttribute('class', 'list-group-item');
                         li.appendChild(document.createTextNode(getPDFName(url)));
                         ul.appendChild(li);
                     }
+
+                    // Remove info
+                    document.getElementById('multiple-info').style.display = "none";
+
+                    // Add buttons
+                    document.getElementById('multiple-buttons').style.display = "block";
                 };
                 break;
             case "dataset":
@@ -406,7 +435,30 @@
                 document.getElementById('dataset').style.display = "block";
 
                 canvas_bubble.onclick = function download(e) {
-                    console.log("Action dataset")
+                    var activePoint = myBubbleChart.getElementAtEvent(e);
+                    if (!activePoint.length) return; // return if not clicked on slice
+
+                    // Get Dataset
+                    var fullDataset = myBubbleChart.data.datasets[activePoint[0]._datasetIndex];
+                    var dataset = fullDataset.data;
+                    var label = fullDataset.label;
+
+                    // Retrieve all URLs
+                    datasetUrlArray = [];
+                    var datasetLength = dataset.length;
+                    for (var i = 0; i < datasetLength; i++) {
+                        var url = "http://" + dataset[i].url.substring(5);
+                         if (! multipleUrlArray.includes(url)) {
+                             datasetUrlArray.push(url);
+                         }
+                    }
+
+                    // Give text feedback
+                    document.getElementById("dataset-selection").innerHTML = label;
+                    document.getElementById("dataset-number").innerHTML = datasetLength;
+
+                    // Remove info
+                    document.getElementById('dataset-info').style.display = "none";
 
                 }
                 break;
