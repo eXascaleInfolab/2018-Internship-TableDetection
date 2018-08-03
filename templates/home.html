@@ -15,10 +15,10 @@
     <div class="form-group ">
         <label>URL</label>
         <input type="text" name="url" class="form-control" value='https://www.bit.admin.ch'>
-        <!-- <input type="text" name="url" class="form-control" value={{request.form.url}}> -->
+        <input id="crawl_again" type="text" name="crawl_again" class="form-control hidden" value="False">
         </div>
         <button id="crawl-btn" type="crawl" class="btn btn-primary btn-lg btn-block">Crawl</button>
-        <a id="recent-btn" href={{most_recent_url}}} style="display:none;" type="crawl" class="btn btn-success btn-lg btn-block">View most recent crawl statistics of this domain</a>
+        <a id="recent-btn" href={{most_recent_url}} style="display:none;" type="crawl" class="btn btn-success btn-lg btn-block">View most recent crawl statistics of this domain</a>
   </form>
 
 {% endif %}
@@ -50,11 +50,10 @@
 <script>
     $(document).ready(function() {
         if ("{{most_recent_url}}" != "none") {
-            document.getElementById("crawl-btn").innerHTML = "Crawl Again"
+            document.getElementById("crawl-btn").innerHTML = "Crawl Again";
             document.getElementById("recent-btn").style.display = "block";
-            console.log("heeelllooo")
+            document.getElementById("crawl_again").value = "True";
         }
-        console.log("if did not succeed")
     });
 </script>
 {% endblock %}

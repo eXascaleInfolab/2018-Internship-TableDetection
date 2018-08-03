@@ -75,6 +75,7 @@ MEDIUM_TABLE_LIMIT = 20                 # defines what is considered a medium ta
 # like downloading pdf's from stats page. For those reasons I would not recommend
 # using more than 50 % of available disk space.
 MAX_CRAWL_SIZE = 1024 * 1024 * 500      # in bytes (500MB)
+CRAWL_CACHING_TIME = 7                  # in days
 
 
 # CELERY TASKS
@@ -333,23 +334,43 @@ def event():
 # Index
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    if request.method == 'POST': #FIXME I didn't handle security yet !! make sure only logged-in people can execute
-
+    if request.method == 'POST':
         # User can type in url
         # The url will then get parsed to extract domain, while the crawler starts at url.
 
         # Get Form Fields and save
         url = request.form['url']
+        crawl_again = request.form['crawl_again']
+        print("Crawl again = " + crawl_again)
 
         # Check if valid URL
         if not exists(url):
             flash('This URL does not exists. Please try another.', 'danger')
-            return render_template('home.html', most_recent_url="/statistics")
+            return render_template('home.html', most_recent_url="none")
 
         parsed = urlparse(url)
-
-        session['domain'] = parsed.netloc
+        domain = parsed.netloc
+        session['domain'] = domain
         session['url'] = url
+
+        # Check if stats already exist about this domain
+        # Create cursor
+        cur = mysql.connection.cursor()
+
+        # Get biggest crawl_id from the last 7 days
+        result = cur.execute("""SELECT COALESCE(MAX(cid), 0) as cid FROM Crawls WHERE domain = %s 
+                      AND (crawl_date > DATE_SUB(now(), INTERVAL %s DAY))""", (domain, CRAWL_CACHING_TIME))
+
+        cid = cur.fetchone()["cid"]
+
+        # Closing cursor apparently not needed when using this extension
+        if crawl_again != "True" and cid != 0:
+            # There was a previous crawl, make button appear to view corresponding stats
+            flash("This domain was already crawled in the last " + str(CRAWL_CACHING_TIME) + " days, "
+                  + "you have to option to directly view the most recent statistics or restart the crawling process.",
+                  "info")
+
+            return render_template('home.html', most_recent_url=url_for("cid_statistics", cid=cid))
 
         return redirect(url_for('crawling'))
 
