@@ -7,7 +7,7 @@ import json
 from functools import wraps
 from urllib.parse import urlparse
 
-from flask import Flask, render_template, flash, redirect, url_for, session, request, logging, Response, send_file
+from flask import Flask, render_template, flash, redirect, url_for, session, request, logging, Response, send_file, Markup
 from flask_mysqldb import MySQL
 from wtforms import Form, StringField, TextAreaField, PasswordField, validators
 from passlib.hash import sha256_crypt
@@ -19,6 +19,7 @@ from flask_socketio import SocketIO, emit
 
 from celery import Celery, chord
 from requests import post
+from celery import app as a
 
 import tabula
 import PyPDF2
@@ -386,9 +387,11 @@ def crawling():
     # STEP -1: check no crawling in progress
     if not lock.acquire(False):
         # Failed to lock the ressource
-        flash("There are already Tasks scheduled, please wait before "
-              "running another query or cancel the previous query under the advanced tab", 'danger') #TODO link to killing query
+
+        flash(Markup('There are already Tasks scheduled, please wait before running another query or '
+                     'terminate all running processes <a href="/advanced" class="alert-link">here.</a>'), 'danger')
         return redirect(url_for('index'))
+
     else:
         try:
             # STEP 0: TimeKeeping
@@ -439,7 +442,10 @@ def end_crawling():
     flash('You successfully manually interrupted the crawler.', 'success')
 
     # STEP 4: Release Lock
-    lock.release()
+    try:
+        lock.release()
+    except RuntimeError:
+        pass
 
     return render_template('end_crawling.html')
 
@@ -466,7 +472,10 @@ def autoend_crawling():
     session['crawling_id'] = 0  # remove crawling id
 
     # STEP 3: Release Lock
-    lock.release()
+    try:
+        lock.release()
+    except RuntimeError:
+        pass
 
     return redirect(url_for("table_detection"))
 
@@ -530,7 +539,10 @@ def table_detection():
 @is_logged_in
 def processing():
     # Release lock
-    lock.release()
+    try:
+        lock.release()
+    except RuntimeError:
+        pass
     return render_template('processing.html', domain=session.get('domain', ''), )
 
 
@@ -765,22 +777,17 @@ def advanced():
 @is_logged_in
 def terminate():
 
-    # TODO kill wget subprocess
+    # Purge all tasks from task queue
+    command = shlex.split("celery -A -f bar.celery purge")
+    process = subprocess.Popen(command)
 
-    # Kill all current Celery tasks
+    # Kill all Celery tasks currently executing
     i = celery.control.inspect()
     active_tasks = i.active()
 
-    print(active_tasks)
-
     for workers in active_tasks:
-        print(active_tasks[workers])
-        print(active_tasks[workers])
         for i in range(0, len(active_tasks[workers])):
             celery.control.revoke(active_tasks[workers][i]['id'], terminate=True)
-
-    # Purge all tasks from task queue
-    celery.control.purge()
 
     # Release Lock if locked
     try:
@@ -788,7 +795,7 @@ def terminate():
     except RuntimeError:
         pass
 
-    flash("All processes were interrupted and the lock released !", 'danger')
+    flash("All processes were interrupted and the lock released !", 'warning')
 
     return redirect(url_for('index'))
 
