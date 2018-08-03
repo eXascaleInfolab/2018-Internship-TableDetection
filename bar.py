@@ -536,7 +536,6 @@ def processing():
 
 # Last Crawl Statistics
 @app.route('/statistics')
-@is_logged_in
 def statistics():
     # Create cursor
     cur = mysql.connection.cursor()
@@ -559,7 +558,6 @@ def statistics():
 
 # CID specific Statistics
 @app.route('/statistics/<int:cid>')
-@is_logged_in
 def cid_statistics(cid):
 
     # STEP 1: retrieve all saved stats from DB
@@ -735,7 +733,6 @@ def logout():
 
 # Dashboard
 @app.route('/dashboard')
-@is_logged_in
 def dashboard():
 
     # Create cursor
@@ -758,12 +755,14 @@ def dashboard():
 
 # Advanced
 @app.route('/advanced')
+@is_logged_in
 def advanced():
     return render_template('advanced.html')
 
 
 # Release and Terminate all
 @app.route('/terminate')
+@is_logged_in
 def terminate():
 
     # TODO kill wget subprocess
@@ -809,6 +808,7 @@ def delete_data():
 
 # Download JSON hierarchy
 @app.route('/hierarchy/<int:cid>')
+@is_logged_in
 def hierarchy_download(cid):
 
     # Get JSON string
