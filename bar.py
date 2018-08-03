@@ -23,11 +23,8 @@ from requests import post
 import tabula
 import PyPDF2
 
-import traceback
 import shutil
 
-import io
-import csv
 
 # Set this variable to "threading", "eventlet" or "gevent" to test the
 # different async modes, or leave it set to None for the application to choose
@@ -45,9 +42,8 @@ app.config['CELERY_RESULT_BACKEND'] = 'redis://localhost:6379/0'
 # SocketIO
 socketio = SocketIO(app, async_mode=async_mode)
 
-# Deprecated FIXME have another
-thread = None
-thread_lock = Lock()
+# Lock
+lock = Lock()
 
 # Initialize Celery
 celery = Celery(app.name, broker=app.config['CELERY_BROKER_URL'])
@@ -75,7 +71,7 @@ MEDIUM_TABLE_LIMIT = 20                 # defines what is considered a medium ta
 # like downloading pdf's from stats page. For those reasons I would not recommend
 # using more than 50 % of available disk space.
 MAX_CRAWL_SIZE = 1024 * 1024 * 500      # in bytes (500MB)
-CRAWL_CACHING_TIME = 7                  # in days
+CRAWL_REPETITION_WARNING_TIME = 7                  # in days
 
 
 # CELERY TASKS
@@ -140,7 +136,7 @@ def tabula_task(self, file_path='', post_url=''):
             if result > 0:
                 stats = json.loads(file['stats'])
                 post(post_url, json={'event': 'tabula_success', 'data':
-                    {'data': 'Processing time saved, document was already processed at an earlier time',
+                    {'data': 'Processing time saved, document was already processed at an earlier time: ',
                      'pages': stats['n_pages'], 'tables': stats['n_tables']}})
 
                 return file['fid'] #TODO test extensively
@@ -335,14 +331,13 @@ def event():
 @app.route('/', methods=['GET', 'POST'])
 def index():
     if request.method == 'POST':
-        # User can type in url
-        # The url will then get parsed to extract domain, while the crawler starts at url.
 
         # Get Form Fields and save
         url = request.form['url']
         crawl_again = request.form['crawl_again']
-        print("Crawl again = " + crawl_again)
 
+        # User can type in url
+        # The url will then get parsed to extract domain, while the crawler starts at url.
         # Check if valid URL
         if not exists(url):
             flash('This URL does not exists. Please try another.', 'danger')
@@ -359,15 +354,15 @@ def index():
 
         # Get biggest crawl_id from the last 7 days
         result = cur.execute("""SELECT COALESCE(MAX(cid), 0) as cid FROM Crawls WHERE domain = %s 
-                      AND (crawl_date > DATE_SUB(now(), INTERVAL %s DAY))""", (domain, CRAWL_CACHING_TIME))
+                      AND (crawl_date > DATE_SUB(now(), INTERVAL %s DAY))""", (domain, CRAWL_REPETITION_WARNING_TIME))
 
         cid = cur.fetchone()["cid"]
 
         # Closing cursor apparently not needed when using this extension
         if crawl_again != "True" and cid != 0:
             # There was a previous crawl, make button appear to view corresponding stats
-            flash("This domain was already crawled in the last " + str(CRAWL_CACHING_TIME) + " days, "
-                  + "you have to option to directly view the most recent statistics or restart the crawling process.",
+            flash("This domain was already crawled in the last " + str(CRAWL_REPETITION_WARNING_TIME) + " days, "
+                  + "you have the option to directly view the most recent statistics or restart the crawling process.",
                   "info")
 
             return render_template('home.html', most_recent_url=url_for("cid_statistics", cid=cid))
@@ -389,26 +384,31 @@ def crawling():
     os.mkdir(WGET_DATA_PATH)
 
     # STEP -1: check no crawling in progress
-    if session.get('crawling_id', 0) is not 0:
-        flash("Crawling already in progress, please wait before "
-              "running another query", 'danger') #TODO link to killing query
+    if not lock.acquire(False):
+        # Failed to lock the ressource
+        flash("There are already Tasks scheduled, please wait before "
+              "running another query or cancel the previous query under the advanced tab", 'danger') #TODO link to killing query
         return redirect(url_for('index'))
+    else:
+        try:
+            # STEP 0: TimeKeeping
+            session['crawl_start_time'] = time.time()
 
-    # STEP 0: TimeKeeping
-    session['crawl_start_time'] = time.time()
+            # STEP 1: Prepare WGET command
+            url = session.get('url', None)
+            post_url = url_for('event', _external=True)
 
-    # STEP 1: Prepare WGET command
-    url = session.get('url', None)
-    post_url = url_for('event', _external=True)
+            # STEP 2: Schedule celery task
+            result = crawling_task.delay(url=url, post_url=post_url, domain=session.get('domain', ''))
+            session['crawling_id'] = result.id
 
-    # STEP 2: Schedule celery task
-    result = crawling_task.delay(url=url, post_url=post_url, domain=session.get('domain', ''))
-    session['crawling_id'] = result.id
-
-    return render_template('crawling.html', max_crawling_duration=MAX_CRAWLING_DURATION)
+            return render_template('crawling.html', max_crawling_duration=MAX_CRAWLING_DURATION)
+        except Exception as e:
+            # Even if something goes wrong Lock is not released, as a call to end all tasks is safer to assure
+            # that the crawling process which might have been started is also interrupted.
+            pass
 
     # FIXME problem with automatic redirection if task not started yet
-
 
 # End Crawling manually
 @app.route('/crawling/end')
@@ -423,6 +423,7 @@ def end_crawling():
     # STEP 1: Kill only subprocess, and the celery process will then recognize it and terminate too
     celery_id = session.get('crawling_id', 0)                       # get saved celery task id
     try:
+        # This is a hack to kill the spawned subprocess and not only the celery task
         pid = crawling_task.AsyncResult(celery_id).info.get('pid')      # get saved subprocess id
         os.kill(pid, signal.SIGTERM)                                    # kill subprocess
     except AttributeError:
@@ -434,8 +435,11 @@ def end_crawling():
     session['crawl_total_time'] = time.time() - crawl_start_time
 
     # STEP 3: Successful interruption
-    session['crawling_id'] = 0                                      # allow crawling again
+    session['crawling_id'] = 0                                      # remove crawling id
     flash('You successfully manually interrupted the crawler.', 'success')
+
+    # STEP 4: Release Lock
+    lock.release()
 
     return render_template('end_crawling.html')
 
@@ -459,7 +463,10 @@ def autoend_crawling():
     else:
         flash("Crawled all PDFs until depth of 5 - Crawler interrupted automatically", 'success')
 
-    session['crawling_id'] = 0
+    session['crawling_id'] = 0  # remove crawling id
+
+    # STEP 3: Release Lock
+    lock.release()
 
     return redirect(url_for("table_detection"))
 
@@ -468,45 +475,62 @@ def autoend_crawling():
 @app.route('/table_detection')
 @is_logged_in
 def table_detection():
-    # Step 0: take start time and prepare arguments
-    processing_start_time = time.time()
-    domain = session.get('domain', None)
-    url = session.get('url', None)
-    crawl_total_time = session.get('crawl_total_time', 0)
-    post_url = url_for('event', _external=True)
 
-    path = WGET_DATA_PATH + '/' + domain
+    # First check if lock can be acquired
+    if not lock.acquire(False):
+        flash("There are already Tasks scheduled, please wait before "
+              "running another query or cancel the previous query under the advanced tab",
+              'danger')  # TODO link to killing query
+        return redirect(url_for('index'))
 
-    count = 0
-    file_array = []
+    else:
+        try:
+            # Step 0: take start time and prepare arguments
+            processing_start_time = time.time()
+            domain = session.get('domain', None)
+            url = session.get('url', None)
+            crawl_total_time = session.get('crawl_total_time', 0)
+            post_url = url_for('event', _external=True)
 
-    # STEP 1: Find PDF we want to process
-    for dir_, _, files in os.walk(path):
-        for fileName in files:
-            if ".pdf" in fileName and count < PDF_TO_PROCESS:
-                rel_file = os.path.join(dir_, fileName)
-                file_array.append(rel_file)
-                count += 1
+            path = WGET_DATA_PATH + '/' + domain
 
-    # STEP 2: Prepare a celery task for every pdf and then a callback to store result in db
-    header = (tabula_task.s(f, post_url) for f in file_array)
-    callback = pdf_stats.s(domain=domain, url=url, crawl_total_time=crawl_total_time, post_url=post_url,
-                           processing_start_time=processing_start_time)
+            count = 0
+            file_array = []
 
-    # STEP 3: Run the celery Chord
-    result = chord(header)(callback)
+            # STEP 1: Find PDF we want to process
+            for dir_, _, files in os.walk(path):
+                for fileName in files:
+                    if ".pdf" in fileName and count < PDF_TO_PROCESS:
+                        rel_file = os.path.join(dir_, fileName)
+                        file_array.append(rel_file)
+                        count += 1
 
-    # STEP 4: If query was empty go straight further
-    if count == 0:
-        return redirect(url_for('processing'))
+            # STEP 2: Prepare a celery task for every pdf and then a callback to store result in db
+            header = (tabula_task.s(f, post_url) for f in file_array)
+            callback = pdf_stats.s(domain=domain, url=url, crawl_total_time=crawl_total_time, post_url=post_url,
+                                   processing_start_time=processing_start_time)
 
-    return render_template('table_detection.html', total_pdf=count)
+            # STEP 3: Run the celery Chord
+            result = chord(header)(callback)
+
+            # STEP 4: If query was empty go straight further
+            if count == 0:
+                return redirect(url_for('processing'))
+
+            return render_template('table_detection.html', total_pdf=count)
+
+        finally:
+            # FIXME auto kill all processes
+            # Don't release Lock even if something goes wrong, as I want to force the user to kill all processes first
+            pass
 
 
 # end of PDF processing (FIXME name not very representative anymore)
 @app.route('/processing')
 @is_logged_in
 def processing():
+    # Release lock
+    lock.release()
     return render_template('processing.html', domain=session.get('domain', ''), )
 
 
@@ -732,6 +756,43 @@ def dashboard():
     cur.close()
 
 
+# Advanced
+@app.route('/advanced')
+def advanced():
+    return render_template('advanced.html')
+
+
+# Release and Terminate all
+@app.route('/terminate')
+def terminate():
+
+    # TODO kill wget subprocess
+
+    # Kill all current Celery tasks
+    i = celery.control.inspect()
+    active_tasks = i.active()
+
+    print(active_tasks)
+
+    for workers in active_tasks:
+        print(active_tasks[workers])
+        print(active_tasks[workers])
+        for i in range(0, len(active_tasks[workers])):
+            celery.control.revoke(active_tasks[workers][i]['id'], terminate=True)
+
+    # Purge all tasks from task queue
+    celery.control.purge()
+
+    # Release Lock if locked
+    try:
+        lock.release()
+    except RuntimeError:
+        pass
+
+    flash("All processes were interrupted and the lock released !", 'danger')
+
+    return redirect(url_for('index'))
+
 # About
 @app.route('/about')
 def about():
@@ -765,6 +826,7 @@ def hierarchy_download(cid):
     return Response(hierarchy,
                     mimetype='application/json',
                     headers={'Content-Disposition': 'attachment;filename=hierarchy.json'})
+
 
 # Asynchronous Communication wrappers
 # Note: these are not crucial as of yet

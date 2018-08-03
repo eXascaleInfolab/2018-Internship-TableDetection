@@ -1,0 +1,85 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+<div class="" id="pane">
+    <h1>Advanced</h1>
+    <hr>
+    <p class="lead"> Here you have access to some more advanced options:</p>
+
+     <div class="row">
+                <div class="col-lg-4">
+                    <div class="panel panel-info">
+                        <div class="panel-heading">
+                            Download the url of every crawled file.
+                        </div>
+                        <div class="panel-body">
+                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum tincidunt est vitae ultrices accumsan. Aliquam ornare lacus adipiscing, posuere lectus et, fringilla augue.</p>
+                        </div>
+                        <div class="panel-footer">
+                           <button type="button" onclick="" class="btn btn-outline btn-primary btn-sm"><i class="fa  fa-download "></i> Download</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- /.col-lg-4 -->
+                <div class="col-lg-4">
+                    <div class="panel panel-danger">
+                        <div class="panel-heading">
+                            Terminate all running processes
+                        </div>
+                        <div class="panel-body">
+                            <p>You can use this feature when you get error messages and can't start a new crawl. This
+                            behavior might be normal if you quit the web page without waiting for the process termination.</p>
+                            <p>Note that when terminating ongoing table-detection processes, the work done so far will be saved, so you won't lose much.</p>
+                        </div>
+                        <div class="panel-footer">
+                           <a type="button" href={{url_for('terminate')}} class="btn btn-outline btn-danger btn-sm"><i class="fa  fa-gears "></i> Free Ressources </a>
+                        </div>
+                    </div>
+                </div>
+                <!-- /.col-lg-4 -->
+                <div class="col-lg-4">
+                    <div class="panel panel-success">
+                        <div class="panel-heading">
+                            Set Processing Constraints
+                        </div>
+                        <div class="panel-body">
+                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum tincidunt est vitae ultrices accumsan. Aliquam ornare lacus adipiscing, posuere lectus et, fringilla augue.</p>
+                        </div>
+                        <div class="panel-footer">
+                        </div>
+                    </div>
+                </div>
+                <!-- /.col-lg-4 -->
+            </div>
+            <!-- /.row -->
+            <div class="row">
+                <div class="col-lg-4">
+                    <div class="panel panel-danger">
+                        <div class="panel-heading">
+                            Clear Database
+                        </div>
+                        <div class="panel-body">
+                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum tincidunt est vitae ultrices accumsan. Aliquam ornare lacus adipiscing, posuere lectus et, fringilla augue.</p>
+                        </div>
+                        <div class="panel-footer">
+                        </div>
+                    </div>
+                </div>
+                <!-- /.col-lg-4 -->
+                <div class="col-lg-4">
+                    <div class="panel panel-info">
+                        <div class="panel-heading">
+                            Download logfile of the last crawl.
+                        </div>
+                        <div class="panel-body">
+                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum tincidunt est vitae ultrices accumsan. Aliquam ornare lacus adipiscing, posuere lectus et, fringilla augue.</p>
+                        </div>
+                        <div class="panel-footer">
+                           <button type="button" onclick="" class="btn btn-outline btn-primary btn-sm"><i class="fa  fa-download "></i> Download</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- /.row -->
+</div>
+{% endblock %}
