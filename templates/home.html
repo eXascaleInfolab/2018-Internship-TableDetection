@@ -2,74 +2,45 @@
 
 {% block body %}
 <h1 class="page-header"> Welcome to the PDF Crawl App</h1>
-<div class=" col-lg-8 well">
-    {% if session.logged_in == NULL %}
-      <p class="lead">Log in to be able to crawl a domain.</p>
-      <a href="/register" class="btn btn-primary btn-lg">Register</a>
-      <a href="/login" class="btn btn-success btn-lg">Login</a>
-    {% endif %}
+{% from "includes/_formhelpers.html" import render_field %}
+<form action="" method="POST">
+    <div class=" col-lg-8 well">
+        {% if session.logged_in == NULL %}
+          <p class="lead">Log in to be able to crawl a domain.</p>
+          <a href="/register" class="btn btn-primary btn-lg">Register</a>
+          <a href="/login" class="btn btn-success btn-lg">Login</a>
+        {% endif %}
 
-    {% if session.logged_in != NULL %}
-      <p class="lead">Please select which URL to crawl: </p>
-      <form action="" method="POST">
-        <div class="form-group ">
-            <label>URL</label>
-            <input type="text" name="url" class="form-control" value='https://www.bit.admin.ch'>
-            <input id="crawl_again" type="text" name="crawl_again" class="form-control hidden" value="False">
+        {% if session.logged_in != NULL %}
+          <p class="lead">Please select which URL to crawl: </p>
+            <div class="form-group ">
+                {{render_field(form.url, class_="form-control")}}
+                <input id="crawl_again" type="text" name="crawl_again" class="form-control hidden" value="False">
             </div>
             <button id="crawl-btn" type="crawl" class="btn btn-primary btn-lg btn-block">Crawl</button>
             <a id="recent-btn" href={{most_recent_url}} style="display:none;" type="crawl" class="btn btn-success btn-lg btn-block">View most recent crawl statistics of this domain</a>
-
-
-      </form>
-
-    {% endif %}
-
-</div>
-
-<div class="col-lg-4">
-    <div class="panel panel-success">
-        <div class="panel-heading">
-            Set Processing Constraints
-        </div>
-        <div class="panel-body">
-            <form action="" method="POST">
+    </div>
+    <div class="col-lg-4">
+        <div class="panel panel-success">
+            <div class="panel-heading">
+                Set Processing Constraints
+            </div>
+            <div class="panel-body">
                <div class="form-group">
-                    <label>Max Crawl Depth</label>
-                    <label class="radio-inline">
-                        <input type="radio" name="optionsRadiosInline" id="optionsRadiosInline1" value="option1">1
-                    </label>
-                    <label class="radio-inline">
-                        <input type="radio" name="optionsRadiosInline" id="optionsRadiosInline2" value="option2">2
-                    </label>
-                    <label class="radio-inline">
-                        <input type="radio" name="optionsRadiosInline" id="optionsRadiosInline3" value="option3">3
-                    </label>
-                   <label class="radio-inline">
-                        <input type="radio" name="optionsRadiosInline" id="optionsRadiosInline4" value="option4">4
-                    </label>
-                   <label class="radio-inline">
-                        <input type="radio" name="optionsRadiosInline" id="optionsRadiosInline5" value="option5" checked>5
-                    </label>
-                   <label class="radio-inline">
-                        <input type="radio" name="optionsRadiosInline" id="optionsRadiosInline6" value="option6">6
-                    </label>
-                     <label class="radio-inline">
-                        <input type="radio" name="optionsRadiosInline" id="optionsRadiosInline7" value="option7">7
-                    </label>
+                   {{render_field(form.depth, class_="form-control")}}
                </div>
                 <div class="form-group">
-                  <label>Maximum Crawl Time [Minutes]</label>
-                  <input type="integer" name="crawl_time" class="form-control" value={{request.form.crawl_time}}>
+                    {{render_field(form.time, class_="form-control")}}
                 </div>
                 <div class="form-group">
-                  <label>Maximum size crawled [MegaBytes]</label>
-                  <input type="integer" name="size" class="form-control" value={{request.form.size}}>
+                    {{render_field(form.size, class_="form-control")}}
                 </div>
-            </form>
+            </div>
         </div>
     </div>
-</div>
+</form>
+
+{% endif %}
 
 {% endblock %}
 

@@ -9,7 +9,7 @@ from urllib.parse import urlparse
 
 from flask import Flask, render_template, flash, redirect, url_for, session, request, logging, Response, send_file, Markup
 from flask_mysqldb import MySQL
-from wtforms import Form, StringField, TextAreaField, PasswordField, validators
+from wtforms import Form, StringField, IntegerField, PasswordField, validators
 from passlib.hash import sha256_crypt
 import time
 
@@ -19,7 +19,6 @@ from flask_socketio import SocketIO, emit
 
 from celery import Celery, chord
 from requests import post
-from celery import app as a
 
 import tabula
 import PyPDF2
@@ -71,17 +70,25 @@ MEDIUM_TABLE_LIMIT = 20                 # defines what is considered a medium ta
 # the effective size can be up to 10% higher, also leave enough room for other requests,
 # like downloading pdf's from stats page. For those reasons I would not recommend
 # using more than 50 % of available disk space.
-MAX_CRAWL_SIZE = 1024 * 1024 * 500      # in bytes (500MB)
+MB_CRAWL_SIZE = 500
+MAX_CRAWL_SIZE = 1024 * 1024 * MB_CRAWL_SIZE       # in bytes (500MB)
 CRAWL_REPETITION_WARNING_TIME = 7                  # in days
-
+MAX_CRAWL_DEPTH = 5
+DEFAULT_CRAWL_URL = 'https://www.bit.admin.ch'
 
 # CELERY TASKS
 
+
 @celery.task(bind=True)                 # time_limit=MAX_CRAWLING_DURATION other possibility
-def crawling_task(self, url='', post_url='', domain=''):
+def crawling_task(self, url='', post_url='', domain='',
+                  max_crawl_duration=MAX_CRAWLING_DURATION, max_crawl_size=MAX_CRAWL_SIZE,
+                  max_crawl_depth=MAX_CRAWL_DEPTH):
 
     # STEP 1: Start the wget subprocess
-    command = shlex.split("timeout %d wget -r -A pdf %s" % (MAX_CRAWLING_DURATION, url,))
+    command = shlex.split("timeout %d wget -r -l %d -A pdf %s" % (max_crawl_duration, max_crawl_depth, url,))
+    # Note: Consider using --wait flag, takes longer to download but less aggressive crawled server
+    # https://www.gnu.org/software/wget/manual/wget.html#Recursive-Download
+
     process = subprocess.Popen(command, cwd=WGET_DATA_PATH, stderr=subprocess.PIPE)
 
     # Set the pid in the state
@@ -97,7 +104,7 @@ def crawling_task(self, url='', post_url='', domain=''):
             break
 
         crawled_size = dir_size(WGET_DATA_PATH + "/" + domain)
-        if crawled_size is not None and crawled_size > MAX_CRAWL_SIZE:
+        if crawled_size is not None and crawled_size > max_crawl_size:
             # threshold reached
             break
 
@@ -319,6 +326,7 @@ def stream_template(template_name, **context):
 # APP ROUTES
 
 # Used to easily emit WebSocket messages from inside tasks
+# Pattern taken from https://github.com/jwhelland/flask-socketio-celery-example/blob/master/app.py
 @app.route('/event/', methods=['POST'])
 def event():
     data = request.json
@@ -329,21 +337,37 @@ def event():
 
 
 # Index
+class CrawlForm(Form):
+    url = StringField('URL', [validators.Length(min=4, max=300)], default=DEFAULT_CRAWL_URL)
+    depth = IntegerField('Max Crawl Depth', [validators.NumberRange(min=1, max=10)], default=MAX_CRAWL_DEPTH)
+    time = IntegerField('Max Crawl Duration [Minutes]', [validators.NumberRange(min=1, max=1000)],
+                        default=int(MAX_CRAWLING_DURATION / 60))
+    size = IntegerField('Max Crawl Size [MBytes]', [validators.NumberRange(min=10, max=1000)], default=MB_CRAWL_SIZE)
+
+
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    if request.method == 'POST':
+    form = CrawlForm(request.form)
+
+    if request.method == 'POST' and form.validate():
+
+        # Change global variables depending on input
+        global MAX_CRAWLING_DURATION, MAX_CRAWL_DEPTH, MAX_CRAWL_SIZE, MB_CRAWL_SIZE
 
         # Get Form Fields and save
-        url = request.form['url']
+        url = form.url.data
         crawl_again = request.form['crawl_again']
+        MAX_CRAWL_DEPTH = form.depth.data
+        MB_CRAWL_SIZE = form.size.data
+        MAX_CRAWL_SIZE = 1024 * 1024 * MB_CRAWL_SIZE
+        MAX_CRAWLING_DURATION = form.time.data * 60
 
-        # User can type in url
-        # The url will then get parsed to extract domain, while the crawler starts at url.
         # Check if valid URL
         if not exists(url):
             flash('This URL does not exists. Please try another.', 'danger')
-            return render_template('home.html', most_recent_url="none")
+            return render_template('home.html', most_recent_url="none", form=form)
 
+        # Extract domain name out of url
         parsed = urlparse(url)
         domain = parsed.netloc
         session['domain'] = domain
@@ -366,11 +390,11 @@ def index():
                   + "you have the option to directly view the most recent statistics or restart the crawling process.",
                   "info")
 
-            return render_template('home.html', most_recent_url=url_for("cid_statistics", cid=cid))
+            return render_template('home.html', most_recent_url=url_for("cid_statistics", cid=cid), form=form)
 
         return redirect(url_for('crawling'))
 
-    return render_template('home.html', most_recent_url="none")
+    return render_template('home.html', most_recent_url="none", form=form)
 
 
 # Crawling
@@ -378,13 +402,7 @@ def index():
 @is_logged_in
 def crawling():
 
-    # STEP -3: delete previously crawled data
-    delete_data()
-
-    # STEP -2: create directory for data
-    os.mkdir(WGET_DATA_PATH)
-
-    # STEP -1: check no crawling in progress
+    # Check no crawling in progress
     if not lock.acquire(False):
         # Failed to lock the ressource
 
@@ -394,6 +412,12 @@ def crawling():
 
     else:
         try:
+            # delete previously crawled data
+            delete_data()
+
+            # create directory for data
+            os.mkdir(WGET_DATA_PATH)
+
             # STEP 0: TimeKeeping
             session['crawl_start_time'] = time.time()
 
@@ -402,10 +426,16 @@ def crawling():
             post_url = url_for('event', _external=True)
 
             # STEP 2: Schedule celery task
-            result = crawling_task.delay(url=url, post_url=post_url, domain=session.get('domain', ''))
+            result = crawling_task.delay(url=url, post_url=post_url, domain=session.get('domain', ''),
+                                         max_crawl_duration=MAX_CRAWLING_DURATION,
+                                         max_crawl_depth=MAX_CRAWL_DEPTH,
+                                         max_crawl_size=MAX_CRAWL_SIZE)
             session['crawling_id'] = result.id
 
-            return render_template('crawling.html', max_crawling_duration=MAX_CRAWLING_DURATION)
+            return render_template('crawling.html',
+                                   max_crawling_duration=MAX_CRAWLING_DURATION,
+                                   max_crawl_depth=MAX_CRAWL_DEPTH,
+                                   max_crawl_size=MAX_CRAWL_SIZE)
         except Exception as e:
             # Even if something goes wrong Lock is not released, as a call to end all tasks is safer to assure
             # that the crawling process which might have been started is also interrupted.
@@ -421,7 +451,7 @@ def end_crawling():
     # STEP 0: check crawling process exists
     if session.get('crawling_id', 0) is 0:
         flash("There is no crawling process to kill", 'danger')
-        render_template('crawling.html', max_crawling_duration=MAX_CRAWLING_DURATION)
+        return redirect(url_for('index'))
 
     # STEP 1: Kill only subprocess, and the celery process will then recognize it and terminate too
     celery_id = session.get('crawling_id', 0)                       # get saved celery task id
@@ -467,7 +497,7 @@ def autoend_crawling():
     elif crawled_size > MAX_CRAWL_SIZE:
         flash("Size limit reached - Crawler interrupted automatically", 'success')
     else:
-        flash("Crawled all PDFs until depth of 5 - Crawler interrupted automatically", 'success')
+        flash("Crawled all PDFs until depth of " + str(MAX_CRAWL_DEPTH) + " - Crawler interrupted automatically", 'success')
 
     session['crawling_id'] = 0  # remove crawling id
 
