@@ -2,8 +2,7 @@
 
 {% block body %}
 <div class="" id="pane">
-    <h1>Advanced</h1>
-    <hr>
+    <h1 class="page-header"> Advanced</h1>
     <p class="lead"> Here you have access to some more advanced options:</p>
 
      <div class="row">
@@ -16,7 +15,7 @@
                             <p>TODO</p>
                         </div>
                         <div class="panel-footer">
-                           <button type="button" onclick="" class="btn btn-outline btn-primary btn-sm"><i class="fa  fa-download "></i> Download</button>
+                           <button type="button" onclick="" class="btn btn-outline btn-primary btn-sm"><i class="fa  fa-download "></i>Download</button>
                         </div>
                     </div>
                 </div>
@@ -45,9 +44,10 @@
                             Clear Database
                         </div>
                         <div class="panel-body">
-                            <p>This allows you to clear all data from the database, except for User login data. TODO</p>
+                            <p>This allows you to clear all data from the database, except for User login data.</p>
                         </div>
                         <div class="panel-footer">
+                            <a type="button" href={{url_for('empty_tables')}} class="btn btn-outline btn-danger btn-sm"><i class="fa  fa-gears "></i> Empty All Tables </a>
                         </div>
                     </div>
                 </div>

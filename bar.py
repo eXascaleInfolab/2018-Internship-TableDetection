@@ -827,7 +827,34 @@ def terminate():
 
     flash("All processes were interrupted and the lock released !", 'warning')
 
-    return redirect(url_for('index'))
+    return redirect(url_for('advanced'))
+
+
+# Empty all Tables except for User data
+@app.route('/empty_tables')
+@is_logged_in
+def empty_tables():
+
+    # Create cursor
+    cur = mysql.connection.cursor()
+
+    # Truncate all tables, necessary trick because of constrained table
+    # https://stackoverflow.com/questions/5452760/how-to-truncate-a-foreign-key-constrained-table
+    cur.execute("""SET FOREIGN_KEY_CHECKS = 0""")
+
+    cur.execute("""TRUNCATE TABLE Crawlfiles""")
+    cur.execute("""TRUNCATE TABLE Crawls""")
+    cur.execute("""TRUNCATE TABLE Files""")
+
+    cur.execute("""SET FOREIGN_KEY_CHECKS = 1""")
+
+    # Close connection
+    cur.close()
+
+    flash("All tables were emptied !", 'success')
+
+    return redirect(url_for('advanced'))
+
 
 # About
 @app.route('/about')
