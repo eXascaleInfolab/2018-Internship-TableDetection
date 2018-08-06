@@ -8,3 +8,4 @@ static/json/
 virtualenv/
 *.pyc
 log/*
+redis-stable/

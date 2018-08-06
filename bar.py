@@ -443,8 +443,9 @@ def crawling():
             # Even if something goes wrong Lock is not released, as a call to end all tasks is safer to assure
             # that the crawling process which might have been started is also interrupted.
             pass
+            flash("An error occurred : " + str(e), 'danger')
+            return redirect(url_for('index'))
 
-    # FIXME problem with automatic redirection if task not started yet
 
 # End Crawling manually
 @app.route('/crawling/end')
