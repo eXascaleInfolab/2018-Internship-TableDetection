@@ -30,24 +30,28 @@
         // section of the page.
         socket.on('tabula_success', function(msg) {
             $('#log').append('<br>' + $('<div/>').text(msg.data + msg.tables + ' tables found on ' + msg.pages + ' page(s).').html());
-            var count_pdf = document.getElementById('count_pdf');
-            var number = count_pdf.innerHTML;
-            number++;
-            count_pdf.innerHTML = number;
-            // TODO where should progress bar start? here I assume 40% (design choice)
-            var percentage = 40 + (60.0 / {{total_pdf}}) * number;
-            $('.progress-bar').css('width', percentage+'%').attr('aria-valuenow', percentage);
-
+            advanceProcessBar()
         });
 
         socket.on('processing_failure', function(msg) {
             $('#log').append('<br>' + $('<div/>').text(msg.text + msg.pdf_name + ' traceback: ' + msg.trace).html());
+            advanceProcessBar()
         });
 
         socket.on('redirect', function (data) {
             window.location = data.url;
         });
     });
+
+    function advanceProcessBar() {
+        var count_pdf = document.getElementById('count_pdf');
+        var number = count_pdf.innerHTML;
+        number++;
+        count_pdf.innerHTML = number;
+        // TODO where should progress bar start? here I assume 40% (design choice)
+        var percentage = 40 + (60.0 / {{total_pdf}}) * number;
+        $('.progress-bar').css('width', percentage+'%').attr('aria-valuenow', percentage);
+    }
 
 </script>
 {% endblock %}

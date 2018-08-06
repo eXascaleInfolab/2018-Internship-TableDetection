@@ -343,6 +343,8 @@ class CrawlForm(Form):
     time = IntegerField('Max Crawl Duration [Minutes]', [validators.NumberRange(min=1, max=1000)],
                         default=int(MAX_CRAWLING_DURATION / 60))
     size = IntegerField('Max Crawl Size [MBytes]', [validators.NumberRange(min=10, max=1000)], default=MB_CRAWL_SIZE)
+    pdf = IntegerField('Max Number of PDF to be processed', [validators.NumberRange(min=0, max=10000)],
+                       default=PDF_TO_PROCESS)
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -352,7 +354,7 @@ def index():
     if request.method == 'POST' and form.validate():
 
         # Change global variables depending on input
-        global MAX_CRAWLING_DURATION, MAX_CRAWL_DEPTH, MAX_CRAWL_SIZE, MB_CRAWL_SIZE
+        global MAX_CRAWLING_DURATION, MAX_CRAWL_DEPTH, MAX_CRAWL_SIZE, MB_CRAWL_SIZE, PDF_TO_PROCESS
 
         # Get Form Fields and save
         url = form.url.data
@@ -361,6 +363,7 @@ def index():
         MB_CRAWL_SIZE = form.size.data
         MAX_CRAWL_SIZE = 1024 * 1024 * MB_CRAWL_SIZE
         MAX_CRAWLING_DURATION = form.time.data * 60
+        PDF_TO_PROCESS = form.pdf.data
 
         # Check if valid URL
         if not exists(url):
@@ -808,16 +811,30 @@ def advanced():
 def terminate():
 
     # Purge all tasks from task queue
-    command = shlex.split("celery -A -f bar.celery purge")
+    command = shlex.split("celery -f -A bar.celery purge")
     process = subprocess.Popen(command)
 
-    # Kill all Celery tasks currently executing
+    # Kill all Celery tasks that have an ETA or are scheduled for later processing
     i = celery.control.inspect()
+    scheduled_tasks = i.scheduled()
+
+    for workers in scheduled_tasks:
+        for j in range(0, len(scheduled_tasks[workers])):
+            celery.control.revoke(scheduled_tasks[workers][j]['id'], terminate=True)
+
+    # Kill all Celery tasks that are currently active.
     active_tasks = i.active()
 
     for workers in active_tasks:
-        for i in range(0, len(active_tasks[workers])):
-            celery.control.revoke(active_tasks[workers][i]['id'], terminate=True)
+        for j in range(0, len(active_tasks[workers])):
+            celery.control.revoke(active_tasks[workers][j]['id'], terminate=True)
+
+    # Kill all Celery tasks that have been claimed by workers
+    reserved_tasks = i.reserved()
+
+    for workers in reserved_tasks:
+        for j in range(0, len(reserved_tasks[workers])):
+            celery.control.revoke(reserved_tasks[workers][j]['id'], terminate=True)
 
     # Release Lock if locked
     try:

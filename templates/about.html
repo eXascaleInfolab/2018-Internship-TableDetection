@@ -3,29 +3,11 @@
 {% block body %}
 <div class="jumbotron text-center" id="pane">
     <h1>About.</h1>
-    <p class="lead"> This app implements 3 main steps:</p>
-    <ol class="list-group">
-        <li> Crawling a domain and retrieving all PDF that can be found</li>
-        <li> Analysing the PDF's found and detecting the tables present</li>
-        <li> Extracting the data from the tables</li>
+    <p class="lead"> This app works in 3 main steps:</p>
+    <ol class="list-group text-center">
+        <li>Chose which domain to crawl. If you enter a specific url the crawler will start to crawl from there.</li>
+        <li>After finishing fetching the pdf or being interrupted this tool will perform table detection on the pdf.</li>
+        <li>Finally you will be able to see the collected data on the Statistics page and it will be listed on the Dashboard.</li>
     </ol>
-     <div class="text-left jumbotron">
-        <div class="panel panel-info">
-            <div class="panel-heading">
-                How this tool works:
-            </div>
-            <div class="panel-body">
-                <ol>
-                    <li>Chose which domain to crawl. If you enter a specific url the crawler will start to crawl from there.</li>
-                    <li>After finishing fetching the pdf or being interrupted this tool will perform table detection on the pdf.</li>
-                    <li>Finally you will be able to see the collected data on the Stats page.</li>
-                </ol>
-
-            </div>
-            <!-- /.panel-body -->
-        </div>
-        <!-- /.panel -->
-    </div>
-    <!-- /.col-lg-4 -->
 </div>
 {% endblock %}

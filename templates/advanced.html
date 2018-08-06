@@ -5,69 +5,64 @@
     <h1 class="page-header"> Advanced</h1>
     <p class="lead"> Here you have access to some more advanced options:</p>
 
-     <div class="row">
-                <div class="col-lg-4">
-                    <div class="panel panel-info">
-                        <div class="panel-heading">
-                            Download the url of every crawled file.
-                        </div>
-                        <div class="panel-body">
-                            <p>TODO</p>
-                        </div>
-                        <div class="panel-footer">
-                           <button type="button" onclick="" class="btn btn-outline btn-primary btn-sm"><i class="fa  fa-download "></i>Download</button>
-                        </div>
-                    </div>
+    <div class="row">
+        <div class="col-lg-4">
+            <div class="panel panel-danger">
+                <div class="panel-heading">
+                    Clear Database
                 </div>
-                <!-- /.col-lg-4 -->
-                <div class="col-lg-4">
-                    <div class="panel panel-info">
-                        <div class="panel-heading">
-                            Download logfile of the last crawl.
-                        </div>
-                        <div class="panel-body">
-                            <p>TODO</p>
-                        </div>
-                        <div class="panel-footer">
-                           <button type="button" onclick="" class="btn btn-outline btn-primary btn-sm"><i class="fa  fa-download "></i> Download</button>
-                        </div>
-                    </div>
+                <div class="panel-body">
+                    <p>This allows you to clear all data from the database, except for User login data.</p>
                 </div>
+                <div class="panel-footer">
+                    <a type="button" href={{url_for('empty_tables')}} class="btn btn-outline btn-danger btn-sm"><i class="fa  fa-gears "></i> Empty All Tables </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="panel panel-danger">
+                <div class="panel-heading">
+                    Terminate all running processes
+                </div>
+                <div class="panel-body">
+                    <p>You can use this feature when you get error messages and can't start a new crawl. This
+                        behavior might be normal if you quit the web page without waiting for the process termination.</p>
+                    <p>Note that when terminating ongoing table-detection processes, the work done so far will be saved, so you won't lose much.</p>
+                </div>
+                <div class="panel-footer">
+                    <a type="button" href={{url_for('terminate')}} class="btn btn-outline btn-danger btn-sm"><i class="fa  fa-gears "></i> Free Ressources </a>
+                </div>
+            </div>
+        </div>
+    </div>
 
-                <!-- /.col-lg-4 -->
-            </div>
-            <!-- /.row -->
-            <div class="row">
-                <div class="col-lg-4">
-                    <div class="panel panel-danger">
-                        <div class="panel-heading">
-                            Clear Database
-                        </div>
-                        <div class="panel-body">
-                            <p>This allows you to clear all data from the database, except for User login data.</p>
-                        </div>
-                        <div class="panel-footer">
-                            <a type="button" href={{url_for('empty_tables')}} class="btn btn-outline btn-danger btn-sm"><i class="fa  fa-gears "></i> Empty All Tables </a>
-                        </div>
-                    </div>
+    <div class="row">
+        <div class="col-lg-4">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    Download the url of every crawled file.
                 </div>
-                <div class="col-lg-4">
-                    <div class="panel panel-danger">
-                        <div class="panel-heading">
-                            Terminate all running processes
-                        </div>
-                        <div class="panel-body">
-                            <p>You can use this feature when you get error messages and can't start a new crawl. This
-                                behavior might be normal if you quit the web page without waiting for the process termination.</p>
-                            <p>Note that when terminating ongoing table-detection processes, the work done so far will be saved, so you won't lose much.</p>
-                        </div>
-                        <div class="panel-footer">
-                            <a type="button" href={{url_for('terminate')}} class="btn btn-outline btn-danger btn-sm"><i class="fa  fa-gears "></i> Free Ressources </a>
-                        </div>
-                    </div>
+                <div class="panel-body">
+                    <p>Not done yet.</p>
                 </div>
-                <!-- /.col-lg-4 -->
+                <div class="panel-footer">
+                   <button type="button" onclick="" class="btn btn-outline btn-primary btn-sm"><i class="fa  fa-download "></i>Download</button>
+                </div>
             </div>
-            <!-- /.row -->
+        </div>
+        <div class="col-lg-4">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    Download logfile of the last crawl.
+                </div>
+                <div class="panel-body">
+                    <p>Not done yet.</p>
+                </div>
+                <div class="panel-footer">
+                   <button type="button" onclick="" class="btn btn-outline btn-primary btn-sm"><i class="fa  fa-download "></i> Download</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}
