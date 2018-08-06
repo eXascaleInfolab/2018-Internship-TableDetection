@@ -32,7 +32,7 @@ import shutil
 async_mode = None
 
 app = Flask(__name__)
-app.debug = True
+#app.debug = True
 app.secret_key = 'Aj"$7PE#>3AC6W]`STXYLz*[G\gQWA'
 
 # Celery configuration
@@ -627,7 +627,6 @@ def cid_statistics(cid):
     json_hierarchy = json.loads(crawl['hierarchy'])
 
     stats_items = stats.items()
-    print(stats_items)
     n_tables = sum([subdict['n_tables'] for filename, subdict in stats_items])
     n_rows = sum([subdict['n_table_rows'] for filename, subdict in stats_items])
 
