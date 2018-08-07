@@ -9,3 +9,4 @@ virtualenv/
 *.pyc
 log/*
 redis-stable/
+wget_log.txt
