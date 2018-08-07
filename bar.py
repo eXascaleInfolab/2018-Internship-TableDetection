@@ -636,6 +636,7 @@ def cid_statistics(cid):
     stats_items = stats.items()
     n_tables = sum([subdict['n_tables'] for filename, subdict in stats_items])
     n_rows = sum([subdict['n_table_rows'] for filename, subdict in stats_items])
+    n_pages = sum([subdict['n_pages'] for filename, subdict in stats_items])
 
     medium_tables = sum([subdict['table_sizes']['medium'] for filename, subdict in stats_items])
     small_tables = sum([subdict['table_sizes']['small'] for filename, subdict in stats_items])
@@ -660,7 +661,8 @@ def cid_statistics(cid):
                            hierarchy=json_hierarchy, end_time=crawl['crawl_date'],
                            crawl_total_time=round(crawl['crawl_total_time'] / 60.0, 1),
                            proc_total_time=round(crawl['proc_total_time'] / 60.0, 1),
-                           oldest_pdf=oldest_pdf, most_recent_pdf=most_recent_pdf, disk_size=disk_size)
+                           oldest_pdf=oldest_pdf, most_recent_pdf=most_recent_pdf, disk_size=disk_size,
+                           n_pages=n_pages)
 
 
 class RegisterForm(Form):

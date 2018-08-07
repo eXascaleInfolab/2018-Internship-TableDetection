@@ -98,91 +98,122 @@
         </div>
     </div>
 <div class="row">
-        <div class="col-lg-8">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <i class="fa fa-bar-chart-o fa-fw"></i> Processed files (Larger radius indicates more pages)
-                </div>
-                <!-- /.panel-heading -->
-                <div class="panel-body">
-                    <div class="row">
-                        <canvas id = "bubble"></canvas>
-                    </div>
-                    <!-- /.row -->
-                </div>
-                <!-- /.panel-body -->
+    <div class="col-lg-8">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <i class="fa fa-bar-chart-o fa-fw"></i> Processed files (Larger radius indicates more pages)
             </div>
-            <!-- /.panel -->
-        </div>
-        <!-- /.col-lg-8 -->
-        <div class="col-lg-4">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <i class="fa fa-gear fa-fw"></i> Download selected PDFs
+            <!-- /.panel-heading -->
+            <div class="panel-body">
+                <div class="row">
+                    <canvas id = "bubble"></canvas>
                 </div>
-                <!-- /.panel-heading -->
-                <div class="panel-body">
-                    <div class="text-center">
-                        <div class="btn-group" role="group" aria-label="Basic example">
-                            <button type="button" onclick="changeOnClick('single')" class="btn btn-outline btn-primary">Sinlge</button>
-                            <button type="button" onclick="changeOnClick('multiple')" class="btn btn-outline btn-primary">Multiple</button>
-                            <button type="button" onclick="changeOnClick('dataset')" class="btn btn-outline btn-primary">Dataset</button>
-                        </div>
-                    </div>
-                    <br>
-                    <div id="single" class="list-group" style="display:none;">
-                        <div class="list-group-item-info text-center" style="display:block;" id="single-info"> Select a pdf by clicking on a bubble.</div>
-                        <a class="list-group-item">
-                            <i class="fa fa-search fa-fw"></i> Name of PDF clicked
-                            <br>
-                            <span class="text-muted small"><em id="pdf-name"></em>
-                            </span>
-                        </a>
-                        <a class="list-group-item">
-                            <i class="fa fa-globe  fa-fw"></i> URL of PDF
-                            <br>
-                            <div class="text-muted small uneditable-textarea" id="pdf-url"></div>
-                        </a>
-                        <br>
-                        <div class="text-center">
-                            <button type="button" onclick="copyUrlToClipboard()" class="btn btn-outline btn-success btn-sm"><i class="fa fa-save "></i> Copy URL to clipboard</button>
-                            <button type="button" onclick="openURL()" class="btn btn-outline btn-success btn-sm"><i class="fa  fa-download "></i> Download</button>
-                        </div>
-
-                    </div>
-                    <div id="multiple" class="" style="display:none;">
-                        <div class="list-group-item-info text-center" style="display:block;" id="multiple-info"> Select multiple files by clicking on their bubbles.</div>
-                        <div class="pre-scrollable list-group" id="dynamic-list">
-                        </div>
-
-                        <div class="text-center" id="multiple-buttons" style="display:none;">
-                            <button type="button" onclick="cancelSelection()" class="btn btn-outline btn-default btn-sm">Cancel Selection</button>
-                            <button type="button" onclick="downloadAll(multipleUrlArray)" class="btn btn-outline btn-success btn-sm"><i class="fa  fa-download "></i> Download All</button>
-                        </div>
-                    </div>
-                    <div id="dataset" class="list-group" style="display:none;">
-                        <div class="list-group-item-info text-center" style="display:block;" id="dataset-info"> Select a dataset by clicking on one of its members. </div>
-                        <a class="list-group-item">
-                            <i class="fa fa-search fa-fw"></i> Label of Dataset clicked
-                            <span class="text-muted small pull-right"><em id="dataset-selection"></em>
-                            </span>
-                        </a>
-                        <a class="list-group-item">
-                            <i class="fa fa-folder fa-fw"></i> Number of PDF in Dataset
-                            <div class="text-muted small pull-right" id="dataset-number"></div>
-                        </a>
-                        <br>
-                        <div class="text-center">
-                            <button type="button" onclick="downloadAll(datasetUrlArray)" class="btn btn-outline btn-success btn-sm"><i class="fa  fa-download "></i> Download All</button>
-                        </div>
-                    </div>
-                </div>
-                <!-- /.panel-body -->
+                <!-- /.row -->
             </div>
-            <!-- /.panel -->
+            <!-- /.panel-body -->
         </div>
-        <!-- /.col-lg-4 -->
+        <!-- /.panel -->
     </div>
+    <!-- /.col-lg-8 -->
+     <div class="col-lg-4">
+         <div class="panel panel-default">
+            <div class="panel-heading">
+                <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne"><i class="fa fa-share-alt fa-fw"></i> Share this page</a>
+            </div>
+            <div id="collapseOne" class="panel-collapse collapse">
+                <div class="panel-body">
+                    <div class="list-group-item">
+                        <i class="fa  fa-fw"></i> Copy page URL
+                        <span class="pull-right">
+                        <a onclick="copyCurrentUrlToClipboard()" class="btn btn-social-icon"><i class="fa fa-save "></i></a>
+                        </span>
+                </div>
+                    <div class="list-group-item">
+                        <i class="fa fa-fw"></i> Send URL by email
+                        <span class="pull-right">
+                        <a title="Email a friend" href="#" onclick="javascript:window.location='mailto:?subject=PDF Crawl App&body=Have a look at these statistics: ' + window.location;"  class="btn btn-social-icon"><i class="fa fa-envelope"></i></a>
+
+                            <!-- Could add more buttons to share on different platforms here !
+                        <a class="btn btn-social-icon btn-facebook"><i class="fa fa-facebook"></i></a>
+                        <a class="btn btn-social-icon btn-linkedin"><i class="fa fa-linkedin"></i></a>
+                        <a class="btn btn-social-icon btn-twitter"><i class="fa fa-twitter"></i></a>
+                        -->
+                        </span>
+                </div>
+                </div>
+            </div>
+        </div>
+        <!-- /.panel -->
+    </div>
+    <!-- /.col-lg-4 -->
+    <div class="col-lg-4">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <i class="fa fa-gear fa-fw"></i> Download selected PDFs
+            </div>
+            <!-- /.panel-heading -->
+            <div class="panel-body">
+                <div class="text-center">
+                    <div class="btn-group" role="group" aria-label="Basic example">
+                        <button type="button" onclick="changeOnClick('single')" class="btn btn-outline btn-primary">Sinlge</button>
+                        <button type="button" onclick="changeOnClick('multiple')" class="btn btn-outline btn-primary">Multiple</button>
+                        <button type="button" onclick="changeOnClick('dataset')" class="btn btn-outline btn-primary">Dataset</button>
+                    </div>
+                </div>
+                <br>
+                <div id="single" class="list-group" style="display:none;">
+                    <div class="list-group-item-info text-center" style="display:block;" id="single-info"> Select a pdf by clicking on a bubble.</div>
+                    <a class="list-group-item">
+                        <i class="fa fa-search fa-fw"></i> Name of PDF clicked
+                        <br>
+                        <span class="text-muted small"><em id="pdf-name"></em>
+                        </span>
+                    </a>
+                    <a class="list-group-item">
+                        <i class="fa fa-globe  fa-fw"></i> URL of PDF
+                        <br>
+                        <div class="text-muted small uneditable-textarea" id="pdf-url"></div>
+                    </a>
+                    <br>
+                    <div class="text-center">
+                        <button type="button" onclick="copyUrlToClipboard()" class="btn btn-outline btn-success btn-sm"><i class="fa fa-save "></i> Copy URL to clipboard</button>
+                        <button type="button" onclick="openURL()" class="btn btn-outline btn-success btn-sm"><i class="fa  fa-download "></i> Download</button>
+                    </div>
+
+                </div>
+                <div id="multiple" class="" style="display:none;">
+                    <div class="list-group-item-info text-center" style="display:block;" id="multiple-info"> Select multiple files by clicking on their bubbles.</div>
+                    <div class="pre-scrollable list-group" id="dynamic-list">
+                    </div>
+
+                    <div class="text-center" id="multiple-buttons" style="display:none;">
+                        <button type="button" onclick="cancelSelection()" class="btn btn-outline btn-default btn-sm">Cancel Selection</button>
+                        <button type="button" onclick="downloadAll(multipleUrlArray)" class="btn btn-outline btn-success btn-sm"><i class="fa  fa-download "></i> Download All</button>
+                    </div>
+                </div>
+                <div id="dataset" class="list-group" style="display:none;">
+                    <div class="list-group-item-info text-center" style="display:block;" id="dataset-info"> Select a dataset by clicking on one of its members. </div>
+                    <a class="list-group-item">
+                        <i class="fa fa-search fa-fw"></i> Label of Dataset clicked
+                        <span class="text-muted small pull-right"><em id="dataset-selection"></em>
+                        </span>
+                    </a>
+                    <a class="list-group-item">
+                        <i class="fa fa-folder fa-fw"></i> Number of PDF in Dataset
+                        <div class="text-muted small pull-right" id="dataset-number"></div>
+                    </a>
+                    <br>
+                    <div class="text-center">
+                        <button type="button" onclick="downloadAll(datasetUrlArray)" class="btn btn-outline btn-success btn-sm"><i class="fa  fa-download "></i> Download All</button>
+                    </div>
+                </div>
+            </div>
+            <!-- /.panel-body -->
+        </div>
+        <!-- /.panel -->
+    </div>
+    <!-- /.col-lg-4 -->
+</div>
 <div class="row">
     <div class="col-lg-4">
             <div class="panel panel-default">
@@ -205,6 +236,11 @@
                         <a class="list-group-item">
                             <i class="fa fa-clock-o  fa-fw"></i> Processing duration
                             <span class="pull-right text-muted small"><em>{{proc_total_time}} minutes</em>
+                            </span>
+                        </a>
+                        <a class="list-group-item">
+                            <i class="fa fa-file fa-fw"></i> Total number pages processed
+                            <span class="pull-right text-muted small"><em>{{n_pages}}</em>
                             </span>
                         </a>
                         <a class="list-group-item">
@@ -240,18 +276,6 @@
                             <span class="pull-right text-muted small"><em>{{large_tables}}</em>
                             </span>
                         </button>
-                        <div class="list-group-item">
-                            <i class="fa fa-share-alt  fa-fw"></i> Share this page
-                            <span class="pull-right">
-                            <a onclick="copyCurrentUrlToClipboard()" class="btn btn-social-icon"><i class="fa fa-save "></i></a>
-                            <a title="Email a friend" href="#" onclick="javascript:window.location='mailto:?subject=PDF Crawl App&body=Have a look at these statistics: ' + window.location;"  class="btn btn-social-icon"><i class="fa fa-envelope"></i></a>
-
-                                <!-- Could add more buttons to share on different platforms here !
-                            <a class="btn btn-social-icon btn-facebook"><i class="fa fa-facebook"></i></a>
-                            <a class="btn btn-social-icon btn-linkedin"><i class="fa fa-linkedin"></i></a>
-                            <a class="btn btn-social-icon btn-twitter"><i class="fa fa-twitter"></i></a>
-                            -->
-                        </div>
                     </div>
                 </div>
                 <!-- /.panel-body -->
