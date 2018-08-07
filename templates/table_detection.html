@@ -29,12 +29,12 @@
         // to the client. The data is then displayed in the "Received"
         // section of the page.
         socket.on('tabula_success', function(msg) {
-            $('#log').append('<br>' + $('<div/>').text(msg.data + msg.tables + ' tables found on ' + msg.pages + ' page(s).').html());
+            $('#log').prepend('<br>' + $('<div/>').text(msg.data + msg.tables + ' tables found on ' + msg.pages + ' page(s).').html());
             advanceProcessBar()
         });
 
         socket.on('processing_failure', function(msg) {
-            $('#log').append('<br>' + $('<div/>').text(msg.text + msg.pdf_name + ' traceback: ' + msg.trace).html());
+            $('#log').prepend('<br>' + $('<div/>').text(msg.text + msg.pdf_name + ' traceback: ' + msg.trace).html());
             advanceProcessBar()
         });
 

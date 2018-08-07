@@ -75,6 +75,7 @@ MAX_CRAWL_SIZE = 1024 * 1024 * MB_CRAWL_SIZE       # in bytes (500MB)
 CRAWL_REPETITION_WARNING_TIME = 7                  # in days
 MAX_CRAWL_DEPTH = 5
 DEFAULT_CRAWL_URL = 'https://www.bit.admin.ch'
+VIRTUALENV_PATH = '/home/yann/bar/virtualenv/bin/celery'
 
 # CELERY TASKS
 
@@ -816,7 +817,7 @@ def advanced():
 def terminate():
 
     # Purge all tasks from task queue
-    command = shlex.split("/home/yann/bar/virtualenv/bin/celery -f -A bar.celery purge") #FIXME datapath variable
+    command = shlex.split(VIRTUALENV_PATH + " -f -A bar.celery purge") #FIXME datapath variable
     process = subprocess.Popen(command)
 
     # Kill all Celery tasks that have an ETA or are scheduled for later processing
