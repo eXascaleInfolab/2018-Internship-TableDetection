@@ -1,0 +1,177 @@
+--- DB ---
+
+pip install flask_mysqldb
+sudo apt-get install mysql-server libmysqlclient-dev
+
+CREATE DATABASE bar;
+
+use bar
+
+source /home/yann/bar/create_db.sql
+
+--- JAVA ---
+https://www.digitalocean.com/community/tutorials/how-to-install-java-with-apt-get-on-ubuntu-16-04
+
+all pip
+
+
+--- GENERAL ---
+sudo apt-get install python3-pip python3-dev
+sudo pip3 install virtualenv/
+
+sudo timedatectl set-timezone Europe/Zurich
+sudo apt-get install timeout
+pip install gunicorn flask
+pip install tabula-py
+
+
+
+--- SOCKETIO / EVENTLET ---
+
+--- CELERY & REDIS ---
+./run-redis.sh
+
+--- FLASK APPLICATION ---
+
+git clone https://github.com/eXascaleInfolab/2018-Internship-TableDetection.git
+mkdir log ?
+
+
+--- NGINX ---
+sudo nano /etc/nginx/sites-available/bar
+
+server {
+    listen 80;
+    server_name tin.zenosyne.ch;
+
+   location / {
+        include proxy_params;
+        proxy_pass http://unix:/home/yann/bar/bar.sock;
+    }
+
+}
+
+server {
+    listen 80;
+    server_name tin.zenosyne.ch;
+
+   location / {
+        include proxy_params;
+        proxy_pass http://unix:/home/yann/bar/bar.sock;
+    }
+
+
+   location /socket.io {
+        include proxy_params;
+        proxy_http_version 1.1;
+        proxy_buffering off;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "Upgrade";
+        proxy_pass http://unix:/home/yann/bar/bar.sock/socket.io;
+    }
+
+}
+
+
+sudo nano /etc/nginx/sites-enabled/bar 
+
+(sudo nano /etc/nginx/nginx.conf)
+
+--- SUPERVISOR ---
+nano /etc/supervisor/conf.d/bar.conf 
+
+[program:wsgi]
+directory=/home/yann/bar
+command=/home/yann/bar/virtualenv/bin/gunicorn --workers 3 --bind unix:bar.sock --timeout 100000 bar:app
+autostart=true
+autorestart=true
+stderr_logfile=/home/yann/bar/log/bar.err.log
+stdout_logfile=/home/yann/bar/log/bar.out.log
+
+--- NEW SUPERVISOR ---
+[program:bar]
+directory=/home/yann/bar
+command=/home/yann/bar/virtualenv/bin/gunicorn --worker-class eventlet -w 1 --bind localhost:5000 bar:app
+autostart=true
+autorestart=true
+stderr_logfile=/home/yann/bar/log/bar.err.log
+stdout_logfile=/home/yann/bar/log/bar.out.log
+
+
+[program:celery]
+; Set full path to celery program if using virtualenv
+command=/home/yann/bar/virtualenv/bin/celery worker -A bar.celery --loglevel=INFO
+directory=/home/yann/bar
+user=nobody
+numprocs=1
+stdout_logfile=/home/yann/bar/log/celery.log
+stderr_logfile=/home/yann/bar/log/celery.log
+autostart=true
+autorestart=true
+startsecs=10
+
+; Need to wait for currently executing tasks to finish at shutdown.
+; Increase this if you have very long running tasks.
+stopwaitsecs = 600
+
+; Causes supervisor to send the termination signal (SIGTERM) to the whole process group.
+stopasgroup=true
+
+; Set Celery priority higher than default (999)
+; so, if rabbitmq is supervised, it will start first.
+priority=1000
+
+[program:redis] ;not working
+command=/usr/local/bin/redis-server
+autostart=true
+autorestart=true
+user=root
+stdout_logfile=/home/yann/bar/log/redis.log
+stderr_logfile=/home/yann/bar/log/redis.log
+stopsignal=QUIT
+
+
+--- UFW ---
+sudo ufw disable
+
+
+--- DEPLOY LOG ---
+
+Deployement1 - PoC
+
+Deployement2 - Tabula Speedup
+commit a216004f727a590128a739942b65758d327fabb3
+
+Deployement3 - Celery/SocketIO/Redis/Flower
+commit fb8311c1f40f3f47d209db9622f12dcb8b592fea
+
+
+--- DEPLOY LOG 3 ---
+source virtualenv
+
+pip install -r requirements.txt
+
+virtualenv deactivate !
+redis script
+
+celery worker -A bar.celery --loglevel=info
+
+mysql source new script
+
+gunicorn --worker-class eventlet -w 1 --bind unix:bar.sock bar:app
+
+https://www.digitalocean.com/community/tutorials/how-to-install-and-configure-redis-on-ubuntu-16-04
+https://stackoverflow.com/questions/14816892/how-to-keep-redis-server-running
+
+redis-server --daemonize yes
+
+create data dir myself !!
+
+
+chmod 777 wget_log.txt
+chmod 777 data/
+
+change virtualenv for purge command under /terminate
+
+
+
