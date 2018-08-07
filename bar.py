@@ -111,7 +111,7 @@ def crawling_task(self, url='', post_url='', domain='',
             crawled_size = dir_size(WGET_DATA_PATH + "/" + domain)
             if crawled_size is not None and crawled_size > max_crawl_size:
                 # threshold reached
-                print("exit loop simce threshold reached")
+                print("exit loop since threshold reached")
                 break
 
     # STEP 3: Kill the subprocess if still alive
@@ -424,7 +424,7 @@ def crawling():
             delete_data()
 
             # create directory for data
-            os.mkdir(WGET_DATA_PATH)
+            # os.mkdir(WGET_DATA_PATH) # Extremely problematic since it does not necessarily give write rights !!
 
             # STEP 0: TimeKeeping
             session['crawl_start_time'] = time.time()
@@ -847,7 +847,7 @@ def terminate():
     except RuntimeError:
         pass
 
-    flash("All processes were interrupted and the lock released !", 'warning')
+    flash("All processes were interrupted and the lock released !", 'success')
 
     return redirect(url_for('advanced'))
 
@@ -888,7 +888,17 @@ def about():
 @app.route('/delete_data', methods=['GET', 'POST'])
 @is_logged_in
 def delete_data():
-    shutil.rmtree(WGET_DATA_PATH)
+    # Taken from https://stackoverflow.com/questions/185936/how-to-delete-the-contents-of-a-folder-in-python
+    folder = WGET_DATA_PATH
+    for the_file in os.listdir(folder):
+        file_path = os.path.join(folder, the_file)
+        try:
+            if os.path.isfile(file_path):
+                os.unlink(file_path)
+            elif os.path.isdir(file_path): shutil.rmtree(file_path)
+        except Exception as e:
+            print(e)
+
     return "Crawled data deleted successfully"
 
 
