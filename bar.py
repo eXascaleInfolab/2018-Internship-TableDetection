@@ -101,17 +101,20 @@ def crawling_task(self, url='', post_url='', domain='',
 
         if process.poll() is not None:
             # Subprocess is finished
+            print("exit loop since process over.")
             break
 
         crawled_size = dir_size(WGET_DATA_PATH + "/" + domain)
         if crawled_size is not None and crawled_size > max_crawl_size:
             # threshold reached
+            print("exit loop simce threshold reached")
             break
 
         post(post_url, json={'event': 'crawl_update', 'data': next_line})
 
     # STEP 3: Kill the subprocess if still alive
     if process.poll() is None:
+        print("killing subprocess")
         os.kill(process.pid, signal.SIGTERM)
 
     # STEP 4: Return the exit code
