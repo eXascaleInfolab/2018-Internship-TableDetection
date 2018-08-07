@@ -816,7 +816,7 @@ def advanced():
 def terminate():
 
     # Purge all tasks from task queue
-    command = shlex.split("celery -f -A bar.celery purge")
+    command = shlex.split("/home/yann/bar/virtualenv/bin/celery -f -A bar.celery purge") #FIXME datapath variable
     process = subprocess.Popen(command)
 
     # Kill all Celery tasks that have an ETA or are scheduled for later processing
