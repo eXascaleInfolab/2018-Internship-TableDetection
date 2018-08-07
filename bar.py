@@ -94,23 +94,25 @@ def crawling_task(self, url='', post_url='', domain='',
     # Set the pid in the state
     self.update_state(state='PROGRESS', meta={'pid': process.pid, })
 
-    # STEP 2: send crawl stderr through WebSocket
-    while True:
-        next_line = process.stderr.readline()
-        next_line = next_line.decode("utf-8")
+    # STEP 2: send crawl stderr through WebSocket and save in logfile
+    with open("wget_log.txt", "a") as logfile:
+        while True:
+            next_line = process.stderr.readline()
+            next_line = next_line.decode("utf-8")
 
-        if process.poll() is not None:
-            # Subprocess is finished
-            print("exit loop since process over.")
-            break
+            post(post_url, json={'event': 'crawl_update', 'data': next_line})
+            logfile.write(next_line)
 
-        crawled_size = dir_size(WGET_DATA_PATH + "/" + domain)
-        if crawled_size is not None and crawled_size > max_crawl_size:
-            # threshold reached
-            print("exit loop simce threshold reached")
-            break
+            if process.poll() is not None:
+                # Subprocess is finished
+                print("exit loop since process over.")
+                break
 
-        post(post_url, json={'event': 'crawl_update', 'data': next_line})
+            crawled_size = dir_size(WGET_DATA_PATH + "/" + domain)
+            if crawled_size is not None and crawled_size > max_crawl_size:
+                # threshold reached
+                print("exit loop simce threshold reached")
+                break
 
     # STEP 3: Kill the subprocess if still alive
     if process.poll() is None:
@@ -910,6 +912,12 @@ def hierarchy_download(cid):
     return Response(hierarchy,
                     mimetype='application/json',
                     headers={'Content-Disposition': 'attachment;filename=hierarchy.json'})
+
+# Download WGET Logfile
+@app.route('/wget_log')
+@is_logged_in
+def wget_log_download():
+    return send_file("wget_log.txt")
 
 
 # Asynchronous Communication wrappers
