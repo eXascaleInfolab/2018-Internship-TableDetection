@@ -1,0 +1,18 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+    <div class="row">
+        <div class="progress progress-striped">
+            <div class="progress-bar progress-bar-danger" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
+                <span class="sr-only">100% Complete</span>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="col-lg-8">
+        <h1 class="page-header"> Your process was terminated by another user. </h1>
+        <p class="lead"> If you were performing table detection the intermediary results have been saved, so when running the same query again you will save time. </p>
+    </div>
+
+{% endblock %}

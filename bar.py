@@ -850,9 +850,20 @@ def terminate():
     except RuntimeError:
         pass
 
+    # Broadcast the termination messages to users that were potentially still observing task progress
+    socketio.emit('redirect', {'url': 'terminated'})
+
+    # Flash success message
     flash("All processes were interrupted and the lock released !", 'success')
 
     return redirect(url_for('advanced'))
+
+
+# Page displayed when process terminated by other user
+@app.route('/terminated')
+@is_logged_in
+def terminated():
+    return render_template('terminated.html')
 
 
 # Empty all Tables except for User data
