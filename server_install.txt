@@ -31,6 +31,14 @@ pip install tabula-py
 --- CELERY & REDIS ---
 ./run-redis.sh
 
+--- kill it
+ps -u yann -o pid,rss,command | grep redis
+sudo kill -9 2801
+
+--- use supervisor OR run
+redis-server --daemonize yes
+
+
 --- FLASK APPLICATION ---
 
 git clone https://github.com/eXascaleInfolab/2018-Internship-TableDetection.git
@@ -172,6 +180,91 @@ chmod 777 wget_log.txt
 chmod 777 data/
 
 change virtualenv for purge command under /terminate
+
+
+--- FLOWER ---
+nginx:
+server {
+    listen 80;
+    server_name zenosyne.ch;
+
+    location / {
+        include proxy_params;
+        proxy_pass http://127.0.0.1:5000;
+    }
+
+    location /socket.io {
+        include proxy_params;
+        proxy_http_version 1.1;
+        proxy_buffering off;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "Upgrade";
+        proxy_pass http://127.0.0.1:5000/socket.io;
+    }
+
+    location /flower/static {
+        alias /home/yann/bar/virtualenv/lib/python3.5/site-packages/flower/static;
+    }
+
+    location /flower {
+        rewrite ^/flower/(.*)$ /$1 break;
+        proxy_pass http://localhost:5555;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header Host $host;
+    }
+}
+
+flower -A bar.celery --port=5555  --url-prefix=flere
+
+--- with authentication:
+sudo apt install apache2-utils
+sudo htpasswd -c /etc/nginx/.htpasswd admin --> you will be promted to choose a password
+
+server {
+    listen 80;
+    server_name zenosyne.ch;
+
+    location / {
+        include proxy_params;
+        proxy_pass http://127.0.0.1:5000;
+    }
+
+    location /socket.io {
+        include proxy_params;
+        proxy_http_version 1.1;
+        proxy_buffering off;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "Upgrade";
+        proxy_pass http://127.0.0.1:5000/socket.io;
+    }
+
+    location /flower/static {
+        alias /home/yann/bar/virtualenv/lib/python3.5/site-packages/flower/static;
+    }
+
+    location /flower {
+        rewrite ^/flower/(.*)$ /$1 break;
+        proxy_pass http://localhost:5555;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header Host $host;
+        auth_basic "Restricted";
+        auth_basic_user_file /etc/nginx/.htpasswd;
+    }
+}
+
+[program:flower]
+directory = /home/yann/bar/
+command=/home/yann/bar/virtualenv/bin/flower -A bar.celery --port=5555  --url-prefix=flower
+autostart=true
+autorestart=true
+stdout_logfile=/home/yann/bar/log/flower.log
+stderr_logfile=/home/yann/bar/log/flower.log
+stopsignal=QUIT
+
+sudo supervisorctl reload DO NOT FORGET !! :D
+sudo supervisorctl reread all
+sudo supervisorctl restart all
+
 
 
 
