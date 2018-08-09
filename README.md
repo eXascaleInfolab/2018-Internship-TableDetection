@@ -2,7 +2,7 @@
 
 Visit the the first deployed version [here](zenosyne.ch).
 
-![SCREENSHOT](/home/yann/bar/images/IMG1.png)
+![SCREENSHOT](images/IMG1.png)
 
 ## Introduction
 
@@ -41,7 +41,7 @@ This guide should work you through every step required to install this applicati
 
 I used the 5$/month Digital Ocean droplet option that comes with 1GB memory, 25GB disk space and a single core CPU. This is perfectly sufficient for demonstration purposes but probably too slow to perform table detection on large datasets. You will find more about execution speed in the Performance section at the end of this document.
 
-![IMG3](/home/yann/bar/images/IMG3.png)
+![IMG3](images/IMG3.png)
 
 ### Prerequisites & Setting up the Server
 If you start with a fresh Ubuntu 16.04 server I would recommend to first follow [these steps](https://www.digitalocean.com/community/tutorials/initial-server-setup-with-ubuntu-16-04) to initialize the server and create a non-root user with sudo privileges. 
@@ -339,7 +339,7 @@ Other usefull commands for Supervisor are
 
 ### Authentication for Flower 
 
-![IMG4](/home/yann/bar/images/IMG4.png)[Flower](http://flower.readthedocs.io/en/latest/) is a web based tool for monitoring and administrating [Celery](http://celeryproject.org) clusters. It will allow you to see how busy the server is and check what tasks are currently running, how long they took to complete and much more. It was installed through pip already, so now all you need to do is set up an htpasswd file. This basic access control is important to protect Flower from unwanted access if your application runs on the Internet. 
+![IMG4](images/IMG4.png)[Flower](http://flower.readthedocs.io/en/latest/) is a web based tool for monitoring and administrating [Celery](http://celeryproject.org) clusters. It will allow you to see how busy the server is and check what tasks are currently running, how long they took to complete and much more. It was installed through pip already, so now all you need to do is set up an htpasswd file. This basic access control is important to protect Flower from unwanted access if your application runs on the Internet. 
 
     $ sudo apt install apache2-utils
     $ sudo htpasswd -c /etc/nginx/.htpasswd admin
@@ -384,7 +384,7 @@ Adding a domain name to point to your server is extremely simple. There is essen
 
 > Note: you might have to change your nginx settings, you can simply change the server_name line from the IP-address to the newly purchased domain name.
 
-![DigitalOcean as DNS host](/home/yann/bar/images/IMG2.png)
+![DigitalOcean as DNS host](images/IMG2.png)
 
 ## Performance Evaluation
 
