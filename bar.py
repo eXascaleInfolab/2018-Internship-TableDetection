@@ -6,25 +6,43 @@ from helper import path_dict, path_number_of_files, pdf_stats, pdf_date_format_t
 import json
 from functools import wraps
 from urllib.parse import urlparse
-
-from flask import Flask, render_template, flash, redirect, url_for, session, request, logging, Response, send_file, Markup
+from flask import flash, redirect, url_for, Response, send_file, Markup, logging
 from flask_mysqldb import MySQL
 from wtforms import Form, StringField, IntegerField, PasswordField, validators
 from passlib.hash import sha256_crypt
 import time
-
 from threading import Lock
 from flask import Flask, render_template, session, request
 from flask_socketio import SocketIO, emit
-
 from celery import Celery, chord
 from requests import post
-
 import tabula
 import PyPDF2
-
 import shutil
 
+# ----------------------------- CONSTANTS -----------------------------------------------------------------------------
+
+PDF_TO_PROCESS = 100
+MAX_CRAWLING_DURATION = 60 * 15         # in seconds
+WAIT_AFTER_CRAWLING = 1000              # in milliseconds
+SMALL_TABLE_LIMIT = 10                  # defines what is considered a small table
+MEDIUM_TABLE_LIMIT = 20                 # defines what is considered a medium table
+
+# Note that when checking for size folders are not taken into account and thus
+# the effective size can be up to 10% higher, also leave enough room for other requests,
+# like downloading pdf's from stats page. For those reasons I would not recommend
+# using more than 50 % of available disk space.
+MB_CRAWL_SIZE = 500
+MAX_CRAWL_SIZE = 1024 * 1024 * MB_CRAWL_SIZE       # in bytes (500MB)
+CRAWL_REPETITION_WARNING_TIME = 7                  # in days
+MAX_CRAWL_DEPTH = 5
+DEFAULT_CRAWL_URL = 'https://www.bit.admin.ch'
+VIRTUALENV_PATH = '/home/yann/bar/virtualenv/bin/celery'  # TODO has to be changed when deploying
+WGET_DATA_PATH = 'data'
+WGET_LOG_PATH = 'log/wget.txt'
+
+
+# ----------------------------- APP CONFIG ----------------------------------------------------------------------------
 
 # Set this variable to "threading", "eventlet" or "gevent" to test the
 # different async modes, or leave it set to None for the application to choose
@@ -42,7 +60,7 @@ app.config['CELERY_RESULT_BACKEND'] = 'redis://localhost:6379/0'
 # SocketIO
 socketio = SocketIO(app, async_mode=async_mode)
 
-# Lock
+# Lock to limit app to a single user
 lock = Lock()
 
 # Initialize Celery
@@ -56,29 +74,11 @@ app.config['MYSQL_PASSWORD'] = 'mountain'
 app.config['MYSQL_DB'] = 'bar'
 app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
 
-# init MySQL
+# Init MySQL
 mysql = MySQL(app)
 
-# CONSTANTS
-WGET_DATA_PATH = 'data'
-PDF_TO_PROCESS = 100
-MAX_CRAWLING_DURATION = 60 * 15         # in seconds
-WAIT_AFTER_CRAWLING = 1000              # in milliseconds
-SMALL_TABLE_LIMIT = 10                  # defines what is considered a small table
-MEDIUM_TABLE_LIMIT = 20                 # defines what is considered a medium table
-# Note that when checking for size folders are not taken into account and thus
-# the effective size can be up to 10% higher, also leave enough room for other requests,
-# like downloading pdf's from stats page. For those reasons I would not recommend
-# using more than 50 % of available disk space.
-MB_CRAWL_SIZE = 500
-MAX_CRAWL_SIZE = 1024 * 1024 * MB_CRAWL_SIZE       # in bytes (500MB)
-CRAWL_REPETITION_WARNING_TIME = 7                  # in days
-MAX_CRAWL_DEPTH = 5
-DEFAULT_CRAWL_URL = 'https://www.bit.admin.ch'
-VIRTUALENV_PATH = '/home/yann/bar/virtualenv/bin/celery'
-WGET_LOG_PATH = 'log/wget.txt'
 
-# CELERY TASKS
+# ----------------------------- CELERY TASKS --------------------------------------------------------------------------
 
 
 @celery.task(bind=True)                 # time_limit=MAX_CRAWLING_DURATION other possibility
@@ -91,9 +91,12 @@ def crawling_task(self, url='', post_url='', domain='',
     # Note: Consider using --wait flag, takes longer to download but less aggressive crawled server
     # https://www.gnu.org/software/wget/manual/wget.html#Recursive-Download
 
+    # Note: Using timeout is not necessary, but serves as safety, as wget should be used with caution.
+
     process = subprocess.Popen(command, cwd=WGET_DATA_PATH, stderr=subprocess.PIPE)
 
-    # Set the pid in the state
+    # Set the pid in the state in order to be able to cancel subprocess anytime
+    # Note: one could also cancel the celery task which then should kill its subprocess, but again I prefer option one
     self.update_state(state='PROGRESS', meta={'pid': process.pid, })
 
     # STEP 2: send crawl stderr through WebSocket and save in logfile
@@ -107,24 +110,27 @@ def crawling_task(self, url='', post_url='', domain='',
 
             if process.poll() is not None:
                 # Subprocess is finished
-                print("exit loop since process over.")
+                print("Crawling task has successfully terminated.")
                 break
 
             crawled_size = dir_size(WGET_DATA_PATH + "/" + domain)
             if crawled_size is not None and crawled_size > max_crawl_size:
-                # threshold reached
-                print("exit loop since threshold reached")
+                # Threshold reached
+                print("Crawling task terminated, threshold was reached")
                 break
 
-    # STEP 3: Kill the subprocess if still alive
+    # STEP 3: Kill the subprocess if still alive at this poing
     if process.poll() is None:
-        print("killing subprocess")
         os.kill(process.pid, signal.SIGTERM)
 
     # STEP 4: Return the exit code
     output = process.communicate()[0]
     exitCode = process.returncode
+
+    # STEP 5: redirect user to crawling end options.
     post(post_url, json={'event': 'redirect', 'data': {'url': '/crawling/autoend'}})
+
+    # TODO consider releasing lock here
 
     return exitCode
 
@@ -307,8 +313,7 @@ def pdf_stats(self, tabula_list, domain='', url='', crawl_total_time=0, post_url
         return 'success'
 
 
-# HELPER FUNCTION
-
+# ----------------------------- HELPER FUNCTIONS ----------------------------------------------------------------------
 # Check if user logged in
 def is_logged_in(f):
     @wraps(f)
@@ -330,17 +335,7 @@ def stream_template(template_name, **context):
     return rv
 
 
-# APP ROUTES
-
-# Used to easily emit WebSocket messages from inside tasks
-# Pattern taken from https://github.com/jwhelland/flask-socketio-celery-example/blob/master/app.py
-@app.route('/event/', methods=['POST'])
-def event():
-    data = request.json
-    if data:
-        socketio.emit(data['event'], data['data'])
-        return 'ok'
-    return 'error', 404
+# ----------------------------- APP ROUTES ----------------------------------------------------------------------------
 
 
 # Index
@@ -944,9 +939,22 @@ def hierarchy_download(cid):
 def wget_log_download():
     return send_file(WGET_LOG_PATH)
 
+# Used to easily emit WebSocket messages from inside tasks
+# Pattern taken from https://github.com/jwhelland/flask-socketio-celery-example/blob/master/app.py
+@app.route('/event/', methods=['POST'])
+def event():
+    data = request.json
+    if data:
+        socketio.emit(data['event'], data['data'])
+        return 'ok'
+    return 'error', 404
 
-# Asynchronous Communication wrappers
-# Note: these are not crucial as of yet
+
+# ----------------------------- ASYNCHRONOUS COMMUNICATION ------------------------------------------------------------
+# Note: these are not crucial at the moment,
+# though it would be nice to direct messages to clients instead of broadcasting.
+
+
 @socketio.on('connect')
 def test_connect():
     emit('my_response', {'data': 'Connected', 'count': 0})
@@ -956,6 +964,8 @@ def test_connect():
 def test_disconnect():
     print('Client disconnected', request.sid)
 
+
+# ----------------------------- RUNNING APPLICATION -------------------------------------------------------------------
 
 if __name__ == '__main__':
     socketio.run(app)
