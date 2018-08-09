@@ -76,6 +76,7 @@ CRAWL_REPETITION_WARNING_TIME = 7                  # in days
 MAX_CRAWL_DEPTH = 5
 DEFAULT_CRAWL_URL = 'https://www.bit.admin.ch'
 VIRTUALENV_PATH = '/home/yann/bar/virtualenv/bin/celery'
+WGET_LOG_PATH = '/log/wget.txt'
 
 # CELERY TASKS
 
@@ -96,7 +97,7 @@ def crawling_task(self, url='', post_url='', domain='',
     self.update_state(state='PROGRESS', meta={'pid': process.pid, })
 
     # STEP 2: send crawl stderr through WebSocket and save in logfile
-    with open("wget_log.txt", "a") as logfile:
+    with open(WGET_LOG_PATH, "a") as logfile:
         while True:
             next_line = process.stderr.readline()
             next_line = next_line.decode("utf-8")

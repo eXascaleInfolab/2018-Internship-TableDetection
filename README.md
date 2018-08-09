@@ -1,29 +1,27 @@
 ﻿# PDF Crawl App 
 
-Visit the the first deployed version here: zenosyne.ch
+Visit the the first deployed version [here](zenosyne.ch).
 
-TODO add pictures.
+![SCREENSHOT](/home/yann/bar/images/IMG1.png)
 
 ## Introduction
 
 ### Purpose
-Data has become extremely valuable, while some call it the [world's most valuable resource](https://www.economist.com/leaders/2017/05/06/the-worlds-most-valuable-resource-is-no-longer-oil-but-data), there is no doubt that with the recent surge in Machine Learning the demand and impact is extremely high. But for the data to be valuable it has to be in convenient form which sadly is not always the case. The aim of this application is to visualize how much data is hidden in PDF files instead of being stored in more convenient data formats, that would allow third parties to integrate it in their research, business and more.
- 
+Data has become extremely valuable, some going as far as calling it the [world's most valuable resource.](https://www.economist.com/leaders/2017/05/06/the-worlds-most-valuable-resource-is-no-longer-oil-but-data) There is no doubt that with the recent surge in Machine Learning the demand has become very high. But for the data to be valuable it has to be findable and stored in data formats that allow further exploitation. The aim of this application is to visualize how much data is hidden in PDF files instead of being stored in more practical data formats.
+
 ### Implementation Details
-The current App works in 3 steps:
-1.  The user enters the domain that is to be crawled. If a specific URL is given the crawler will start from there, work recursively  in a breadth-first manner from there. 
-2.  After finishing fetching the PDF or being interrupted this tool will perform table detection on the PDFs.
-3.  Finally the collected data will be displayed on the Statistics page and it will be listed on the Dashboard.
+The current application works in 3 steps:
+1.  The user enters the domain that is to be crawled. If a specific URL is given the crawler will start from there, working recursively  in a breadth-first manner from there. 
+2.  After finishing fetching the PDF files or being interrupted this tool will perform table detection on the PDFs.
+3.  Finally the collected data will be displayed on the Statistics page and will be listed on the Dashboard.
 
 ### Technologies used
-The application is written in Python 3 using the [Flask](http://flask.pocoo.org/) micro framework that is based on Werkzeug and Jinja 2. It uses [Celery](http://flask.pocoo.org/docs/1.0/patterns/celery/) as Task queue and [redis](https://redis.io/) as message broker to run the three different types of background tasks:
-1. Crawling task that uses [wget](https://www.gnu.org/software/wget/)
-2. Table detection task that is performed by [Tabula](https://tabula.technology/)
-3. Callback that saves retrieved statistics in database
+The application is written in Python 3 using the [Flask](http://flask.pocoo.org/) micro framework that is based on Werkzeug and Jinja 2. Built using the well known Bootstrap [SB Admin 2](https://startbootstrap.com/template-overviews/sb-admin-2/) theme as front-end, it uses [Celery](http://flask.pocoo.org/docs/1.0/patterns/celery/) as Task queue and [Redis](https://redis.io/) as message broker to run three different types of background tasks in the following order:
+1. A Crawling task is run using the [wget](https://www.gnu.org/software/wget/) command line tool.
+2. The Table detection tasks are performed in parallel using [Tabula](https://tabula.technology/), an open-source tool running on the JVM.
+3. A Callback will save the insights won in a [MySQL Server](https://dev.mysql.com/downloads/mysql/) database.
 
-The Crawl results and statistics for every PDF processed are stored in a [MySQL Server](https://dev.mysql.com/downloads/mysql/) database.
-
-Additionally the [Flask SocketIO](https://flask-socketio.readthedocs.io/en/latest/) plug-in is used in combination with the [eventlet](http://eventlet.net/) to communicate feedback asynchronously to the client.
+The [Flask SocketIO](https://flask-socketio.readthedocs.io/en/latest/) plug-in is used in combination with [eventlet](http://eventlet.net/) to communicate feedback asynchronously to the client.
 
 Finally the Deployment server runs on Ubuntu 16.04. It uses [Supervisor](http://supervisord.org/) to start processes at boot time,  [NGINX](https://www.nginx.com/) as reverse proxy, and [Gunicorn](http://gunicorn.org/) as HTTP server.
 
@@ -33,41 +31,36 @@ Finally the Deployment server runs on Ubuntu 16.04. It uses [Supervisor](http://
 
 This guide should work you through every step required to install this application on your own server running Ubuntu 16.04, all you need is to have shell access, everything else will be provided in this document.
 
-The approximate time to set this up is about 3 hours if you are at least somewhat familiar with Linux.
-
-### Prerequisites & Setting up Server
+### Prerequisites & Setting up the Server
 If you start with a fresh Ubuntu 16.04 server I would recommend to first follow [these steps](https://www.digitalocean.com/community/tutorials/initial-server-setup-with-ubuntu-16-04) to initialize the server and create a non-root user with sudo privileges. 
 
-TODO fire-wall
- 
+If you haven't done so already, setting your servers time zone is quite useful for the time-stamps to display meaningful information to the users.
+
+```
+$ sudo timedatectl set-timezone Europe/Zurich
+```
+
 ### Install the Components from the Ubuntu Repositories
-First you need to install the required packages.
+First, install the required packages.
 
     $ sudo apt-get update
     $ sudo apt-get install python3-pip python3-dev nginx supervisor
 
-### Other Dependencies and Set up
-If you haven't done so already, setting your servers time zone is quite useful for the time-stamps to display meaningful information to the users.
-
-    $ sudo timedatectl set-timezone Europe/Zurich
-    
-Additionally you should make sure to have the following two packages by typing
-
-    sudo apt-get install wget
-    TODO timeout?
+> If you are using Ubuntu 16.04 as recommended you will have **timeout** and **wget** installed, otherwise you might have to fetch theses packages yourself.
 
 ### Install MySQL Server
-Since some of the Python packages have MySQL server as dependency we will instart the MySQL server first.
+
+Since some of the Python packages have MySQL server as dependency we will start the MySQL server first.
 
     $ sudo apt-get install mysql-server libmysqlclient-dev
 
-You will be prompted to set a password, remember it !
+You will be prompted to set a password for the db.
 We can now create the database by typing
 
     $ mysql -u root -p 
-    
+
 Again you will be prompted to type your previously chosen password.
-Now from inside SQL you can create the database and the required tables by issuing the follwing commands:
+Now from inside SQL you can create the database and the required tables by issuing the following commands:
 
 
 ```sql
@@ -75,7 +68,7 @@ mysql> CREATE DATABASE bar;
 mysql> USE bar
 mysql> source /home/yann/bar/create_db.sql
 ```
-You can now exit mysql by typing
+We can then exit mysql again.
 ```sql
 mysql> exit
 ```
@@ -85,63 +78,61 @@ First download the JRE.
 ```
 $ sudo apt-get install default-jre
 ```
-You won't need to set JAVA_HOME environament variable for this but you can check out [this turorial](https://www.digitalocean.com/community/tutorials/how-to-install-java-with-apt-get-on-ubuntu-16-04) if you want to do so for completeness.
+You won't need to set JAVA_HOME environment variable for the application to run but you can check out [this turorial](https://www.digitalocean.com/community/tutorials/how-to-install-java-with-apt-get-on-ubuntu-16-04) if you want to do so for completeness.
 
 ### Create a Python Virtual Environment
 Next, you'll need to set up a virtual environment in order to isolate the Flask application from the other Python files on the system.
 
     $ sudo pip3 install virtualenv
 
-Now you can chose where to store the application. You can do it either under `/opt` or under you home directory. I chose the second option here, with ´/bar´ as parent directory for the application. Make sure to replace `/home/yann/bar` with the path you chose in the following sections. 
-
-> Note: There are other places where this will be important but I will
-> also annote these
+Now you can chose where to store the application. You can do it either under `/opt` or under your home directory. I chose the second option here, with `/bar` as parent directory for the application. Make sure to replace `/home/yann/bar` with the path you chose in every snippet that follows. 
 
 
     $ mkdir ~/bar
     $ cd ~/bar
-     
-     TODO mkdir log, data
 Now it's time to create the virtual environment to store the project's Python requirements.
 
     $ virtualenv virtualenv
 
-> Note: Again you are free to chose the name of your virtual environment, I will use virtualenv.
+> Note: Again you are free to chose the name of your virtual environment, I will use `virtualenv` as my virtual environments name.
 
-This will install a local copy of Python and `pip` into a directory called `myprojectenv` within your project directory.
+This will install a local copy of Python and `pip` into a directory called `virtualenv` within your project directory.
 
 Before we install applications within the virtual environment, we need to activate it. You can do so by typing:
 
     $ source virtualenv/bin/activate
 
-Your prompt will change to indicate that you are now operating within the virtual environment. It will look something like this `(virtualenv) user@host:~/bar$`.
+Your prompt will change to indicate that you are now operating within the virtual environment. It will look something like this `(virtualenv) user@host:~/bar $`.
 
 ### Set up the Application
-It is now time to clone the app from GitHub.
+It is now time to clone the application's code from GitHub.
 
     (virtualenv)$ git clone https://github.com/eXascaleInfolab/2018-Internship-TableDetection.git
 
-Now to move all files out of the new directory into the original bar directory we first copy them over and then delete the folder.
+ To move all files out of the new directory into the original bar directory we first copy them over and then delete the original folder.
 
     (virtualenv)$ cp -vaR 2018-Internship-TableDetection/. .
     (virtualenv)$ sudo rm -R 2018-Internship-TableDetection/
 
-TODO change name ?
-
-We can now install all Python dependencies by using pip again.
+We can now install all Python dependencies by using pip.
 
     (virtualenv)$ pip install -r requirements.txt
     (virtualenv)$ pip install gunicorn
 
-The second command installs the HTTP server, it is not in the requirements since a local version for instance could run on Werkzeug, the built in Flask developement server, or Eventlet by itself.
+The first command installs a multitude of dependencies such as celery, flask, flask-socketIO and many more. The second command installs the HTTP server. It is not in the requirements file since a local version of the application could run on it's own on Werkzeug, the built in Flask developement server for example, or Eventlet that only serves as message broker for our purposes but could function as production ready Web server.
 
-This should terminate without errors, otherwise you might have to install required packages manually using pip install.
+These commands should terminate without errors, otherwise you might have to install required packages manually using `pip install`.
+
+### Code changes
+
+This should be fixed soon, but for now there is a single line of code that you will have to change before running the application. In the main module called `bar.py` you will have to set the variable `VIRTUALENV_PATH` to the path to your virtual environment. 
 
 ### Set up NGINX reverse proxy and Firewall
-To add some security the traffic will be routed through NGINX. First add the config file by following the steps below.
+To add some security the traffic will be routed through NGINX. First you should create a config file.
 
     $ sudo nano /etc/nginx/sites-available/bar
-You can now copy the following text into it, then close and save.
+You can now copy the following text into it, then save and close.
+
 ```nginx
 server {
     listen 80;
@@ -176,9 +167,9 @@ server {
 }
 ```
 
-> Note: change server_name to your own domain name or IP-address.
+> Note: change server_name to your own domain name or IP-address and /home/yann/bar to your project directories path
 
-To enable the Nginx server block configuration we've just created, link the file to the `sites-enabled` directory:
+To enable the Nginx server block configuration we've just created, we link the file to the `sites-enabled` directory.
 
 ```
 $ sudo ln -s /etc/nginx/sites-available/bar /etc/nginx/sites-enabled
@@ -189,26 +180,34 @@ With the file in that directory, we can test for syntax errors by typing:
 $ sudo nginx -t
 ```
 
-If this returns without indicating any issues, we can restart the Nginx process to read the our new config:
+If this returns without indicating any issues, we can restart the Nginx process to read the our new configuration.
 
 ```
 $ sudo systemctl restart nginx
 ```
 
-If you followed the server set-up guide I linked at the beginning you will have the Firewall enabled yet, now we will only allow NGINX and SHH to pass through:
+If you followed the server set-up guide I linked at the beginning you will have the Firewall enabled already, in that case you only need to allow NGINX. If not the following commands will set up a basic Firewall.
 
 You can see all allowed services by typing:
 ```
 $ sudo ufw app list
 ```
 
-First
+You should now allow SSH and NGINX connections.
 ```
 $ sudo ufw allow 'Nginx Full'
 $ sudo ufw allow OpenSSH 
+```
+> Make sure to allow ssh, otherwise you won't be able to log back into your server !
+
+Finally you can start the Firewall.
+
+```
 $ sudo ufw enable
 ```
-Some other useful and self explanatory commands are:
+
+If you desire you can check the status. 
+
 ```
 $ sudo ufw status
 ```
@@ -216,10 +215,10 @@ $ sudo ufw status
 ### Set up Redis
 [Source](https://www.digitalocean.com/community/tutorials/how-to-install-and-configure-redis-on-ubuntu-16-04)
 
-The only other Tool that needs seperate installation is the message broker redis.
-Luckily you should be able to use the installation script from the git repo.
+The only other Tool that needs seperate installation is the message broker Redis.
+Luckily you should be able to use the installation script provided in the cloned git repository.
 
-First make sure to deactivate your virtual environment
+First make sure to deactivate your virtual environment if you haven't done so before.
 
     (virtualenv) $ deactivate
 
@@ -227,13 +226,18 @@ Then you can launch the installation script provided to you.
 
     $ ./run-redis.sh 
 
-This script will not only install but also run redis right away in the shell. You can press `Ctrl-C` to quit redis, since it will be managed by supervisor like all other services.
+This script will not only install but also run redis in the shell. You can press `Ctrl-C` to quit redis, since like all other services it will be managed by supervisor and doesn't require manual start-up.
 
 #### Redis without supervisor
 
-    ps -u yann -o pid,rss,command | grep redis
-    sudo kill -9 2801
-    redis-server --daemonize yes
+For completeness I added some the commands that where usefull to me when I used Redis without Supervisor.
+
+```
+$ redis-server --daemonize yes
+```
+
+    $ ps -u <your_username> -o pid,rss,command | grep redis
+    $ sudo kill -9 <pid>
 
 
 ### Set up Supervisor and run Services
@@ -297,7 +301,7 @@ stopsignal=QUIT
 
 ```
 
-> Note: You will have to replace /home/yann/bar by your own project directory
+> Note: As before you will have to replace /home/yann/bar by your own project directory path!
 
 
 You can now restart Supervisor to bring all service on-line.
@@ -305,39 +309,54 @@ You can now restart Supervisor to bring all service on-line.
 $ sudo supervisorctl reread all
 $ sudo supervisorctl restart all
 ```
-Check that all 4 services are running by executing:
+This will start up the flask-app that I called **bar** and the **celery**, **redis** and **flower** processes. Check that all 4 services are running by executing:
 ```
 $ sudo supervisorctl status 
 ```
 If you forgot to adapt the paths to your project directory or made any other changes you might have to reload first.
 
     $ sudo supervisorctl reload
-    
+
 Other usefull commands for Supervisor are
 
-    $ sudo supervisorctl status, reload, start, stop bar
-
-### Other
-The following might be necessary
-```
-$ touch /home/yann/bar/wget_log.txt
-$ chmod 777 /home/yann/bar/wget_log.txt
-$ mkdir /home/yann/bar/data/
-$ chmod 777 /home/yann/bar/data/
-``` 
-change virtualenv for purge command under /terminate
+    $ sudo supervisorctl status, start <service>, stop <service>
 
 ### Flower 
+
+[Flower](http://flower.readthedocs.io/en/latest/) is a web based tool for monitoring and administrating [Celery](http://celeryproject.org) clusters. It will allow you to see how busy the server is and check what tasks are currently running, how long they took to complete and much more. It was installed through pip already, so now all you need to do is set up an htpasswd file. This basic access control is important to protect Flower from unwanted access if your app runs on the Internet. 
 
     $ sudo apt install apache2-utils
     $ sudo htpasswd -c /etc/nginx/.htpasswd admin
 
-you will be promted to choose a password
+This sets *admin* as username, but you can choose any username you want of course, you will then be promted to choose a password.
+
+> Note: this step is crucial to access Flower, since in the NGINX config file the last two lines require authentication. You can remove the authentication entirely by removing those two lines.
+
+You can now access the Flower task monitoring interface by going to <server-IP-or-domain>/flower or under the Advanced tab of the application.
+
+### Final touches - Creating log and data directories
+
+To log the Crawler output you should create a log file, and allow a non sudo user to alter it.
+
+```
+$ mkdir /home/yann/bar/log && touch /home/yann/bar/log/wget.txt
+$ chmod 777 /home/yann/bar/wget.txt
+```
+
+The temporarily stored crawled data will be located in the /data directory. You should create and allow access to it.
+
+```
+$ mkdir /home/yann/bar/data/
+$ chmod 777 /home/yann/bar/data/
+```
 
 ### Warning
-The aformentionned installements and configurations are the minimal configurations to get the server up and running. You might want to configure further for more safety.
+The aforementioned configurations are the minimal configurations to get the server up and running. You might want to configure further for more safety and stability
+
+
 
 ## Adding domain name
+
 Adding a domain name to point to your server is extremely simple. There is esentially only two steps. First you must purchase a domain name from a registrar (I chose Hostpoint). Then you need to choose a DNS host
 ing service, most of the registrars offer this for free, but I chose to go with DigitalOcean's DNS hosting. It is also free and extremly easy and convenient to set up. All you need to do is to choose which hostname redirects to which IP address, thus setting up the DNS records and you are good to go.
 
@@ -352,5 +371,13 @@ https://www.digitalocean.com/community/tutorials/initial-server-setup-with-ubunt
 
 
 ## Further work
-## Acknowledgements
-If you wonder where Zenosyne comes from check out the Dictionnary of Obscure sorrows: 
+- Adding SSL encryption
+- Deploy application on Docker
+- Allow multiple simultaneous users
+- Improve Table Detection speed and accuracy by training a Neural Net
+
+
+
+## Miscellaneous
+
+If you wonder where the word Zenosyne comes from check out the Dictionnary of Obscure sorrows on Youtube.
