@@ -181,7 +181,7 @@ server {
 To enable the Nginx server block configuration we've just created, link the file to the `sites-enabled` directory:
 
 ```
-$ sudo ln -s /etc/nginx/sites-available/myproject /etc/nginx/sites-enabled
+$ sudo ln -s /etc/nginx/sites-available/bar /etc/nginx/sites-enabled
 ```
 With the file in that directory, we can test for syntax errors by typing:
 
@@ -320,8 +320,10 @@ Other usefull commands for Supervisor are
 ### Other
 The following might be necessary
 ```
-$ chmod 777 wget_log.txt
-$ chmod 777 data/
+$ touch /home/yann/bar/wget_log.txt
+$ chmod 777 /home/yann/bar/wget_log.txt
+$ mkdir /home/yann/bar/data/
+$ chmod 777 /home/yann/bar/data/
 ``` 
 change virtualenv for purge command under /terminate
 
@@ -334,6 +336,14 @@ you will be promted to choose a password
 
 ### Warning
 The aformentionned installements and configurations are the minimal configurations to get the server up and running. You might want to configure further for more safety.
+
+## Adding domain name
+Adding a domain name to point to your server is extremely simple. There is esentially only two steps. First you must purchase a domain name from a registrar (I chose Hostpoint). Then you need to choose a DNS host
+ing service, most of the registrars offer this for free, but I chose to go with DigitalOcean's DNS hosting. It is also free and extremly easy and convenient to set up. All you need to do is to choose which hostname redirects to which IP address, thus setting up the DNS records and you are good to go.
+
+> Note: you might have to change your nginx settings, you can simply change the server_name line from the IP-address to the newly purchased domain name.
+
+TODO add picture
 
 ## Sources
 The present guide was adapted from these resources:
