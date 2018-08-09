@@ -942,7 +942,7 @@ def hierarchy_download(cid):
 @app.route('/wget_log')
 @is_logged_in
 def wget_log_download():
-    return send_file("wget_log.txt")
+    return send_file(WGET_LOG_PATH)
 
 
 # Asynchronous Communication wrappers

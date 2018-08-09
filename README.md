@@ -9,13 +9,18 @@ Visit the the first deployed version [here](zenosyne.ch).
 ### Purpose
 Data has become extremely valuable, some going as far as calling it the [world's most valuable resource.](https://www.economist.com/leaders/2017/05/06/the-worlds-most-valuable-resource-is-no-longer-oil-but-data) There is no doubt that with the recent surge in Machine Learning the demand has become very high. But for the data to be valuable it has to be findable and stored in data formats that allow further exploitation. The aim of this application is to visualize how much data is hidden in PDF files instead of being stored in more practical data formats.
 
-### Implementation Details
+### How to use the application
 The current application works in 3 steps:
 1.  The user enters the domain that is to be crawled. If a specific URL is given the crawler will start from there, working recursively  in a breadth-first manner from there. 
 2.  After finishing fetching the PDF files or being interrupted this tool will perform table detection on the PDFs.
 3.  Finally the collected data will be displayed on the Statistics page and will be listed on the Dashboard.
 
+### Implementation Details
+
+- There is a simple Registration and Login system in place 
+
 ### Technologies used
+
 The application is written in Python 3 using the [Flask](http://flask.pocoo.org/) micro framework that is based on Werkzeug and Jinja 2. Built using the well known Bootstrap [SB Admin 2](https://startbootstrap.com/template-overviews/sb-admin-2/) theme as front-end, it uses [Celery](http://flask.pocoo.org/docs/1.0/patterns/celery/) as Task queue and [Redis](https://redis.io/) as message broker to run three different types of background tasks in the following order:
 1. A Crawling task is run using the [wget](https://www.gnu.org/software/wget/) command line tool.
 2. The Table detection tasks are performed in parallel using [Tabula](https://tabula.technology/), an open-source tool running on the JVM.
@@ -29,7 +34,11 @@ Finally the Deployment server runs on Ubuntu 16.04. It uses [Supervisor](http://
 
 ## Deployement
 
-This guide should work you through every step required to install this application on your own server running Ubuntu 16.04, all you need is to have shell access, everything else will be provided in this document.
+This guide should work you through every step required to install this application on your own server running Ubuntu 16.04, all you need is to have shell access, everything else will be provided in this document. 
+
+I used the 5$/month Digital Ocean droplet that comes with 1GB memory, 25GB disk and a single core CPU. This is perfectly sufficient for demonstration purposes but probably too slow to perform table detection on large datasets. You will find more about execution speed in the Performance section at the end of this document.
+
+![IMG3](/home/yann/bar/images/IMG3.png)
 
 ### Prerequisites & Setting up the Server
 If you start with a fresh Ubuntu 16.04 server I would recommend to first follow [these steps](https://www.digitalocean.com/community/tutorials/initial-server-setup-with-ubuntu-16-04) to initialize the server and create a non-root user with sudo privileges. 
@@ -72,7 +81,7 @@ We can then exit mysql again.
 ```sql
 mysql> exit
 ```
-### Install JAVA
+### Install Java
 
 First download the JRE.
 ```
@@ -213,8 +222,6 @@ $ sudo ufw status
 ```
 
 ### Set up Redis
-[Source](https://www.digitalocean.com/community/tutorials/how-to-install-and-configure-redis-on-ubuntu-16-04)
-
 The only other Tool that needs seperate installation is the message broker Redis.
 Luckily you should be able to use the installation script provided in the cloned git repository.
 
@@ -323,7 +330,7 @@ Other usefull commands for Supervisor are
 
 ### Flower 
 
-[Flower](http://flower.readthedocs.io/en/latest/) is a web based tool for monitoring and administrating [Celery](http://celeryproject.org) clusters. It will allow you to see how busy the server is and check what tasks are currently running, how long they took to complete and much more. It was installed through pip already, so now all you need to do is set up an htpasswd file. This basic access control is important to protect Flower from unwanted access if your app runs on the Internet. 
+![IMG4](/home/yann/bar/images/IMG4.png)[Flower](http://flower.readthedocs.io/en/latest/) is a web based tool for monitoring and administrating [Celery](http://celeryproject.org) clusters. It will allow you to see how busy the server is and check what tasks are currently running, how long they took to complete and much more. It was installed through pip already, so now all you need to do is set up an htpasswd file. This basic access control is important to protect Flower from unwanted access if your app runs on the Internet. 
 
     $ sudo apt install apache2-utils
     $ sudo htpasswd -c /etc/nginx/.htpasswd admin
@@ -350,7 +357,14 @@ $ mkdir /home/yann/bar/data/
 $ chmod 777 /home/yann/bar/data/
 ```
 
+### Access Control
+
+In the current version everyone is allowed to register and set up and account. You could restrict the application to a small set of users easily by removing the possibility to register freely. 
+
+Currently the Dashboard and Statistics are open to every visitor of the website, only the crawling and table detection process as well as the deletion and other irreversible actions are restricted to logged in users.
+
 ### Warning
+
 The aforementioned configurations are the minimal configurations to get the server up and running. You might want to configure further for more safety and stability
 
 
@@ -362,15 +376,16 @@ ing service, most of the registrars offer this for free, but I chose to go with 
 
 > Note: you might have to change your nginx settings, you can simply change the server_name line from the IP-address to the newly purchased domain name.
 
-TODO add picture
+![DigitalOcean as DNS host](/home/yann/bar/images/IMG2.png)
 
-## Sources
-The present guide was adapted from these resources:
-https://www.digitalocean.com/community/tutorials/initial-server-setup-with-ubuntu-16-04
-https://www.digitalocean.com/community/tutorials/initial-server-setup-with-ubuntu-16-04
+## Performance Evaluation
+
+Todo: Add my Jupyter notebook results from benchmarking.
+
 
 
 ## Further work
+
 - Adding SSL encryption
 - Deploy application on Docker
 - Allow multiple simultaneous users
@@ -378,6 +393,18 @@ https://www.digitalocean.com/community/tutorials/initial-server-setup-with-ubunt
 
 
 
-## Miscellaneous
+## Advanced Details
 
-If you wonder where the word Zenosyne comes from check out the Dictionnary of Obscure sorrows on Youtube.
+- Celery can use multiple workers on different machines, with each worker taking advantage of multi-core systems. The table detection step can thus be accelerated by more powerful hardware.
+- When using Gunicorn you can only use one eventlet worker process. 
+
+## Sources
+
+[ Deploy flask app with nginx using gunicorn and supervisor]: https://medium.com/ymedialabs-innovation/deploy-flask-app-with-nginx-using-gunicorn-and-supervisor-d7a93aa07c18
+[How To Serve Flask Applications with Gunicorn and Nginx on Ubuntu 16.04]: https://www.digitalocean.com/community/tutorials/how-to-serve-flask-applications-with-gunicorn-and-nginx-on-ubuntu-16-04
+[Deploying a Flask Site Using NGINX Gunicorn, Supervisor and Virtualenv on Ubuntu]: http://alexandersimoes.com/hints/2015/10/28/deploying-flask-with-nginx-gunicorn-supervisor-virtualenv-on-ubuntu.html
+[The Flask Mega-Tutorial Part XVII: Deployment on Linux]: https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-xvii-deployment-on-linux
+[Using Celery With Flask]: https://blog.miguelgrinberg.com/post/using-celery-with-flask
+[Asynchronous updates to a webpage with Flask and Socket.io]: https://www.shanelynn.ie/asynchronous-updates-to-a-webpage-with-flask-and-socket-io/
+[How To Install and Configure Redis on Ubuntu 16.04]: https://www.digitalocean.com/community/tutorials/how-to-install-and-configure-redis-on-ubuntu-16-04
+[Domains and DNS]: https://www.digitalocean.com/docs/networking/dns/
