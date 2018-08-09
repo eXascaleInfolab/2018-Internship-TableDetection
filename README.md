@@ -17,7 +17,10 @@ The current application works in 3 steps:
 
 ### Implementation Details
 
-- There is a simple Registration and Login system in place 
+- There is a simple Registration and Login system in place. Currently everyone can register and use this tool.
+- There is a Lock to prevent multiple users to start queries at the same time. Only one query can run at the same time, other users will have to wait until the query terminates.
+- The table detection only starts if the Crawling tab is kept open, or table detection is started manually.
+- Once table detection is started it will finish even if the tab is closed.
 
 ### Technologies used
 
@@ -36,7 +39,7 @@ Finally the Deployment server runs on Ubuntu 16.04. It uses [Supervisor](http://
 
 This guide should work you through every step required to install this application on your own server running Ubuntu 16.04, all you need is to have shell access, everything else will be provided in this document. 
 
-I used the 5$/month Digital Ocean droplet that comes with 1GB memory, 25GB disk and a single core CPU. This is perfectly sufficient for demonstration purposes but probably too slow to perform table detection on large datasets. You will find more about execution speed in the Performance section at the end of this document.
+I used the 5$/month Digital Ocean droplet option that comes with 1GB memory, 25GB disk space and a single core CPU. This is perfectly sufficient for demonstration purposes but probably too slow to perform table detection on large datasets. You will find more about execution speed in the Performance section at the end of this document.
 
 ![IMG3](/home/yann/bar/images/IMG3.png)
 
@@ -55,32 +58,8 @@ First, install the required packages.
     $ sudo apt-get update
     $ sudo apt-get install python3-pip python3-dev nginx supervisor
 
-> If you are using Ubuntu 16.04 as recommended you will have **timeout** and **wget** installed, otherwise you might have to fetch theses packages yourself.
+> If you are using Ubuntu 16.04 as recommended you will have **timeout** and **wget** already installed, otherwise you might have to fetch theses packages yourself.
 
-### Install MySQL Server
-
-Since some of the Python packages have MySQL server as dependency we will start the MySQL server first.
-
-    $ sudo apt-get install mysql-server libmysqlclient-dev
-
-You will be prompted to set a password for the db.
-We can now create the database by typing
-
-    $ mysql -u root -p 
-
-Again you will be prompted to type your previously chosen password.
-Now from inside SQL you can create the database and the required tables by issuing the following commands:
-
-
-```sql
-mysql> CREATE DATABASE bar;
-mysql> USE bar
-mysql> source /home/yann/bar/create_db.sql
-```
-We can then exit mysql again.
-```sql
-mysql> exit
-```
 ### Install Java
 
 First download the JRE.
@@ -113,7 +92,7 @@ Before we install applications within the virtual environment, we need to activa
 
 Your prompt will change to indicate that you are now operating within the virtual environment. It will look something like this `(virtualenv) user@host:~/bar $`.
 
-### Set up the Application
+### Clone the Application
 It is now time to clone the application's code from GitHub.
 
     (virtualenv)$ git clone https://github.com/eXascaleInfolab/2018-Internship-TableDetection.git
@@ -123,20 +102,51 @@ It is now time to clone the application's code from GitHub.
     (virtualenv)$ cp -vaR 2018-Internship-TableDetection/. .
     (virtualenv)$ sudo rm -R 2018-Internship-TableDetection/
 
+### Install MySQL Server
+
+Since some of the Python packages have MySQL server as dependency we will start the MySQL server first.
+
+```
+(virtualenv)$ sudo apt-get install mysql-server libmysqlclient-dev
+```
+
+You will be prompted to set a password for the db. We can now access the database by typing:
+
+```
+(virtualenv)$ mysql -u root -p 
+```
+
+Again you will be prompted to type your previously chosen password.
+Now from inside SQL you can create the database and the required tables by issuing the following commands:
+
+```sql
+mysql> CREATE DATABASE bar;
+mysql> USE bar
+mysql> source /home/yann/bar/create_db.sql
+```
+
+We can then exit mysql again.
+
+```sql
+mysql> exit
+```
+
+### Install Python Dependencies
+
 We can now install all Python dependencies by using pip.
 
     (virtualenv)$ pip install -r requirements.txt
     (virtualenv)$ pip install gunicorn
 
-The first command installs a multitude of dependencies such as celery, flask, flask-socketIO and many more. The second command installs the HTTP server. It is not in the requirements file since a local version of the application could run on it's own on Werkzeug, the built in Flask developement server for example, or Eventlet that only serves as message broker for our purposes but could function as production ready Web server.
+The first command installs a multitude of dependencies such as celery, flask, flask-socketIO and many more. The second command installs the HTTP server. It is not in the requirements file since a local version of the application could run on it's own using Werkzeug, the built in Flask developement server for example, or Eventlet is by itself a production ready Web server.
 
-These commands should terminate without errors, otherwise you might have to install required packages manually using `pip install`.
+These commands should terminate without errors, otherwise you might have to install required packages manually using `pip install` which would be extremely inconvenient.
 
 ### Code changes
 
 This should be fixed soon, but for now there is a single line of code that you will have to change before running the application. In the main module called `bar.py` you will have to set the variable `VIRTUALENV_PATH` to the path to your virtual environment. 
 
-### Set up NGINX reverse proxy and Firewall
+### NGINX reverse proxy and Firewall set up
 To add some security the traffic will be routed through NGINX. First you should create a config file.
 
     $ sudo nano /etc/nginx/sites-available/bar
@@ -145,7 +155,7 @@ You can now copy the following text into it, then save and close.
 ```nginx
 server {
     listen 80;
-    server_name zenosyne.ch;
+    server_name zenosyne.ch, 138.68.102.72; #add your server IP, domain or both here.
 
     location / {
         include proxy_params;
@@ -162,6 +172,7 @@ server {
     }
 
     location /flower/static {
+        # Change this path to your virtual environment
         alias /home/yann/bar/virtualenv/lib/python3.5/site-packages/flower/static;
     }
 
@@ -178,7 +189,7 @@ server {
 
 > Note: change server_name to your own domain name or IP-address and /home/yann/bar to your project directories path
 
-To enable the Nginx server block configuration we've just created, we link the file to the `sites-enabled` directory.
+To enable the NGINX server block configuration we've just created, we link the file to the `sites-enabled` directory.
 
 ```
 $ sudo ln -s /etc/nginx/sites-available/bar /etc/nginx/sites-enabled
@@ -189,13 +200,13 @@ With the file in that directory, we can test for syntax errors by typing:
 $ sudo nginx -t
 ```
 
-If this returns without indicating any issues, we can restart the Nginx process to read the our new configuration.
+If this returns without indicating any issues, we can restart the Nginx process to read our new configuration.
 
 ```
 $ sudo systemctl restart nginx
 ```
 
-If you followed the server set-up guide I linked at the beginning you will have the Firewall enabled already, in that case you only need to allow NGINX. If not the following commands will set up a basic Firewall.
+If you followed the server set-up guide I linked at the beginning you will have the Firewall enabled already, in that case you only need to allow NGINX. If not, the following commands will set up a basic Firewall.
 
 You can see all allowed services by typing:
 ```
@@ -221,7 +232,7 @@ If you desire you can check the status.
 $ sudo ufw status
 ```
 
-### Set up Redis
+### Redis
 The only other Tool that needs seperate installation is the message broker Redis.
 Luckily you should be able to use the installation script provided in the cloned git repository.
 
@@ -235,9 +246,9 @@ Then you can launch the installation script provided to you.
 
 This script will not only install but also run redis in the shell. You can press `Ctrl-C` to quit redis, since like all other services it will be managed by supervisor and doesn't require manual start-up.
 
-#### Redis without supervisor
+#### [Deprecated] Redis without supervisor
 
-For completeness I added some the commands that where usefull to me when I used Redis without Supervisor.
+For completeness I added some the commands that where useful to me when I used Redis without Supervisor.
 
 ```
 $ redis-server --daemonize yes
@@ -247,13 +258,13 @@ $ redis-server --daemonize yes
     $ sudo kill -9 <pid>
 
 
-### Set up Supervisor and run Services
+### Set up Supervisor and start application
 Finally you can now configure Supervisor that will be in charge of running and restarting all services when the system reboots for example.
 
 ```
 $ sudo nano /etc/supervisor/conf.d/bar.conf
 ```
-You can now copy the entire following text inside this config file.
+You can now copy the entire following text inside this configuration file.
 ```supervisor
 [program:bar]
 directory=/home/yann/bar
@@ -284,7 +295,6 @@ stopwaitsecs = 600
 stopasgroup=true
 
 ; Set Celery priority higher than default (999)
-; so, if rabbitmq is supervised, it will start first.
 priority=1000
 
 [program:redis]
@@ -295,7 +305,6 @@ user=root
 stdout_logfile=/home/yann/bar/log/redis.log
 stderr_logfile=/home/yann/bar/log/redis.log
 stopsignal=QUIT
-
 
 [program:flower]
 directory = /home/yann/bar/
@@ -316,7 +325,7 @@ You can now restart Supervisor to bring all service on-line.
 $ sudo supervisorctl reread all
 $ sudo supervisorctl restart all
 ```
-This will start up the flask-app that I called **bar** and the **celery**, **redis** and **flower** processes. Check that all 4 services are running by executing:
+This will start up the flask-app that I called **bar** and the **celery**, **redis** and **flower** processes. Check that all four services are running by executing:
 ```
 $ sudo supervisorctl status 
 ```
@@ -328,22 +337,22 @@ Other usefull commands for Supervisor are
 
     $ sudo supervisorctl status, start <service>, stop <service>
 
-### Flower 
+### Authentication for Flower 
 
-![IMG4](/home/yann/bar/images/IMG4.png)[Flower](http://flower.readthedocs.io/en/latest/) is a web based tool for monitoring and administrating [Celery](http://celeryproject.org) clusters. It will allow you to see how busy the server is and check what tasks are currently running, how long they took to complete and much more. It was installed through pip already, so now all you need to do is set up an htpasswd file. This basic access control is important to protect Flower from unwanted access if your app runs on the Internet. 
+![IMG4](/home/yann/bar/images/IMG4.png)[Flower](http://flower.readthedocs.io/en/latest/) is a web based tool for monitoring and administrating [Celery](http://celeryproject.org) clusters. It will allow you to see how busy the server is and check what tasks are currently running, how long they took to complete and much more. It was installed through pip already, so now all you need to do is set up an htpasswd file. This basic access control is important to protect Flower from unwanted access if your application runs on the Internet. 
 
     $ sudo apt install apache2-utils
     $ sudo htpasswd -c /etc/nginx/.htpasswd admin
 
-This sets *admin* as username, but you can choose any username you want of course, you will then be promted to choose a password.
+This sets *admin* as username, but you can choose any username you want of course, you will then be prompted to choose a password.
 
 > Note: this step is crucial to access Flower, since in the NGINX config file the last two lines require authentication. You can remove the authentication entirely by removing those two lines.
 
 You can now access the Flower task monitoring interface by going to <server-IP-or-domain>/flower or under the Advanced tab of the application.
 
-### Final touches - Creating log and data directories
+### Final touches: Creating log and data directories
 
-To log the Crawler output you should create a log file, and allow a non sudo user to alter it.
+To log the Crawler output you should create a log file, and allow a non-sudo user to alter it.
 
 ```
 $ mkdir /home/yann/bar/log && touch /home/yann/bar/log/wget.txt
@@ -359,20 +368,19 @@ $ chmod 777 /home/yann/bar/data/
 
 ### Access Control
 
-In the current version everyone is allowed to register and set up and account. You could restrict the application to a small set of users easily by removing the possibility to register freely. 
+In the current version everyone is allowed to register and set up an account. You could restrict the application to a small set of users easily by removing the possibility to register freely. 
 
-Currently the Dashboard and Statistics are open to every visitor of the website, only the crawling and table detection process as well as the deletion and other irreversible actions are restricted to logged in users.
+Currently the Dashboard and Statistics are open to every visitor of the website, while the crawling and table detection process as well as the deletion and other irreversible actions are restricted to authenticated users.
 
 ### Warning
 
-The aforementioned configurations are the minimal configurations to get the server up and running. You might want to configure further for more safety and stability
+The aforementioned configurations are the minimal configurations to get the server up and running. You might want to configure further for more safety and stability if this is a concern for you.
 
 
 
-## Adding domain name
+## [Optional] Adding domain name
 
-Adding a domain name to point to your server is extremely simple. There is esentially only two steps. First you must purchase a domain name from a registrar (I chose Hostpoint). Then you need to choose a DNS host
-ing service, most of the registrars offer this for free, but I chose to go with DigitalOcean's DNS hosting. It is also free and extremly easy and convenient to set up. All you need to do is to choose which hostname redirects to which IP address, thus setting up the DNS records and you are good to go.
+Adding a domain name to point to your server is extremely simple. There is essentially only two steps. First you must purchase a domain name from a registrar (I chose Hostpoint). Then you need to choose a DNS hosting service. While most of the registrars offer this for free, I chose to go with DigitalOcean's DNS hosting. It is also free and extremely easy and convenient to set up. All you need to do is to choose which host name redirects to which IP-address, thus setting up the DNS records and you are good to go.
 
 > Note: you might have to change your nginx settings, you can simply change the server_name line from the IP-address to the newly purchased domain name.
 
@@ -380,23 +388,29 @@ ing service, most of the registrars offer this for free, but I chose to go with 
 
 ## Performance Evaluation
 
-Todo: Add my Jupyter notebook results from benchmarking.
+I plan to add some Benchmarking results here, to get an idea of how fast a query should terminate.
 
+In general a single page will take between 0.1 and 1 second of processing time depending on the amount of lines and tables present. Additionally for each PDF file there is some constant overhead. I have observed that datasets of 100 PDFs take between 10 to 120 minutes processing time on a single core CPU.
 
+Of course since we are using Celery we could take full advantage of a multi-core architecture to further speed up the table-detection tasks.
 
 ## Further work
 
-- Adding SSL encryption
-- Deploy application on Docker
-- Allow multiple simultaneous users
-- Improve Table Detection speed and accuracy by training a Neural Net
+- [ ] Adding SSL encryption
+- [ ] Deploy application on Docker
+- [ ] Allow multiple simultaneous users
+- [ ] Improve Table Detection speed and accuracy by training a Neural Net
+- [ ] More options to have control over more variables in the Advanced tab
+- [ ] Better logging
 
 
 
-## Advanced Details
+## Advanced Comments
 
 - Celery can use multiple workers on different machines, with each worker taking advantage of multi-core systems. The table detection step can thus be accelerated by more powerful hardware.
-- When using Gunicorn you can only use one eventlet worker process. 
+- When using Gunicorn you can only use one eventlet worker process, which does not matter for this application.
+
+
 
 ## Sources
 

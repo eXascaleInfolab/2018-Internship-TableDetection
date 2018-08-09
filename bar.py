@@ -76,7 +76,7 @@ CRAWL_REPETITION_WARNING_TIME = 7                  # in days
 MAX_CRAWL_DEPTH = 5
 DEFAULT_CRAWL_URL = 'https://www.bit.admin.ch'
 VIRTUALENV_PATH = '/home/yann/bar/virtualenv/bin/celery'
-WGET_LOG_PATH = '/log/wget.txt'
+WGET_LOG_PATH = 'log/wget.txt'
 
 # CELERY TASKS
 
