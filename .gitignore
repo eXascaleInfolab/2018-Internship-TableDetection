@@ -10,3 +10,4 @@ virtualenv/
 log/*
 redis-stable/
 wget_log.txt
+index.html
