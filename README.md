@@ -1,6 +1,6 @@
 ﻿# PDF Crawl App 
 
-Visit the the first deployed version [here](zenosyne.ch).
+Visit the the first deployed version [here](http://www.zenosyne.ch).
 
 ![SCREENSHOT](images/IMG1.png)
 

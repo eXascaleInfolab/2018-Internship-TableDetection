@@ -17,19 +17,11 @@
 {% endblock %}
 
 {% block body %}
+
 <h1>Dashboard <small> Welcome {{session.username}}</small></h1>
 <a class="btn btn-success" href="/"> Re-run crawler</a>
 <hr>
 
-<!-- Nav tabs -->
-<ul class="nav nav-tabs">
-    <li class="active"><a href="#previous" data-toggle="tab">Previous Crawls</a>
-    </li>
-    <li><a href="#overall" data-toggle="tab">Overall Crawl Statistics</a>
-    </li>
-</ul>
-
-<!-- Tab panes -->
 <div class="tab-content">
     <div class="tab-pane fade in active" id="previous">
 
@@ -98,7 +90,9 @@
 
 
     </div>
-    <div class="tab-pane fade" id="overall">
+
+    <!-- Option to add more statistics -> idea abandonned -->
+    <div class="tab-pane fade" style="display: none" id="overall">
         <div class="row">
             <br>
             <div class="col-lg-4">
@@ -175,8 +169,7 @@
             </div>
         </div>
     </div>
-    <div class="tab-pane fade" id="geo">
-    </div>
+    <div class="tab-pane fade" id="geo"></div>
 </div>
 
 

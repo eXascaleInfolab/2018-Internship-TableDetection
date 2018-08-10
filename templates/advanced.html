@@ -12,7 +12,8 @@
                     Clear Database
                 </div>
                 <div class="panel-body">
-                    <p>This allows you to clear all data from the database, except for User login data.</p>
+                    <p>This allows you to clear all data from the database, except for User login data. </p>
+                    <p>This means that previously saved statistics for individual pdf will be recomputed. </p>
                 </div>
                 <div class="panel-footer">
                     <a type="button" href={{url_for('empty_tables')}} class="btn btn-outline btn-danger btn-sm"><i class="fa  fa-gears "></i> Empty All Tables </a>
@@ -34,19 +35,38 @@
                 </div>
             </div>
         </div>
+        <div class="col-lg-4">
+            <div class="panel panel-success">
+                <div class="panel-heading">
+                    Flower - Celery Monitoring Tool
+                </div>
+                <div class="panel-body">
+                    <p>Use this tool to check progress of your queries if you closed the tab or something else went wrong. </p>
+                    <p>You can also see if someone else is using resources and have access to some more statistics. </p>
+                    <p>Note that you will need potentially different log-in credentials than for this application.</p>
+                </div>
+                <div class="panel-footer">
+                    <a type="button" href='/flower' class="btn btn-outline btn-success btn-sm"><i class="fa  fa-external-link "></i>Access Flower</a>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="row">
         <div class="col-lg-4">
             <div class="panel panel-info">
                 <div class="panel-heading">
-                    Download the url of every crawled file.
+                    Download Application Logs.
                 </div>
                 <div class="panel-body">
-                    <p>Not done yet.</p>
+                    <p>The stdout and stderr output of the different services are stored in a log which can be downloaded here.</p>
                 </div>
                 <div class="panel-footer">
-                   <button type="button" onclick="" class="btn btn-outline btn-primary btn-sm"><i class="fa  fa-download "></i> Download</button>
+                    <button type="button" onclick="" class="btn btn-outline btn-primary btn-sm"><i class="fa  fa-download "></i> stdout </button>
+                    <button type="button" onclick="" class="btn btn-outline btn-danger btn-sm"><i class="fa  fa-download "></i> stderr </button>
+                    <button type="button" onclick="" class="btn btn-outline btn-success btn-sm"><i class="fa  fa-download "></i> Celery </button>
+                    <button type="button" onclick="" class="btn btn-outline btn-info btn-sm"><i class="fa  fa-download "></i> Redis </button>
+                    <button type="button" onclick="" class="btn btn-outline btn-warning btn-sm"><i class="fa  fa-download "></i> Flower </button>
                 </div>
             </div>
         </div>
@@ -60,6 +80,7 @@
                 </div>
                 <div class="panel-footer">
                     <a type="button" href={{url_for('wget_log_download')}} class="btn btn-outline btn-primary btn-sm"><i class="fa  fa-download "></i> Download </a>
+                    <a type="button" href="" class="btn btn-outline btn-primary btn-sm"><i class="fa  fa-gear "></i> Empty Log </a>
                 </div>
             </div>
         </div>
