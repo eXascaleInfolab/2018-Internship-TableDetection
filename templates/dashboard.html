@@ -1,5 +1,21 @@
 {% extends 'layout.html' %}
 
+ {% block headerscripts %}
+<!-- DataTables CSS -->
+<link href="../static/vendor/datatables-plugins/dataTables.bootstrap.css" rel="stylesheet">
+
+<!-- DataTables Responsive CSS -->
+<link href="../static/vendor/datatables-responsive/dataTables.responsive.css" rel="stylesheet">
+
+<!-- Hide Vertical line -->
+<style>
+  .myGrid .webix_cell{
+  border-right:0 none !important;
+  }
+</style>
+
+{% endblock %}
+
 {% block body %}
 <h1>Dashboard <small> Welcome {{session.username}}</small></h1>
 <a class="btn btn-success" href="/"> Re-run crawler</a>
@@ -16,67 +32,71 @@
 <!-- Tab panes -->
 <div class="tab-content">
     <div class="tab-pane fade in active" id="previous">
-        <table class="table table-striped">
-            <tr>
-              <th>Crawl-ID</th>
-              <th>Date</th>
-              <th>Domain</th>
-              <th>URL</th>
-              <th>PDF found</th>
-              <th>PDF processed</th>
-              <th></th>
-              <th></th>
-            </tr>
-            {% for crawl in crawls %}
-              <tr>
-                <td>{{crawl.cid}}</td>
-                <td>{{crawl.crawl_date}}</td>
-                <td>{{crawl.domain}}</td>
-                <td>{{crawl.url}}</td>
-                <td>{{crawl.pdf_crawled}}</td>
-                <td>{{crawl.pdf_processed}}</td>
-                <td><a href="{{url_for('cid_statistics', cid=crawl.cid)}}" class="btn btn-primary pull-right">View Stats</a></td>
-                <td>
-                    <!-- Button trigger modal -->
-                    <button class="btn btn-danger" data-toggle="modal" data-target="#modal{{crawl.cid}}">
-                        Delete
-                    </button>
-                    <!-- Modal -->
-                    <div class="modal fade" id="modal{{crawl.cid}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                                    <h4 class="modal-title" id="myModalLabel">Confirm Delete</h4>
+
+        <table width="100%" class="table table-striped table-border table-hover" id="dataTables-example">
+            <thead>
+                <tr>
+                    <th>Crawl-ID</th>
+                    <th>Date</th>
+                    <th>Domain</th>
+                    <th>URL</th>
+                    <th>PDF found</th>
+                    <th>PDF processed</th>
+                    <th></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for crawl in crawls %}
+                  <tr>
+                    <td>{{crawl.cid}}</td>
+                    <td>{{crawl.crawl_date}}</td>
+                    <td>{{crawl.domain}}</td>
+                    <td>{{crawl.url}}</td>
+                    <td>{{crawl.pdf_crawled}}</td>
+                    <td>{{crawl.pdf_processed}}</td>
+                    <td><a href="{{url_for('cid_statistics', cid=crawl.cid)}}" class="btn btn-primary">View Stats</a></td>
+                    <td>
+                        <!-- Button trigger modal -->
+                        <button class="btn btn-danger" data-toggle="modal" data-target="#modal{{crawl.cid}}">
+                            Delete
+                        </button>
+                        <!-- Modal -->
+                        <div class="modal fade" id="modal{{crawl.cid}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                        <h4 class="modal-title" id="myModalLabel">Confirm Delete</h4>
+                                    </div>
+                                    <div class="modal-body">
+                                        You are about to delete the statistics of this Crawl, this procedure is irreversible. Do you want to proceed?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <table>
+                                            <tr>
+                                                <td> <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button></td>
+                                                <td> <form action="{{url_for('delete_crawl')}}" method="POST">
+                                                        <input type="hidden" name="cid" value="{{crawl.cid}}">
+                                                        <input type="submit" value="Delete" class="btn btn-danger">
+                                                    </form>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </div>
                                 </div>
-                                <div class="modal-body">
-                                    You are about to delete the statistics of this Crawl, this procedure is irreversible. Do you want to proceed?
-                                </div>
-                                <div class="modal-footer">
-                                    <table>
-                                        <tr>
-                                            <td> <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button></td>
-                                            <td> <form action="{{url_for('delete_crawl')}}" method="POST">
-                                                    <input type="hidden" name="cid" value="{{crawl.cid}}">
-                                                    <input type="submit" value="Delete" class="btn btn-danger">
-                                                </form>
-                                            </td>
-                                        </tr>
-                                    </table>
-                                </div>
+                                <!-- /.modal-content -->
                             </div>
-                            <!-- /.modal-content -->
+                            <!-- /.modal-dialog -->
                         </div>
-                        <!-- /.modal-dialog -->
-                    </div>
-                    <!-- /.modal -->
-
-
-
-                </td>
-              </tr>
-            {% endfor %}
+                        <!-- /.modal -->
+                    </td>
+                  </tr>
+                {% endfor %}
+            </tbody>
         </table>
+
+
     </div>
     <div class="tab-pane fade" id="overall">
         <div class="row">
@@ -160,15 +180,38 @@
 </div>
 
 
+{% block addscripts %}
+<!-- DataTables JavaScript -->
+<script src="../static/vendor/datatables/js/jquery.dataTables.min.js"></script>
+<script src="../static/vendor/datatables-plugins/dataTables.bootstrap.min.js"></script>
+<script src="../static/vendor/datatables-responsive/dataTables.responsive.js"></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="../static/dist/js/sb-admin-2.js"></script>
+
+<!-- Page-Level Demo Scripts - Tables - Use for reference -->
 <script>
-    // tooltip demo
+$(document).ready(function() {
+    $('#dataTables-example').DataTable({
+        responsive: true
+    });
+});
+</script>
+
+<!-- Tooltip script -->
+<script>
+
+    // tooltip animation
     $('.tooltip-demo').tooltip({
         selector: "[data-toggle=tooltip]",
         container: "body"
     })
-    // popover demo
+    // popover animation
     $("[data-toggle=popover]")
         .popover()
 </script>
+{% endblock %}
+
+
 
 {% endblock %}
