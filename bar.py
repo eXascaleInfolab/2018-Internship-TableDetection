@@ -22,6 +22,10 @@ import shutil
 
 # ----------------------------- CONSTANTS -----------------------------------------------------------------------------
 
+
+# --- TODO has to be changed when deploying ---
+VIRTUALENV_PATH = '/home/yann/bar/virtualenv/bin/celery'
+
 PDF_TO_PROCESS = 100
 MAX_CRAWLING_DURATION = 60 * 15         # in seconds
 WAIT_AFTER_CRAWLING = 1000              # in milliseconds
@@ -37,9 +41,24 @@ MAX_CRAWL_SIZE = 1024 * 1024 * MB_CRAWL_SIZE       # in bytes (500MB)
 CRAWL_REPETITION_WARNING_TIME = 7                  # in days
 MAX_CRAWL_DEPTH = 5
 DEFAULT_CRAWL_URL = 'https://www.bit.admin.ch'
-VIRTUALENV_PATH = '/home/yann/bar/virtualenv/bin/celery'  # TODO has to be changed when deploying
 WGET_DATA_PATH = 'data'
+
+
+BAR_OUT_LOG_PATH = 'log/bar.out.log'
+BAR_ERR_LOG_PATH = 'log/bar.err.log'
+CELERY_LOG_PATH = 'log/celery.log'
+REDIS_LOG_PATH = 'log/redis.log'
+FLOWER_LOG_PATH = 'log/flower.log'
 WGET_LOG_PATH = 'log/wget.txt'
+
+switcher = {
+        'bar.out.log': BAR_OUT_LOG_PATH,
+        'bar.err.log': BAR_ERR_LOG_PATH,
+        'celery.log': CELERY_LOG_PATH,
+        'redis.log': REDIS_LOG_PATH,
+        'flower.log': FLOWER_LOG_PATH,
+        'wget.log': WGET_LOG_PATH,
+}
 
 
 # ----------------------------- APP CONFIG ----------------------------------------------------------------------------
@@ -940,11 +959,28 @@ def hierarchy_download(cid):
                     headers={'Content-Disposition': 'attachment;filename=hierarchy.json'})
 
 
-# Download WGET Logfile
-@app.route('/wget_log')
+# Download any logfile
+@app.route('/log/<string:lid>')
 @is_logged_in
-def wget_log_download():
-    return send_file(WGET_LOG_PATH)
+def log_download(lid):
+    if lid in switcher:
+        return send_file(switcher.get(lid))
+    else:
+        flash('An error occurred while trying to download log', 'error')
+        return redirect(url_for('advanced'))
+
+
+# Delete any logfile
+@app.route('/log_del/<string:lid>')
+@is_logged_in
+def log_delete(lid):
+    if lid in switcher:
+        open(switcher.get(lid), 'w').close()
+        flash('Log was successfully emptied', 'success')
+        return  redirect(url_for('advanced'))
+    else:
+        flash('An error occurred while trying to delete log', 'error')
+        return redirect(url_for('advanced'))
 
 
 # Used to easily emit WebSocket messages from inside tasks
