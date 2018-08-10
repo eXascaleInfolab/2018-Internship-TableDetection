@@ -414,11 +414,11 @@ Of course since we are using Celery we could take full advantage of a multi-core
 
 ## Sources
 
-[ Deploy flask app with nginx using gunicorn and supervisor]: https://medium.com/ymedialabs-innovation/deploy-flask-app-with-nginx-using-gunicorn-and-supervisor-d7a93aa07c18
-[How To Serve Flask Applications with Gunicorn and Nginx on Ubuntu 16.04]: https://www.digitalocean.com/community/tutorials/how-to-serve-flask-applications-with-gunicorn-and-nginx-on-ubuntu-16-04
-[Deploying a Flask Site Using NGINX Gunicorn, Supervisor and Virtualenv on Ubuntu]: http://alexandersimoes.com/hints/2015/10/28/deploying-flask-with-nginx-gunicorn-supervisor-virtualenv-on-ubuntu.html
-[The Flask Mega-Tutorial Part XVII: Deployment on Linux]: https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-xvii-deployment-on-linux
-[Using Celery With Flask]: https://blog.miguelgrinberg.com/post/using-celery-with-flask
-[Asynchronous updates to a webpage with Flask and Socket.io]: https://www.shanelynn.ie/asynchronous-updates-to-a-webpage-with-flask-and-socket-io/
-[How To Install and Configure Redis on Ubuntu 16.04]: https://www.digitalocean.com/community/tutorials/how-to-install-and-configure-redis-on-ubuntu-16-04
-[Domains and DNS]: https://www.digitalocean.com/docs/networking/dns/
+-  Deploy flask app with nginx using gunicorn and supervisor. https://medium.com/ymedialabs-innovation/deploy-flask-app-with-nginx-using-gunicorn-and-supervisor-d7a93aa07c18
+- How To Serve Flask Applications with Gunicorn and Nginx on Ubuntu 16.04. https://www.digitalocean.com/community/tutorials/how-to-serve-flask-applications-with-gunicorn-and-nginx-on-ubuntu-16-04
+- Deploying a Flask Site Using NGINX Gunicorn, Supervisor and Virtualenv on Ubuntu. http://alexandersimoes.com/hints/2015/10/28/deploying-flask-with-nginx-gunicorn-supervisor-virtualenv-on-ubuntu.html
+- The Flask Mega-Tutorial Part XVII: Deployment on Linux. https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-xvii-deployment-on-linux
+- Using Celery With Flask. https://blog.miguelgrinberg.com/post/using-celery-with-flask
+- Asynchronous updates to a webpage with Flask and Socket.io. https://www.shanelynn.ie/asynchronous-updates-to-a-webpage-with-flask-and-socket-io/
+- How To Install and Configure Redis on Ubuntu 16.04. https://www.digitalocean.com/community/tutorials/how-to-install-and-configure-redis-on-ubuntu-16-04
+- Domains and DNS. https://www.digitalocean.com/docs/networking/dns/
