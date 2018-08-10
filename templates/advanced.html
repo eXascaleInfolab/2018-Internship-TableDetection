@@ -46,7 +46,7 @@
                     <p>Note that you will need potentially different log-in credentials than for this application.</p>
                 </div>
                 <div class="panel-footer">
-                    <a type="button" href='/flower' class="btn btn-outline btn-success btn-sm"><i class="fa  fa-external-link "></i> Access Flower</a>
+                    <a type="button" href='/flower/' class="btn btn-outline btn-success btn-sm"><i class="fa  fa-external-link "></i> Access Flower</a>
                 </div>
             </div>
         </div>
@@ -56,7 +56,7 @@
         <div class="col-lg-4">
             <div class="panel panel-info">
                 <div class="panel-heading">
-                    Download Application Logs.
+                    Download Application Logs
                 </div>
                 <div class="panel-body">
                     <p>The stdout and stderr output of the different services are stored in a log which can be downloaded here.</p>
@@ -73,14 +73,14 @@
         <div class="col-lg-4">
             <div class="panel panel-info">
                 <div class="panel-heading">
-                    Download entire log of Web Crawler.
+                    Download entire log of Web Crawler
                 </div>
                 <div class="panel-body">
                     <p>Simple output of the WGET command used to crawl the websites.</p>
                 </div>
                 <div class="panel-footer">
                     <a type="button" href={{url_for('log_download', lid='wget.log')}} class="btn btn-outline btn-primary btn-sm"><i class="fa  fa-download "></i> Download </a>
-                    <a type="button" href={{url_for('log_delete', lid="wget.log")}} class="btn btn-outline btn-primary btn-sm"><i class="fa  fa-gear "></i> Empty Log </a>
+                    <a type="button" href={{url_for('log_delete', lid="wget.log")}} class="btn btn-outline btn-danger btn-sm"><i class="fa  fa-gear "></i> Empty Log </a>
                 </div>
             </div>
         </div>
