@@ -6,9 +6,11 @@ from time import mktime, strptime
 from requests import post
 import requests
 
+# ----------------------------- GENERAL HELPER FUNCTIONS --------------------------------------------------------------
 
-# Create a json string for given path
-# source: https://stackoverflow.com/questions/25226208/represent-directory-tree-as-json
+
+# Create a json string for given path recursively
+# Source: https://stackoverflow.com/questions/25226208/represent-directory-tree-as-json
 def path_dict(path):
     p = path
     name = os.path.basename(p)
@@ -26,19 +28,20 @@ def path_dict(path):
     if os.path.isdir(p):
         d['type'] = "directory"
         d['children'] = [path_dict(os.path.join(p, x)) for x in os.listdir(p)]
-        d['npdf'] = path_number_of_files(p) # Really bad, but quick way out
+        # Really bad, but quick way out, high complexity if large hierarchy
+        d['npdf'] = path_number_of_files(p)
     else:
         d['type'] = "file"
         if ".pdf" in p:
             d['npdf'] = 1
-            d['url'] = p[5:] # FIXME remove if link not used
+            d['url'] = p[5:]
         else:
             d['npdf'] = 0
     return d
 
 
-# TODO write a Bottom up or DP method to make it faster ! (ask Akansha)
-# finds the number of files in given path
+# TODO write in a Bottom up way or DP method to make it faster
+# Finds the number of files in given path
 def path_number_of_files(path):
     n_files = sum([len(list(filter(lambda f: ".pdf" in f, files))) for r, d, files in os.walk(path)])
     return n_files
@@ -58,8 +61,33 @@ def dir_size(path):
     return total_size
 
 
+# PDF Creation Date Converter (from PDF format to datetime)
+# Doesn't work for all encountered PDFs sadly
+# https://stackoverflow.com/questions/16503075/convert-creationtime-of-pdf-to-a-readable-format-in-python
+def pdf_date_format_to_datetime(str):
+    datestring = str[2:-7]
+    try :
+        ts = strptime(datestring, "%Y%m%d%H%M%S")
+        dt = datetime.datetime.fromtimestamp(mktime(ts))
+    except ValueError:
+        print("Unable to convert time for string: " + str)
+        dt = datetime.datetime.strptime("01/01/1970", '%m/%d/%Y')
+    return dt
+
+
+# Checks if a URL exists
+def exists(url):
+    try:
+        r = requests.head(url)
+        return r.status_code == requests.codes.ok
+    except:
+        return False
+
+# ----------------------------- DEPRECATED HELPER FUNCTIONS -----------------------------------------------------------
+
 # Uses Tabula to detect and extract tables from the pdf's
 # INPUT: path containing pdf's and the maximal number of pdf to analyse
+# This function is now split into two Celery background tasks
 def pdf_stats(path, n_pdf, post_url):
     stats = {}
 
@@ -122,8 +150,6 @@ def pdf_stats(path, n_pdf, post_url):
                     post(post_url, json={'event':'my_response', 'data':
                         {'data': 'I successfully performed table detection', 'success': n_success, 'count': 1}})
 
-                # FIXME more specific,
-                # FIXME otherwise it enters infinite loop if file not found for example / bad url was given
                 except:
                     print("ERROR: Tabula Conversion failed for %s" % (fileName,))
                     n_error += 1
@@ -131,24 +157,4 @@ def pdf_stats(path, n_pdf, post_url):
     return stats, n_error, n_success
 
 
-# PDF Creation Date Converter (from PDF format to datetime)
-# https://stackoverflow.com/questions/16503075/convert-creationtime-of-pdf-to-a-readable-format-in-python
-def pdf_date_format_to_datetime(str):
-    datestring = str[2:-7]
-    try :
-        ts = strptime(datestring, "%Y%m%d%H%M%S")
-        dt = datetime.datetime.fromtimestamp(mktime(ts))
-    except ValueError:
-        print("Unable to convert time for string: " + str)
-        dt = datetime.datetime.strptime("01/01/1970", '%m/%d/%Y')
-    return dt
-
-
-# Checks if a URL exists
-def exists(url):
-    try:
-        r = requests.head(url)
-        return r.status_code == requests.codes.ok
-    except:
-        return False
 

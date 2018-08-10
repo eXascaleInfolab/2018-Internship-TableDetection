@@ -80,7 +80,7 @@ mysql = MySQL(app)
 
 # ----------------------------- CELERY TASKS --------------------------------------------------------------------------
 
-
+# Background task in charge of crawling
 @celery.task(bind=True)                 # time_limit=MAX_CRAWLING_DURATION other possibility
 def crawling_task(self, url='', post_url='', domain='',
                   max_crawl_duration=MAX_CRAWLING_DURATION, max_crawl_size=MAX_CRAWL_SIZE,
@@ -135,12 +135,12 @@ def crawling_task(self, url='', post_url='', domain='',
     return exitCode
 
 
+# Background task in charge of performing table detection on a single pdf
 @celery.task(bind=True)
 def tabula_task(self, file_path='', post_url=''):
 
-    # STEP -1: check if file is already in db
+    # STEP 0: check if file is already in db
     url = file_path[(len(WGET_DATA_PATH) + 1):]
-    print(url) #FIXME debug
 
     try:
         with app.app_context():
@@ -156,42 +156,49 @@ def tabula_task(self, file_path='', post_url=''):
 
             if result > 0:
                 stats = json.loads(file['stats'])
-                post(post_url, json={'event': 'tabula_success', 'data':
-                    {'data': 'Processing time saved, document was already processed at an earlier time: ',
-                     'pages': stats['n_pages'], 'tables': stats['n_tables']}})
 
-                return file['fid'] #TODO test extensively
+                # Communicate success to client in a broadcasting manner
+                post(post_url, json={'event': 'tabula_success', 'data': {'data': 'Processing time saved, document was '
+                                                                                 'already processed '
+                                                                                 'at an earlier time: ',
+                                     'pages': stats['n_pages'], 'tables': stats['n_tables']}})
+
+                return file['fid']
+
     except Exception as e:
+        # Communicate failure to client
         post(post_url, json={'event': 'processing_failure', 'data': {'pdf_name': file_path,
                                                                      'text': 'PyPDF error on file : ',
                                                                      'trace': str(e)}})
         return -1
 
-    # STEP 0: Otherwise proceed, set all counter to 0
+    # STEP 1: Otherwise proceed, set all counters to 0
     n_tables = 0
     n_table_rows = 0
     table_sizes = {'small': 0, 'medium': 0, 'large': 0}
 
-    # STEP 1: count total number of pages
+    # STEP 2: count total number of pages by reading PDF
     try:
         pdf_file = PyPDF2.PdfFileReader(open(file_path, mode='rb'))
         n_pages = pdf_file.getNumPages()
     except Exception as e:
+        # Communicate failure to client
         post(post_url, json={'event': 'processing_failure', 'data': {'pdf_name': file_path,
                                                                      'text': 'PyPDF error on file : ',
                                                                      'trace': str(e)}})
         return -1
 
-    # STEP 2: run TABULA to extract all tables into one dataframe
+    # STEP 3: run TABULA to extract all tables into one pandas data frame
     try:
         df_array = tabula.read_pdf(file_path, pages="all", multiple_tables=True)
     except Exception as e:
+        # Communicate failure to client
         post(post_url, json={'event': 'processing_failure', 'data': {'pdf_name': file_path,
                                                                      'text': 'Tabula error on file : ',
                                                                      'trace': str(e)}})
         return -1
 
-    # STEP 3: count number of rows in each dataframe
+    # STEP 4: count number of rows in each data frame
     for df in df_array:
         rows = df.shape[0]
         n_table_rows += rows
@@ -205,12 +212,12 @@ def tabula_task(self, file_path='', post_url=''):
         else:
             table_sizes['large'] += 1
 
-    # STEP 4: save stats
+    # STEP 5: save stats as intermediary results in db
     try:
         creation_date = pdf_file.getDocumentInfo()['/CreationDate']
         stats = {'n_pages': n_pages, 'n_tables': n_tables,
-                            'n_table_rows': n_table_rows, 'creation_date': creation_date,
-                            'table_sizes': table_sizes}
+                 'n_table_rows': n_table_rows, 'creation_date': creation_date,
+                 'table_sizes': table_sizes}
 
         with app.app_context():
             # Create cursor
@@ -223,29 +230,31 @@ def tabula_task(self, file_path='', post_url=''):
             # Commit to DB
             mysql.connection.commit()
 
-            # Get ID from insert
+            # Get ID from inserted row
             insert_id = cur.lastrowid
 
             # Close connection
             cur.close()
 
     except Exception as e:
+        # Communicate failure to client
         post(post_url, json={'event': 'processing_failure', 'data': {'pdf_name': file_path,
-                                                                     'text': 'Cannot save stats of file : ',
+                                                                     'text': 'Cannot save stats of file in db : ',
                                                                      'trace': str(e)}})
         return -1
 
-    # STEP 5: Send message asynchronously
-    post(post_url, json={'event': 'tabula_success', 'data':
-        {'data': 'Tabula PDF success: ', 'pages': n_pages, 'tables': n_tables}})
+    # STEP 6: Send success message to client
+    post(post_url, json={'event': 'tabula_success', 'data': {'data': 'Tabula PDF success: ',
+                                                             'pages': n_pages, 'tables': n_tables}})
 
-    # STEP 6: Return stats
+    # STEP 7: Return db row id
     return insert_id
 
 
+# Background task serving as callback to save metadata to db
 @celery.task(bind=True)
 def pdf_stats(self, tabula_list, domain='', url='', crawl_total_time=0, post_url='', processing_start_time=0):
-    """Background task that runs a long function with progress reports."""
+
     with app.app_context():
         # STEP 0: Time keeping
         path = "data/%s" % (domain,)
@@ -254,7 +263,7 @@ def pdf_stats(self, tabula_list, domain='', url='', crawl_total_time=0, post_url
         # https://stackoverflow.com/questions/35959580/non-ascii-file-name-issue-with-os-walk works
         # https://stackoverflow.com/questions/2004137/unicodeencodeerror-on-joining-file-name doesn't work
         hierarchy_dict = path_dict(path)  # adding ur does not work as expected either
-        hierarchy_json = json.dumps(hierarchy_dict, sort_keys=True, indent=4)  # , encoding='cp1252' not needed in python3
+        hierarchy_json = json.dumps(hierarchy_dict, sort_keys=True, indent=4)  #encoding='cp1252' not needed in python3
 
         # STEP 2: Call helper function to count number of pdf files
         n_files = path_number_of_files(path)
@@ -293,8 +302,6 @@ def pdf_stats(self, tabula_list, domain='', url='', crawl_total_time=0, post_url
         # Get Crawl ID
         cid = cur.lastrowid
 
-        print("cid is: " + str(cid))
-
         # STEP 6: link all pdf files to this query
         insert_tuples = [(fid, cid) for fid in fid_array]
 
@@ -307,14 +314,14 @@ def pdf_stats(self, tabula_list, domain='', url='', crawl_total_time=0, post_url
         # Close connection
         cur.close()
 
-        # Send message asynchronously
+        # Send success message asynchronously to clients
         post(post_url, json={'event': 'redirect', 'data': {'url': '/processing'}})
 
         return 'success'
 
 
 # ----------------------------- HELPER FUNCTIONS ----------------------------------------------------------------------
-# Check if user logged in
+# Wrapper to check if user logged in
 def is_logged_in(f):
     @wraps(f)
     def wrap(*args, **kwargs):
@@ -326,7 +333,7 @@ def is_logged_in(f):
     return wrap
 
 
-# Ability to stream a template (can be used with python generator)
+# Ability to stream a template (can be used with python generator, was now replaced by flask-socketio interface)
 def stream_template(template_name, **context):
     app.update_template_context(context)
     t = app.jinja_env.get_template(template_name)
@@ -337,8 +344,7 @@ def stream_template(template_name, **context):
 
 # ----------------------------- APP ROUTES ----------------------------------------------------------------------------
 
-
-# Index
+# Crawl from to check user input
 class CrawlForm(Form):
     url = StringField('URL', [validators.Length(min=4, max=300)], default=DEFAULT_CRAWL_URL)
     depth = IntegerField('Max Crawl Depth', [validators.NumberRange(min=1, max=10)], default=MAX_CRAWL_DEPTH)
@@ -349,6 +355,7 @@ class CrawlForm(Form):
                        default=PDF_TO_PROCESS)
 
 
+# Index
 @app.route('/', methods=['GET', 'POST'])
 def index():
     form = CrawlForm(request.form)
@@ -358,7 +365,7 @@ def index():
         # Change global variables depending on input
         global MAX_CRAWLING_DURATION, MAX_CRAWL_DEPTH, MAX_CRAWL_SIZE, MB_CRAWL_SIZE, PDF_TO_PROCESS
 
-        # Get Form Fields and save
+        # Get Form Fields and update variables
         url = form.url.data
         crawl_again = request.form['crawl_again']
         MAX_CRAWL_DEPTH = form.depth.data
@@ -367,12 +374,12 @@ def index():
         MAX_CRAWLING_DURATION = form.time.data * 60
         PDF_TO_PROCESS = form.pdf.data
 
-        # Check if valid URL
+        # Check if valid URL with helper funtion in helper module
         if not exists(url):
             flash('This URL does not exists. Please try another.', 'danger')
             return render_template('home.html', most_recent_url="none", form=form)
 
-        # Extract domain name out of url
+        # Extract domain name out of url and save in session
         parsed = urlparse(url)
         domain = parsed.netloc
         session['domain'] = domain
@@ -382,7 +389,7 @@ def index():
         # Create cursor
         cur = mysql.connection.cursor()
 
-        # Get biggest crawl_id from the last 7 days
+        # Get highest crawl_id from the last 7 days
         result = cur.execute("""SELECT COALESCE(MAX(cid), 0) as cid FROM Crawls WHERE domain = %s 
                       AND (crawl_date > DATE_SUB(now(), INTERVAL %s DAY))""", (domain, CRAWL_REPETITION_WARNING_TIME))
 
@@ -409,8 +416,7 @@ def crawling():
 
     # Check no crawling in progress
     if not lock.acquire(False):
-        # Failed to lock the ressource
-
+        # Failed to lock the resource
         flash(Markup('There are already Tasks scheduled, please wait before running another query or '
                      'terminate all running processes <a href="/advanced" class="alert-link">here.</a>'), 'danger')
         return redirect(url_for('index'))
@@ -419,9 +425,6 @@ def crawling():
         try:
             # delete previously crawled data
             delete_data()
-
-            # create directory for data
-            # os.mkdir(WGET_DATA_PATH) # Extremely problematic since it does not necessarily give write rights !!
 
             # STEP 0: TimeKeeping
             session['crawl_start_time'] = time.time()
@@ -442,9 +445,8 @@ def crawling():
                                    max_crawl_depth=MAX_CRAWL_DEPTH,
                                    max_crawl_size=MAX_CRAWL_SIZE)
         except Exception as e:
-            # Even if something goes wrong Lock is not released, as a call to end all tasks is safer to assure
-            # that the crawling process which might have been started is also interrupted.
-            pass
+            # Call Terminate function to make sure all started tasks are terminated and lock released
+            terminate()
             flash("An error occurred : " + str(e), 'danger')
             return redirect(url_for('index'))
 
@@ -463,10 +465,13 @@ def end_crawling():
     celery_id = session.get('crawling_id', 0)                       # get saved celery task id
     try:
         # This is a hack to kill the spawned subprocess and not only the celery task
+        # I read that in some cases the subprocess doesn't get terminated when the Celery task is revoked,
+        # though I never observed this behavior.
         pid = crawling_task.AsyncResult(celery_id).info.get('pid')      # get saved subprocess id
         os.kill(pid, signal.SIGTERM)                                    # kill subprocess
     except AttributeError:
-        flash("Either the task was not scheduled yet or is already over and thus interruption is not possible", 'danger')
+        flash("Either the task was not scheduled yet, is already over, or was interrupted from someone else"
+              " and thus interruption is not possible", 'danger')
         return redirect(url_for('index'))
 
     # STEP 2: TimeKeeping
@@ -486,7 +491,7 @@ def end_crawling():
     return render_template('end_crawling.html')
 
 
-# End Crawling automatically
+# End Crawling automatically, for this to work the client must still have the tab open !
 @app.route('/crawling/autoend')
 @is_logged_in
 def autoend_crawling():
@@ -503,7 +508,8 @@ def autoend_crawling():
     elif crawled_size > MAX_CRAWL_SIZE:
         flash("Size limit reached - Crawler interrupted automatically", 'success')
     else:
-        flash("Crawled all PDFs until depth of " + str(MAX_CRAWL_DEPTH) + " - Crawler interrupted automatically", 'success')
+        flash("Crawled all PDFs until depth of " + str(MAX_CRAWL_DEPTH) + " - Crawler interrupted automatically",
+              'success')
 
     session['crawling_id'] = 0  # remove crawling id
 
@@ -523,9 +529,9 @@ def table_detection():
 
     # First check if lock can be acquired
     if not lock.acquire(False):
-        flash("There are already Tasks scheduled, please wait before "
-              "running another query or cancel the previous query under the advanced tab",
-              'danger')  # TODO link to killing query
+        # Failed to lock the resource
+        flash(Markup('There are already Tasks scheduled, please wait before running another query or '
+                     'terminate all running processes <a href="/advanced" class="alert-link">here.</a>'), 'danger')
         return redirect(url_for('index'))
 
     else:
@@ -556,7 +562,7 @@ def table_detection():
                                    processing_start_time=processing_start_time)
 
             # STEP 3: Run the celery Chord
-            result = chord(header)(callback)
+            chord(header)(callback)
 
             # STEP 4: If query was empty go straight further
             if count == 0:
@@ -564,13 +570,13 @@ def table_detection():
 
             return render_template('table_detection.html', total_pdf=count)
 
-        finally:
-            # FIXME auto kill all processes
-            # Don't release Lock even if something goes wrong, as I want to force the user to kill all processes first
-            pass
+        except Exception as e:
+            # If something goes wrong make sure all tasks get revoked and lock released
+            terminate()
+            flash("Something went wrong: " + str(e) + " --- All tasks were revoked and the lock released")
 
 
-# end of PDF processing (FIXME name not very representative anymore)
+# End of PDF processing (FIXME name not very fitting anymore)
 @app.route('/processing')
 @is_logged_in
 def processing():
@@ -612,11 +618,11 @@ def cid_statistics(cid):
     # Create cursor
     cur = mysql.connection.cursor()
 
-    result = cur.execute("""SELECT * FROM Crawls WHERE cid = %s""", (cid,))
+    cur.execute("""SELECT * FROM Crawls WHERE cid = %s""", (cid,))
     crawl = cur.fetchone()
 
     # Get stats by getting all individual files
-    result = cur.execute("""SELECT url, stats FROM Files f JOIN Crawlfiles cf ON f.fid = cf.fid WHERE cid = %s""",
+    cur.execute("""SELECT url, stats FROM Files f JOIN Crawlfiles cf ON f.fid = cf.fid WHERE cid = %s""",
                          (cid,))
     stats_db = cur.fetchall()
     stats = {}
@@ -640,7 +646,7 @@ def cid_statistics(cid):
 
     # Find some stats about creation dates
     creation_dates_pdf = [subdict['creation_date'] for filename, subdict in stats_items]
-    creation_dates = list(map(lambda str : pdf_date_format_to_datetime(str), creation_dates_pdf))
+    creation_dates = list(map(lambda s: pdf_date_format_to_datetime(s), creation_dates_pdf))
     disk_size = round(crawl['disk_size'] / (1024*1024), 1)
 
     if len(creation_dates) > 0:
@@ -661,6 +667,7 @@ def cid_statistics(cid):
                            n_pages=n_pages)
 
 
+# Form to check User registration data
 class RegisterForm(Form):
     name = StringField('Name', [validators.Length(min=1, max=50)])
     username = StringField('Username', [validators.Length(min=4, max=25)])
@@ -719,11 +726,11 @@ def login():
 
         if result > 0:
             # Get stored hash
-            data = cur.fetchone()                                       # FIXME why is username not primary key
+            data = cur.fetchone()                                       # FIXME username should be made primary key
             password = data['password']
 
             # Compare passwords
-            if sha256_crypt.verify(password_candidate, password):       # FIXME how does sha256 work?
+            if sha256_crypt.verify(password_candidate, password):
 
                 # Check was successful -> create session variables
                 session['logged_in'] = True
@@ -740,7 +747,6 @@ def login():
             return render_template('login.html', error=error)
 
         # Note: Closing connection not necessary when using flask mysql db extension
-        # cur.close()
 
     return render_template('login.html')
 
@@ -749,26 +755,30 @@ def login():
 @app.route('/delete_crawl', methods=['POST'])
 @is_logged_in
 def delete_crawl():
+        try:
 
-        # Get Form Fields
-        cid = request.form['cid']
+            # Get Form Fields
+            cid = request.form['cid']
 
-        # Create cursor
-        cur = mysql.connection.cursor()
+            # Create cursor
+            cur = mysql.connection.cursor()
 
-        # Get user by username
-        cur.execute("""DELETE FROM Crawls WHERE cid = %s""", (cid,))
+            # Get user by username
+            cur.execute("""DELETE FROM Crawls WHERE cid = %s""", (cid,))
 
-        # Commit to DB
-        mysql.connection.commit()
+            # Commit to DB
+            mysql.connection.commit()
 
-        # Close connection
-        cur.close()
+            # Close connection
+            cur.close()
 
-        # FIXME check if successfull first, return message
-        flash('Crawl successfully removed', 'success')
+            flash('Crawl successfully removed', 'success')
 
-        return redirect(url_for('dashboard'))
+            return redirect(url_for('dashboard'))
+
+        except Exception as e:
+            flash('An error occurred while trying to delete the crawl: ' + str(e), 'danger')
+            redirect(url_for('dashboard'))
 
 
 # Logout
@@ -798,9 +808,6 @@ def dashboard():
         msg = 'No Crawls Found'
         return render_template('dashboard.html', msg=msg)
 
-    # Close connection FIXME is this code executed
-    cur.close()
-
 
 # Advanced
 @app.route('/advanced')
@@ -809,14 +816,14 @@ def advanced():
     return render_template('advanced.html')
 
 
-# Release and Terminate all
+# Release lock and Terminate all background tasks
 @app.route('/terminate')
 @is_logged_in
 def terminate():
 
     # Purge all tasks from task queue
     command = shlex.split(VIRTUALENV_PATH + " -f -A bar.celery purge") #FIXME datapath variable
-    process = subprocess.Popen(command)
+    subprocess.Popen(command)
 
     # Kill all Celery tasks that have an ETA or are scheduled for later processing
     i = celery.control.inspect()
@@ -928,16 +935,17 @@ def hierarchy_download(cid):
 
     hierarchy = cur.fetchone()['hierarchy']
 
-    json_string = "{'number': 0}"
     return Response(hierarchy,
                     mimetype='application/json',
                     headers={'Content-Disposition': 'attachment;filename=hierarchy.json'})
+
 
 # Download WGET Logfile
 @app.route('/wget_log')
 @is_logged_in
 def wget_log_download():
     return send_file(WGET_LOG_PATH)
+
 
 # Used to easily emit WebSocket messages from inside tasks
 # Pattern taken from https://github.com/jwhelland/flask-socketio-celery-example/blob/master/app.py
