@@ -20,7 +20,7 @@ CREATE TABLE Users
 CREATE TABLE Crawls
 (
     cid INT(11) AUTO_INCREMENT PRIMARY KEY,
-    crawl_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP UNIQUE,
+    crawl_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     pdf_crawled INT(11),
     pdf_processed INT(11),
     process_errors INT(11),

@@ -243,14 +243,14 @@ def tabula_task(self, file_path='', post_url=''):
             cur = mysql.connection.cursor()
 
             # Execute query
-            cur.execute("""INSERT INTO Files(fid, processing_date, url, stats) VALUES(NULL, NULL, %s, %s)""",
+            cur.execute("""INSERT INTO Files(url, stats) VALUES(%s, %s)""",
                         (url, json.dumps(stats, sort_keys=True, indent=4)))
-
-            # Commit to DB
-            mysql.connection.commit()
 
             # Get ID from inserted row
             insert_id = cur.lastrowid
+
+            # Commit to DB
+            mysql.connection.commit()
 
             # Close connection
             cur.close()
@@ -290,13 +290,13 @@ def pdf_stats(self, tabula_list, domain='', url='', crawl_total_time=0, post_url
         # STEP 3: Treat result from Tabula tasks
         n_success = 0
         n_errors = 0
-        fid_array = []
+        fid_set = set()
         for fid in tabula_list:
             if fid < 0:
                 n_errors += 1
             else:
                 n_success += 1
-                fid_array.append(fid)
+                fid_set.add(fid)
 
         # STEP 4: Save some additional stats
         disk_size = dir_size(WGET_DATA_PATH + "/" + domain)
@@ -309,9 +309,9 @@ def pdf_stats(self, tabula_list, domain='', url='', crawl_total_time=0, post_url
         cur = mysql.connection.cursor()
 
         # Execute query
-        cur.execute("""INSERT INTO Crawls(cid, crawl_date, pdf_crawled, pdf_processed, process_errors, domain, disk_size, 
+        cur.execute("""INSERT INTO Crawls(pdf_crawled, pdf_processed, process_errors, domain, disk_size, 
                     url, hierarchy, crawl_total_time, proc_total_time) 
-                    VALUES(NULL, NULL, %s ,%s, %s, %s, %s, %s, %s, %s, %s)""",
+                    VALUES(%s ,%s, %s, %s, %s, %s, %s, %s, %s)""",
                     (n_files, n_success, n_errors, domain, disk_size, url, hierarchy_json,
                         crawl_total_time, processing_total_time))
 
@@ -322,7 +322,7 @@ def pdf_stats(self, tabula_list, domain='', url='', crawl_total_time=0, post_url
         cid = cur.lastrowid
 
         # STEP 6: link all pdf files to this query
-        insert_tuples = [(fid, cid) for fid in fid_array]
+        insert_tuples = [(fid, cid) for fid in fid_set]
 
         cur.executemany("""INSERT INTO Crawlfiles(fid, cid) VALUES (%s, %s)""",
                         insert_tuples)
@@ -848,6 +848,7 @@ def terminate():
     i = celery.control.inspect()
     scheduled_tasks = i.scheduled()
 
+    # FIXME don't replicate same code 3 times
     for workers in scheduled_tasks:
         for j in range(0, len(scheduled_tasks[workers])):
             celery.control.revoke(scheduled_tasks[workers][j]['id'], terminate=True)
