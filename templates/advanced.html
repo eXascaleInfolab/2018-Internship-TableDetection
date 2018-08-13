@@ -120,7 +120,8 @@
                     Download Application Logs
                 </div>
                 <div class="panel-body">
-                    <p>The stdout and stderr output of the different services are stored in a log which can be downloaded here.</p>
+                    <p>The stdout and stderr output of the different services are stored in a log which can be downloaded here.
+                        Note: Your browser might cache these files, don't be surprised if you get an old version. </p>
                 </div>
                 <div class="panel-footer">
                     <a type="button" href={{url_for('log_download', lid='bar.out.log')}} class="btn btn-outline btn-primary btn-sm"><i class="fa  fa-download "></i> stdout </a>
@@ -138,6 +139,7 @@
                 </div>
                 <div class="panel-body">
                     <p>Simple output of the WGET command used to crawl the websites.</p>
+                    <br>
                     <br>
                 </div>
                 <div class="panel-footer">
