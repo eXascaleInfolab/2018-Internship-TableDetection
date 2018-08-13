@@ -40,7 +40,7 @@
 
         socket.on('redirect', function (data) {
             // This condition avoids that the table detection process gets started twice, if the interruption was manual
-            if (data.url != {{url_for('table_detection')}}) {
+            if (data.url.indexOf('/crawling/autoend') === -1) {
                 window.location = data.url;
             }
         });
