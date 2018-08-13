@@ -14,9 +14,40 @@
                 <div class="panel-body">
                     <p>This allows you to clear all data from the database, except for User login data. </p>
                     <p>This means that previously saved statistics for individual pdf will be recomputed. </p>
+                    <br>
                 </div>
                 <div class="panel-footer">
-                    <a type="button" href={{url_for('empty_tables')}} class="btn btn-outline btn-danger btn-sm"><i class="fa  fa-gears "></i> Empty All Tables </a>
+                    <!-- Button trigger modal -->
+                    <button class="btn btn-danger btn-outline btn-sm" data-toggle="modal" data-target="#modal-empty-tables">
+                        <i class="fa  fa-gears "></i> Empty All Tables
+                    </button>
+                    <!-- Modal -->
+                    <div class="modal fade" id="modal-empty-tables" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                    <h4 class="modal-title" id="myModalLabel">Confirm Action</h4>
+                                </div>
+                                <div class="modal-body">
+                                    You are about to empty all tables containing all results from previous queries. This procedure is irreversible. Do you want to proceed?
+                                </div>
+                                <div class="modal-footer">
+                                    <table>
+                                        <tr>
+                                            <td> <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button></td>
+                                            <td>
+                                                <a type="button" href={{url_for('empty_tables')}} class="btn btn-outline btn-danger btn-sm"><i class="fa  fa-gears "></i> Empty All Tables </a>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                            <!-- /.modal-content -->
+                        </div>
+                        <!-- /.modal-dialog -->
+                    </div>
+                    <!-- /.modal -->
                 </div>
             </div>
         </div>
@@ -31,7 +62,37 @@
                     <p>Note that when terminating ongoing table-detection processes, the work done so far will be saved, so you won't lose much.</p>
                 </div>
                 <div class="panel-footer">
-                    <a type="button" href={{url_for('terminate')}} class="btn btn-outline btn-danger btn-sm"><i class="fa  fa-gears "></i> Free Ressources </a>
+                    <!-- Button trigger modal -->
+                    <button class="btn btn-danger btn-outline btn-sm" data-toggle="modal" data-target="#modal-terminate">
+                        <i class="fa  fa-gears "></i> Free Ressources </a>
+                    </button>
+                    <!-- Modal -->
+                    <div class="modal fade" id="modal-terminate" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                    <h4 class="modal-title">Confirm Action</h4>
+                                </div>
+                                <div class="modal-body">
+                                    You are about to terminate all running processes. This procedure is irreversible. Do you want to proceed?
+                                </div>
+                                <div class="modal-footer">
+                                    <table>
+                                        <tr>
+                                            <td> <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button></td>
+                                            <td>
+                                                <a type="button" href={{url_for('terminate')}} class="btn btn-outline btn-danger btn-sm"><i class="fa  fa-gears "></i> Free Ressources </a>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                            <!-- /.modal-content -->
+                        </div>
+                        <!-- /.modal-dialog -->
+                    </div>
+                    <!-- /.modal -->
                 </div>
             </div>
         </div>
@@ -41,8 +102,8 @@
                     Flower - Celery Monitoring Tool
                 </div>
                 <div class="panel-body">
-                    <p>Use this tool to check progress of your queries if you closed the tab or something else went wrong. </p>
-                    <p>You can also see if someone else is using resources and have access to some more statistics. </p>
+                    <p>Use this tool to check progress of your queries if you closed the tab or something else went wrong.
+                        You can also see if someone else is using resources and have access to some more statistics.</p>
                     <p>Note that you will need potentially different log-in credentials than for this application.</p>
                 </div>
                 <div class="panel-footer">
@@ -77,10 +138,42 @@
                 </div>
                 <div class="panel-body">
                     <p>Simple output of the WGET command used to crawl the websites.</p>
+                    <br>
                 </div>
                 <div class="panel-footer">
                     <a type="button" href={{url_for('log_download', lid='wget.log')}} class="btn btn-outline btn-primary btn-sm"><i class="fa  fa-download "></i> Download </a>
-                    <a type="button" href={{url_for('log_delete', lid="wget.log")}} class="btn btn-outline btn-danger btn-sm"><i class="fa  fa-gear "></i> Empty Log </a>
+
+                    <!-- Button trigger modal -->
+                    <button class="btn btn-danger btn-outline btn-sm" data-toggle="modal" data-target="#modal-delete-log">
+                        <i class="fa  fa-gear "></i> Empty Log
+                    </button>
+                    <!-- Modal -->
+                    <div class="modal fade" id="modal-delete-log" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                    <h4 class="modal-title">Confirm Action</h4>
+                                </div>
+                                <div class="modal-body">
+                                    You are about to delete the entire Crawling log. This procedure is irreversible. Do you want to proceed?
+                                </div>
+                                <div class="modal-footer">
+                                    <table>
+                                        <tr>
+                                            <td> <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button></td>
+                                            <td>
+                                                <a type="button" href={{url_for('log_delete', lid="wget.log")}} class="btn btn-outline btn-danger btn-sm"><i class="fa  fa-gear "></i> Empty Log </a>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                            <!-- /.modal-content -->
+                        </div>
+                        <!-- /.modal-dialog -->
+                    </div>
+                    <!-- /.modal -->
                 </div>
             </div>
         </div>
