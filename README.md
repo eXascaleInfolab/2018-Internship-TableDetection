@@ -7,11 +7,11 @@ Visit the the first deployed version [here](http://www.zenosyne.ch).
 ## Introduction
 
 ### Purpose
-Data has become extremely valuable, some going as far as calling it the [world's most valuable resource.](https://www.economist.com/leaders/2017/05/06/the-worlds-most-valuable-resource-is-no-longer-oil-but-data) There is no doubt that with the recent surge in Machine Learning the demand has become very high. But for the data to be valuable it has to be findable and stored in data formats that allow further exploitation. The aim of this application is to visualize how much data is hidden in PDF files instead of being stored in more practical data formats.
+Data has become extremely valuable, some going as far as calling it the [world's most valuable resource.](https://www.economist.com/leaders/2017/05/06/the-worlds-most-valuable-resource-is-no-longer-oil-but-data) However, for the data to be valuable it has to be findable and stored in data formats that allow further exploitation. The aim of this application is to visualize how much data is hidden in PDF files.
 
 ### How to use the application
 The current application works in 3 steps:
-1.  The user enters the domain that is to be crawled. If a specific URL is given the crawler will start from there, working recursively  in a breadth-first manner from there. 
+1.  The user enters the domain that is to be crawled. If a specific URL is given the crawler will start from there, working recursively  in a breadth-first manner. 
 2.  After finishing fetching the PDF files or being interrupted this tool will perform table detection on the PDFs.
 3.  Finally the collected data will be displayed on the Statistics page and will be listed on the Dashboard.
 
@@ -20,7 +20,7 @@ The current application works in 3 steps:
 - There is a simple Registration and Login system in place. Currently everyone can register and use this tool.
 - There is a Lock to prevent multiple users to start queries at the same time. Only one query can run at the same time, other users will have to wait until the query terminates.
 - The table detection only starts if the Crawling tab is kept open, or table detection is started manually.
-- Once table detection is started it will finish even if the tab is closed.
+- Once table detection is started it will finish even if the tab is closed (though as of now the lock has to be released manually in that case).
 
 ### Technologies used
 
@@ -396,12 +396,13 @@ Of course since we are using Celery we could take full advantage of a multi-core
 
 ## Further work
 
-- [ ] Adding SSL encryption
+- [ ] Cleaner pipeline (for example implement automatic start to table detection after crawling)
 - [ ] Deploy application on Docker
 - [ ] Allow multiple simultaneous users
 - [ ] Improve Table Detection speed and accuracy by training a Neural Net
-- [ ] More options to have control over more variables in the Advanced tab
 - [ ] Better logging
+- [ ] Improve use of Locks
+- [ ] [Opt] Adding SSL encryption
 
 
 
