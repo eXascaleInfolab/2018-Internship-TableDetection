@@ -2,7 +2,7 @@ import subprocess
 import shlex
 import os
 import signal
-from helper import path_dict, path_number_of_files, pdf_stats, pdf_date_format_to_datetime, dir_size, exists
+from helper import path_dict, path_number_of_files, pdf_stats, pdf_date_format_to_datetime, dir_size, url_status
 import json
 from functools import wraps
 from urllib.parse import urlparse
@@ -19,6 +19,7 @@ from requests import post
 import tabula
 import PyPDF2
 import shutil
+import requests
 
 # ----------------------------- CONSTANTS -----------------------------------------------------------------------------
 
@@ -393,9 +394,14 @@ def index():
         MAX_CRAWLING_DURATION = form.time.data * 60
         PDF_TO_PROCESS = form.pdf.data
 
-        # Check if valid URL with helper funtion in helper module
-        if not exists(url):
-            flash('This URL does not exists. Please try another.', 'danger')
+        # Check if valid URL with function in helper module
+        status_code = url_status(url)
+        if status_code == -1:
+            flash('Impossible to establish contact to given URL, check for typos and format.', 'danger')
+            return render_template('home.html', most_recent_url="none", form=form)
+        elif status_code is not requests.codes.ok:
+            flash('Contact to given url was established, but received back the following status code: '
+                  + str(status_code) + '. (Only status code 200 is accepted at the moment)', 'danger')
             return render_template('home.html', most_recent_url="none", form=form)
 
         # Extract domain name out of url and save in session

@@ -76,14 +76,15 @@ def pdf_date_format_to_datetime(str):
 
 
 # Checks if a URL exists
-def exists(url):
+def url_status(url):
     try:
         r = requests.head(url)
-        return r.status_code == requests.codes.ok
+        return r.status_code
     except:
-        return False
+        return -1
 
 # ----------------------------- DEPRECATED HELPER FUNCTIONS -----------------------------------------------------------
+
 
 # Uses Tabula to detect and extract tables from the pdf's
 # INPUT: path containing pdf's and the maximal number of pdf to analyse
