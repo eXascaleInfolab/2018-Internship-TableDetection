@@ -124,17 +124,17 @@ def crawling_task(self, url='', post_url='', domain='',
         while True:
             try:
                 next_line = process.stderr.readline()
-                # Added try/catch after bug that appears when visiting (probably because latin-1 apostrophe "’"):
+                # Added try/catch after bug that appears when visiting (because of apostrophe "’"):
                 # https://www.edi.admin.ch/edi/it/home/fachstellen/ara/domande-e-risposte/Il-SLR-usa-la-definizione-di-antisemitismo-dell%E2%80%99IHRA.html
                 # Noticed by Jean-Luc.
-                next_line = next_line.decode(encoding='utf-8')
+                decoded_line = next_line.decode(encoding='utf-8')
 
-                post(post_url, json={'event': 'crawl_update', 'data': next_line})
-                logfile.write(next_line)
+                post(post_url, json={'event': 'crawl_update', 'data': decoded_line})
+                logfile.write(decoded_line)
 
             except UnicodeDecodeError as e:
                 # Catch Decoding error.
-                print("UnicodeDecodeError: " + str(e))
+                print("UnicodeDecodeError: " + str(e) + " The bytes trying to get decoded were: " + next_line.hex())
 
             if process.poll() is not None:
                 # Subprocess is finished
