@@ -124,10 +124,10 @@ def crawling_task(self, url='', post_url='', domain='',
         while True:
             try:
                 next_line = process.stderr.readline()
-                # Changed from utf-8 to latin-1 after bug that appears when visiting:
+                # Added try/catch after bug that appears when visiting (probably because latin-1 apostrophe "’"):
                 # https://www.edi.admin.ch/edi/it/home/fachstellen/ara/domande-e-risposte/Il-SLR-usa-la-definizione-di-antisemitismo-dell%E2%80%99IHRA.html
                 # Noticed by Jean-Luc.
-                next_line = next_line.decode(encoding='latin-1')
+                next_line = next_line.decode(encoding='utf-8')
 
                 post(post_url, json={'event': 'crawl_update', 'data': next_line})
                 logfile.write(next_line)
