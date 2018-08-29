@@ -13,6 +13,7 @@
         document.execCommand('copy');
         document.body.removeChild(el);
     };
+
     function copyUrlToClipboard() {
         el = document.createElement('textarea');
         el.value = document.getElementById('pdf-url').innerText;
@@ -327,8 +328,6 @@
         <!-- /.panel -->
     </div>
 </div>
-
-
 
 {% endblock %}
 
