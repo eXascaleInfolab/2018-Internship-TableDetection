@@ -11,7 +11,7 @@ eventlet==0.24.0
 Flask==1.0.2
 Flask-MySQLdb==0.2.0
 Flask-SocketIO==3.0.1
-flower==0.9.2
+flower==1.2.0
 greenlet==0.4.14
 idna==2.7
 itsdangerous==0.24
